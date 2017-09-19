@@ -93,62 +93,63 @@ def process_staff_report(staff_report_html):
     return info_dict
 
 
-with requests.Session() as sess:
-    r = sess.get(city_council_agendas_url)
-    soup = BeautifulSoup(r.text, 'html.parser')
-    agendas = dict()
-    table = soup.find('table', {'class': 'agendaTable'})
-    rows = table.findAll('tr')
-    for row in rows:
-        cells = row.findChildren('td')
-        naive_dt = datetime.datetime.strptime(
-            str(current_year) + " " + cells[0].string.strip(), '%Y %B %d %I:%M %p')
-        local_dt = local_tz.localize(naive_dt, is_dst=None)
-        utc_dt = local_dt.astimezone(pytz.utc)
-        utc_timetuple = utc_dt.timetuple()
-        date = timegm(utc_timetuple)
-        links = []
-        for link in cells[1].findChildren('a', {'href': True}):
-            links.append(link['href'])
-        if cells[1].string == "Agenda":
-            agenda = sess.get(links[0]).text
-            if "CONSENT CALENDAR" in agenda:
-                # Searches the entire HTML text for the words since it's not yet parsed into html by BS
-                soup_agenda = BeautifulSoup(agenda, 'html.parser')
-                tableMeeting = soup_agenda.find(
-                    'table', {'id': 'MeetingDetail'})
-                string_sections = tableMeeting.find_all(
-                    'strong')
-                parent = string_sections[0].find_parent("tr")
-                next_siblings = parent.find_next_siblings("tr")
-                staff_reports = []
-                reports_holder = []
-                for sibling in enumerate(next_siblings):
-                    if (sibling[1].find('strong') == None):
-                        cells = sibling[1].find_all('td')
-                        if len(cells) > 2 and u'Title' in cells[2]['class']:
-                            staff_report = cells[2].find(
-                                'a', {'href': True})
-                            if staff_report is None:
-                                continue
-                            staff_report_href = 'http://santamonicacityca.iqm2.com/Citizens/' + \
-                                staff_report['href']
-                            try:
-                                staff_report_r = sess.get(
-                                    staff_report_href)
-                                staff_report_html = staff_report_r.text.encode(
-                                    'ascii', 'ignore').decode('ascii')
-                                s_r_processed = process_staff_report(
-                                    staff_report_html)
-                                if len(s_r_processed) != 0:
-                                    reports_holder.append(s_r_processed)
-                            except:
-                                print("coult not get: " + staff_report_href)
-                    else:
-                        if len(reports_holder) != 0:
-                            staff_reports.append(reports_holder)
-                        reports_holder = []
-                agendas[date] = staff_reports
-        with io.open('agendas.json', 'w', encoding='utf-8') as temp:
-            s = json.dumps(agendas, ensure_ascii=False)
-            temp.write(unicode(s))
+def get_data():
+    with requests.Session() as sess:
+        r = sess.get(city_council_agendas_url)
+        soup = BeautifulSoup(r.text, 'html.parser')
+        agendas = dict()
+        table = soup.find('table', {'class': 'agendaTable'})
+        rows = table.findAll('tr')
+        for row in rows:
+            cells = row.findChildren('td')
+            naive_dt = datetime.datetime.strptime(
+                str(current_year) + " " + cells[0].string.strip(), '%Y %B %d %I:%M %p')
+            local_dt = local_tz.localize(naive_dt, is_dst=None)
+            utc_dt = local_dt.astimezone(pytz.utc)
+            utc_timetuple = utc_dt.timetuple()
+            date = timegm(utc_timetuple)
+            links = []
+            for link in cells[1].findChildren('a', {'href': True}):
+                links.append(link['href'])
+            if cells[1].string == "Agenda":
+                agenda = sess.get(links[0]).text
+                if "CONSENT CALENDAR" in agenda:
+                    # Searches the entire HTML text for the words since it's not yet parsed into html by BS
+                    soup_agenda = BeautifulSoup(agenda, 'html.parser')
+                    tableMeeting = soup_agenda.find(
+                        'table', {'id': 'MeetingDetail'})
+                    string_sections = tableMeeting.find_all(
+                        'strong')
+                    parent = string_sections[0].find_parent("tr")
+                    next_siblings = parent.find_next_siblings("tr")
+                    staff_reports = []
+                    reports_holder = []
+                    for sibling in enumerate(next_siblings):
+                        if (sibling[1].find('strong') == None):
+                            cells = sibling[1].find_all('td')
+                            if len(cells) > 2 and u'Title' in cells[2]['class']:
+                                staff_report = cells[2].find(
+                                    'a', {'href': True})
+                                if staff_report is None:
+                                    continue
+                                staff_report_href = 'http://santamonicacityca.iqm2.com/Citizens/' + \
+                                    staff_report['href']
+                                try:
+                                    staff_report_r = sess.get(
+                                        staff_report_href)
+                                    staff_report_html = staff_report_r.text.encode(
+                                        'ascii', 'ignore').decode('ascii')
+                                    s_r_processed = process_staff_report(
+                                        staff_report_html)
+                                    if len(s_r_processed) != 0:
+                                        reports_holder.append(s_r_processed)
+                                except:
+                                    print("coult not get: " + staff_report_href)
+                        else:
+                            if len(reports_holder) != 0:
+                                staff_reports.append(reports_holder)
+                            reports_holder = []
+                    agendas[date] = staff_reports
+            
+        return agendas
+        

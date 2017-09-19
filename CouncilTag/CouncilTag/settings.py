@@ -25,7 +25,7 @@ SECRET_KEY = '^=azgctyvokgt(iv(sf0*6k0=gj+#c-!x805u6ofg!27!dpjjw'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '45.63.52.91']
+ALLOWED_HOSTS = ['localhost','counciltag.shariqtorres.name']
 
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'CouncilTag.injest',
     'rest_framework'
 ]
 
@@ -76,8 +77,11 @@ WSGI_APPLICATION = 'CouncilTag.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'counciltag',
+        'USER': 'postgres',
+        'PASSWORD':'root',
+        'HOST':'127.0.0.1',
     }
 }
 
