@@ -24,8 +24,8 @@ def process_staff_report(staff_report_html):
     title = staff_report_soup.find(
         'div', {'class': 'LegiFileTitle'})
     if title != None:
-        title = " ".join(
-            [content.strip() for content in re.split("<[\\a-zA-Z=\- /]*>", title.h1.encode_contents().strip())])
+        title = b" ".join(
+            [content.strip() for content in re.split(b'<[\\a-zA-Z=\- /]*>', title.h1.encode_contents().strip())])
     else:
         return []
     info = staff_report_soup.find(
@@ -135,16 +135,19 @@ def get_data():
                                 staff_report_href = 'http://santamonicacityca.iqm2.com/Citizens/' + \
                                     staff_report['href']
                                 try:
+                                    print(staff_report_href)
                                     staff_report_r = sess.get(
                                         staff_report_href)
-                                    staff_report_html = staff_report_r.text.encode(
-                                        'ascii', 'ignore').decode('ascii')
+                                    staff_report_html = staff_report_r.text
                                     s_r_processed = process_staff_report(
                                         staff_report_html)
                                     if len(s_r_processed) != 0:
                                         reports_holder.append(s_r_processed)
-                                except:
+                                except Exception as e:
                                     print("coult not get: " + staff_report_href)
+                                    print("dsfsdfsd")
+                                    print(e)
+                                    exit()
                         else:
                             if len(reports_holder) != 0:
                                 staff_reports.append(reports_holder)

@@ -5,22 +5,25 @@ from django.core.exceptions import *
 class Command(BaseCommand):
     help = 'Scrapes the Santa Monica website for meeting information'
 
-    def save_agendaitem(agenda_item):
+    def save_agendaitem(self, agenda_item, new_agenda):
         new_agenda_item = AgendaItem()
-        new_agenda_item.department = agenda_item['Department']
-        new_agenda_item.title = agenda_item['title']
-        new_agenda_item.sponsors = agenda_item['Sponsors']
-        if 'body' in agenda_item:
-            new_agenda_item.supplemental = agenda_item['body']['other']
-            new_agenda_item.summary = agenda_item['body']['summary']
-            if 'background' in agenda_item['body']:
-                new_agenda_item.background = agenda_item['body']['background']
-        new_agenda_item.save()
-        if 'recommendations' in agenda_item:
-            new_rec = AgendaRecommendation(recommendations=agenda_item['recommendations'])
-            new_rec.agenda_item = new_agenda_item
-            new_rec.save()
-        return agenda_item
+        for g in agenda_item:
+            new_agenda_item.department = g['Department']
+            new_agenda_item.title = g['title']
+            new_agenda_item.sponsors = g['Sponsors']
+            if 'body' in agenda_item:
+                new_agenda_item.supplemental = g['body']['other']
+                new_agenda_item.summary = ['body']['summary']
+                if 'background' in g['body']:
+                    new_agenda_item.background = g['body']['background']
+            new_agenda.save()
+            new_agenda_item.agenda = new_agenda
+            new_agenda_item.save()
+            if 'recommendations' in g:
+                new_rec = AgendaRecommendation(recommendation=g['recommendations'])
+                new_rec.agenda_item = new_agenda_item
+                new_rec.save()
+            return agenda_item
             
 
     def handle(self, *args, **options):
@@ -32,10 +35,8 @@ class Command(BaseCommand):
         for meeting_time, agenda in agendas.items():
             new_agenda = Agenda(meeting_time = meeting_time)
             new_agenda.committee = committee
-            
             for ag in agenda:
-                ag_item = self.save_agendaitem(ag)
-                ag_item.agenda = new_agenda
-                r =ag_item.save()
-                print(r)
+                
+                ag_item = self.save_agendaitem(ag, new_agenda)
+                
             new_agenda.save()
