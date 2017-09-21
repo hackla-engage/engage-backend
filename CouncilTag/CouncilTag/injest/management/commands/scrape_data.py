@@ -11,9 +11,11 @@ class Command(BaseCommand):
             new_agenda_item.department = g['Department']
             new_agenda_item.title = g['title']
             new_agenda_item.sponsors = g['Sponsors']
-            if 'body' in agenda_item:
-                new_agenda_item.supplemental = g['body']['other']
-                new_agenda_item.summary = ['body']['summary']
+            if 'body' in g:
+                if 'other' in g['body']:
+                    new_agenda_item.supplemental = g['body']['other']
+                if 'summary' in g['body']:
+                    new_agenda_item.summary = g['body']['summary']
                 if 'background' in g['body']:
                     new_agenda_item.background = g['body']['background']
             new_agenda.save()

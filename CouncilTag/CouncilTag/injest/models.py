@@ -15,10 +15,10 @@ class AgendaItem(models.Model):
     background = models.TextField(null=True)
     supplemental = models.TextField(null=True)
     sponsors = models.CharField(max_length=250, null=True)
-    agenda = models.ForeignKey(Agenda)
+    agenda = models.ForeignKey(Agenda, related_name='items')
 
 class AgendaRecommendation(models.Model):
-    agenda_item = models.ForeignKey(AgendaItem)
+    agenda_item = models.ForeignKey(AgendaItem, related_name='recommendations')
     recommendation = models.TextField()
 
 

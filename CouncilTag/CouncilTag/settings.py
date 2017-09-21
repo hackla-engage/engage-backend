@@ -25,7 +25,7 @@ SECRET_KEY = '^=azgctyvokgt(iv(sf0*6k0=gj+#c-!x805u6ofg!27!dpjjw'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','counciltag.shariqtorres.name']
+ALLOWED_HOSTS = ['localhost','counciltag.shariqtorres.name', '127.0.0.1']
 
 
 # Application definition
@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'CouncilTag.injest',
-    'rest_framework'
+    'rest_framework',
+    'CouncilTag.api',
 ]
 
 MIDDLEWARE = [
