@@ -33,7 +33,6 @@ class Command(BaseCommand):
         try:
             committee = Committee.objects.get(name="City Council")
         except ObjectDoesNotExist:
-            print("inside exception")
             Committee(name="City Council").save()
             committee = Committee.objects.get(name="City Council")
         print(committee)
