@@ -22,9 +22,10 @@ class Command(BaseCommand):
             new_agenda_item.agenda = new_agenda
             new_agenda_item.save()
             if 'recommendations' in g:
-                new_rec = AgendaRecommendation(recommendation=g['recommendations'])
-                new_rec.agenda_item = new_agenda_item
-                new_rec.save()
+                for rec in g['recommendations']:
+                    new_rec = AgendaRecommendation(recommendation=rec)
+                    new_rec.agenda_item = new_agenda_item
+                    new_rec.save()
             return agenda_item
             
 
@@ -32,7 +33,10 @@ class Command(BaseCommand):
         try:
             committee = Committee.objects.get(name="City Council")
         except ObjectDoesNotExist:
-            committee = Committee(name="City Council").save()
+            print("inside exception")
+            Committee(name="City Council").save()
+            committee = Committee.objects.get(name="City Council")
+        print(committee)
         agendas = get_data()
         for meeting_time, agenda in agendas.items():
             new_agenda = Agenda(meeting_time = meeting_time)
