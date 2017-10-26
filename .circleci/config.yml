@@ -19,8 +19,6 @@ jobs:
 
     steps:
       - checkout
-      - name: Add DB
-      - command: apt-get update -qq && apt-get install -y build-essential postgresql libpq-dev
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -39,7 +37,10 @@ jobs:
           paths:
             - ./venv
           key: v1-dependencies-{{ checksum "requirements.txt" }}
-        
+
+      - database:
+          override:
+              - psql -U ubuntu -d counciltag -f backup.bak  
       # run tests!
       - run:
           name: run tests
