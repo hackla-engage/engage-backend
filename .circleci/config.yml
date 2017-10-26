@@ -19,6 +19,7 @@ jobs:
 
     steps:
       - checkout
+      - name: Add DB
       - command: apt-get update -qq && apt-get install -y build-essential postgresql libpq-dev
       # Download and cache dependencies
       - restore_cache:
