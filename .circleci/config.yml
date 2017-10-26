@@ -25,7 +25,15 @@ jobs:
           - v1-dependencies-{{ checksum "requirements.txt" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
+      - run:
+          # Add a password to the `ubuntu` user, since Postgres is configured to
+          # always ask for a password without sudo, and fails without one.
+          command: sudo -u postgres psql -p 5433 -c "create user ubuntu with password ‘ubuntu’;”
+          command: sudo -u postgres psql -p 5433 -c "alter user ubuntu with superuser;"
 
+          # Create a new test database.
+          command: sudo -u postgres psql -p 5433 -c "create database test;"
+      
       - run:
           name: install dependencies
           command: |
@@ -38,9 +46,6 @@ jobs:
             - ./venv
           key: v1-dependencies-{{ checksum "requirements.txt" }}
 
-      - database:
-          override:
-              - psql -U ubuntu -d counciltag -f backup.bak  
       # run tests!
       - run:
           name: run tests
