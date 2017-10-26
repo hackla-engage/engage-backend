@@ -32,7 +32,7 @@ jobs:
           command: sudo -u postgres psql -p 5433 -c "alter user ubuntu with superuser;"
 
           # Create a new test database.
-          command: sudo -u postgres psql -p 5433 -c "create database test;"
+          command: sudo -u ubuntu psql -p 5433 -c "create database test;"
       
       - run:
           name: install dependencies
