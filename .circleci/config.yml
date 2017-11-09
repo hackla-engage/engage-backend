@@ -50,12 +50,13 @@ jobs:
       - store_artifacts:
           path: test-reports
           destination: test-reports
-#   deploy:
-#     master:
-#       branch: master
-
-#       command: |
-#         ssh counciltag@counciltag.shariqtorres.name 'cd /var/www/counciltag/CouncilTag-Django && git pull master && cd CouncilTag && python manage.py collectstatic --noinput'
+  deploy:
+    master:
+      branch: master
+      steps:
+        - run:
+        command: |
+          ssh counciltag@counciltag.shariqtorres.name 'cd /var/www/counciltag/CouncilTag-Django && git pull master && cd CouncilTag && python manage.py collectstatic --noinput'
 
 
 # build_and_test:
