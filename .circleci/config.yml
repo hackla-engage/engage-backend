@@ -51,11 +51,11 @@ jobs:
           path: test-reports
           destination: test-reports
   deploy:
-    branch: master
-      run:
-        name: deploy
-        command: |
-          ssh counciltag@counciltag.shariqtorres.name 'cd /var/www/counciltag/CouncilTag-Django && git pull master && cd CouncilTag && python manage.py collectstatic --noinput'
+    steps:
+      - run:
+          name: deploy
+          command: |
+            ssh counciltag@counciltag.shariqtorres.name 'cd /var/www/counciltag/CouncilTag-Django && git pull master && cd CouncilTag && python manage.py collectstatic --noinput'
 
 
 build_and_test:
