@@ -58,16 +58,15 @@ jobs:
             ssh counciltag@counciltag.shariqtorres.name 'cd /var/www/counciltag/CouncilTag-Django && git pull master && cd CouncilTag && python manage.py collectstatic --noinput'
 
 
-version: 2
-  build_and_test:
-    jobs:
-      - build
-      - test:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
-      - deploy
+build_and_test:
+  jobs:
+    - build
+    - test:
+        requires:
+          - build
+        filters:
+          branches:
+            only: master
+    - deploy
 
           
