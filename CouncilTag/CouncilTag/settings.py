@@ -126,3 +126,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATIC_ROOT = '/var/www/public'
+
+import dj_database_url
+DATABASES['default'] = dj_database_url.config()
