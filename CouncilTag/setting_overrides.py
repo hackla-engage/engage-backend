@@ -3,8 +3,8 @@ import os
 def configure_overrides(settings):
     #this is the codeship environment
     if os.getlogin() == "rof":
-        settings.update(dict(
-            DATABASES = {
+        settings['DATABASES'].update(dict(
+            {
                 'default': {
                     'ENGINE': 'django.db.backends.postgresql',
                     'NAME': 'test',
