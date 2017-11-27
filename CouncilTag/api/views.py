@@ -8,7 +8,7 @@ from CouncilTag.api.serializers import AgendaSerializer
 @api_view(['GET'])
 def list_agendas(request, format=None):
     '''
-    dfsfs
+    dfsfs22333
     '''
     agendas = Agenda.objects.all()
     serializer = AgendaSerializer(agendas, many=True)
