@@ -137,3 +137,5 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 import dj_database_url
 DATABASES['default'] = dj_database_url.config()
+DATABASES['default']['USER'] = os.environ.get('PGUSER')
+DATABASES['default']['PASSWORD'] = os.environ.get('PGPASSWORD')
