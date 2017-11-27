@@ -141,4 +141,4 @@ DATABASES['default'] = dj_database_url.config()
 if os.getlogin() == "rof":
     DATABASES['default']['USER'] = os.environ.get('PGUSER')
     DATABASES['default']['PASSWORD'] = os.environ.get('PGPASSWORD')
-    DATABASES['default']['host'] = 'localhost'
+    DATABASES['default']['HOST'] = 'localhost'
