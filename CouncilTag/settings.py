@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+import dj_database_url
+from setting_overrides import configure_overrides
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,7 +27,7 @@ SECRET_KEY = '^=azgctyvokgt(iv(sf0*6k0=gj+#c-!x805u6ofg!27!dpjjw'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','council-tag.herokuapp.com', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', 'council-tag.herokuapp.com', '127.0.0.1']
 
 
 # Application definition
@@ -134,17 +136,6 @@ STATICFILES_DIRS = (
 )
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
-
-import dj_database_url
 DATABASES['default'] = dj_database_url.config()
 
-if os.getlogin() == "rof":
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'test',
-            'USER': os.environ.get('PGUSER'),
-            'PASSWORD':os.environ.get('PGPASSWORD'),
-            'HOST':'127.0.0.1',
-        }
-    }
+configure_overrides(globals())
