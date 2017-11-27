@@ -139,6 +139,12 @@ import dj_database_url
 DATABASES['default'] = dj_database_url.config()
 
 if os.getlogin() == "rof":
-    DATABASES['default']['USER'] = os.environ.get('PGUSER')
-    DATABASES['default']['PASSWORD'] = os.environ.get('PGPASSWORD')
-    DATABASES['default']['HOST'] = 'localhost'
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'test',
+            'USER': os.environ.get('PGUSER'),
+            'PASSWORD':os.environ.get('PGPASSWORD'),
+            'HOST':'127.0.0.1',
+        }
+    }
