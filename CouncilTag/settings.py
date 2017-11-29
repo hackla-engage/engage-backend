@@ -138,4 +138,4 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 DATABASES['default'] = dj_database_url.config()
 
-configure_overrides(globals())
+#configure_overrides(globals())
