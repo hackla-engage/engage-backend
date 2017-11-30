@@ -19,3 +19,12 @@ class TestAgendasEndpoint(TestCase):
         response = self.client.get("/api/agendas.json")
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(response.json()))
+
+
+class TestTagsEndpoint(TestCase):
+    def test_response(self):
+        response = self.client.get("/api/tags.json")
+        self.assertEqual(200, response.status_code)
+        from CouncilTag.injest.management.commands.populate_tags import seed_tags
+        #we just want to make sure that we have atleast the seed tags in the db
+        self.assertGreaterEqual(len(seed_tags), len(response.json()))

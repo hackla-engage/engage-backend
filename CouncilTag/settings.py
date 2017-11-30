@@ -78,15 +78,19 @@ WSGI_APPLICATION = 'CouncilTag.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'counciltag',
-        'USER': 'postgres',
-        'PASSWORD':'root',
-        'HOST':'localhost',
+if os.environ.get("CouncilTag") == "local":
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'counciltag',
+            'USER': 'postgres',
+            'PASSWORD':'root',
+            'HOST':'localhost',
+        }
     }
-}
+else:
+    DATABASES['default'] = dj_database_url.config()
 
 
 # Password validation
@@ -135,6 +139,4 @@ STATICFILES_DIRS = (
 )
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
-DATABASES['default'] = dj_database_url.config()
 
-#configure_overrides(globals())
