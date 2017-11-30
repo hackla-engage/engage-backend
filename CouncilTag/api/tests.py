@@ -28,3 +28,12 @@ class TestTagsEndpoint(TestCase):
         from CouncilTag.injest.management.commands.populate_tags import seed_tags
         #we just want to make sure that we have atleast the seed tags in the db
         self.assertGreaterEqual(len(seed_tags), len(response.json()))
+
+class TestLoginEndpoint(TestCase):
+    def test_response(self):
+        response = self.client.post("/api/login")
+        self.assertEqual(201, response.status_code)
+    
+    def test_user_creation(self):
+        response = self.client.post("/api/login")
+        
