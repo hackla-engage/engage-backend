@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from CouncilTag.injest.models import Tag
+from CouncilTag.ingest.models import Tag
 
 seed_tags = [
     "Community",

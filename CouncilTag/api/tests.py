@@ -1,6 +1,6 @@
 from django.test import TestCase
 import json
-from CouncilTag.injest.models import Agenda, Committee
+from CouncilTag.ingest.models import Agenda, Committee
 import jwt
 from CouncilTag import settings
 from django.contrib.auth.models import User
@@ -30,7 +30,7 @@ class TestTagsEndpoint(TestCase):
     def test_response(self):
         response = self.client.get("/api/tags.json")
         self.assertEqual(200, response.status_code)
-        from CouncilTag.injest.management.commands.populate_tags import seed_tags
+        from CouncilTag.ingest.management.commands.populate_tags import seed_tags
         #we just want to make sure that we have atleast the seed tags in the db
         self.assertGreaterEqual(len(seed_tags), len(response.json()))
 
