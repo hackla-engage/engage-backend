@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                 ('background', models.TextField()),
                 ('supplemental', models.TextField()),
                 ('sponsors', models.CharField(max_length=250)),
-                ('agenda', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='injest.Agenda')),
+                ('agenda', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='ingest.Agenda')),
             ],
         ),
         migrations.CreateModel(
@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('recommendation', models.TextField()),
-                ('agenda', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='injest.AgendaItem')),
+                ('agenda', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='ingest.AgendaItem')),
             ],
         ),
         migrations.CreateModel(
@@ -52,6 +52,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='agenda',
             name='committee',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='injest.Committee'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='ingest.Committee'),
         ),
     ]

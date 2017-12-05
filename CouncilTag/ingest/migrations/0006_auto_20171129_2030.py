@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('injest', '0005_engageuser'),
+        ('ingest', '0005_engageuser'),
     ]
 
     operations = [

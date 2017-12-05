@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('auth', '0008_alter_user_username_max_length'),
-        ('injest', '0004_auto_20171129_1959'),
+        ('ingest', '0004_auto_20171129_1959'),
     ]
 
     operations = [
@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             name='EngageUser',
             fields=[
                 ('user_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL)),
-                ('tags', models.ManyToManyField(to='injest.Tags')),
+                ('tags', models.ManyToManyField(to='ingest.Tags')),
             ],
             options={
                 'verbose_name': 'user',

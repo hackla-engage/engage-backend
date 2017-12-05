@@ -9,7 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('injest', '0003_auto_20170920_0045'),
+        ('ingest', '0003_auto_20170920_0045'),
     ]
 
     operations = [
@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('firstname', models.CharField(max_length=250)),
                 ('lastname', models.CharField(max_length=250)),
                 ('email', models.EmailField(max_length=254)),
-                ('committee', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='members', to='injest.Committee')),
+                ('committee', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='members', to='ingest.Committee')),
             ],
         ),
         migrations.CreateModel(
@@ -33,16 +33,16 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='agendaitem',
             name='agenda',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='items', to='injest.Agenda'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='items', to='ingest.Agenda'),
         ),
         migrations.AlterField(
             model_name='agendarecommendation',
             name='agenda_item',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='recommendations', to='injest.AgendaItem'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='recommendations', to='ingest.AgendaItem'),
         ),
         migrations.AddField(
             model_name='agendaitem',
             name='tags',
-            field=models.ManyToManyField(to='injest.Tags'),
+            field=models.ManyToManyField(to='ingest.Tags'),
         ),
     ]
