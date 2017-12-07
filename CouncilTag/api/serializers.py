@@ -6,6 +6,11 @@ class CommitteeSerializer(serializers.ModelSerializer):
         model = Committee
         fields = '__all__'
 
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = '__all__'
+
 class AgendaRecommendationSerializer(serializers.ModelSerializer):
     class Meta:
         model = AgendaRecommendation
@@ -21,11 +26,9 @@ class AgendaItemSerializer(serializers.ModelSerializer):
 class AgendaSerializer(serializers.ModelSerializer):
     items = AgendaItemSerializer(many=True, read_only=True)
     committee = CommitteeSerializer(read_only=True)
+    tags = TagSerializer(many=True, read_only=True )
     class Meta:
         model = Agenda
         fields ='__all__'
 
-class TagSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tag
-        fields = '__all__'
+

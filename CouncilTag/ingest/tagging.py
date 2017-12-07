@@ -34,6 +34,10 @@ class RandomTagEngine(TagEngine):
         self.tags = Tag.objects.all()
     
     def find_tags(self, agenda_item):
+        '''
+        find_tags takes an Agenda Item and outputs
+        a list of Tag objects
+        '''
         n1 = 0
         n2 = 0
         while n1 == n2:
@@ -42,6 +46,11 @@ class RandomTagEngine(TagEngine):
         return [ self.tags[n1], self.tags[n2] ]
 
     def apply_tags(self, agenda_item, tags):
+        '''
+        apply_tags takes an Agenda Item and a list of Tag objects. The side
+        effect of this function will be saving the tag association with the 
+        Agenda Item
+        '''
         for t in tags:
             agenda_item.tags.add(t)
         

@@ -1,6 +1,6 @@
 from django.test import TestCase
 import json
-from CouncilTag.ingest.models import Agenda, Committee
+from CouncilTag.ingest.models import Agenda, Committee, Tag, AgendaItem
 import jwt
 from CouncilTag import settings
 from django.contrib.auth.models import User
@@ -19,7 +19,6 @@ class TestAgendasEndpoint(TestCase):
         committee = Committee(name="test")
         committee.save()
         print(committee)
-        self.assertEqual(1, committee.id)
         Agenda(meeting_time=393939393, committee=committee).save()
         response = self.client.get("/api/agendas.json")
         self.assertEqual(200, response.status_code)
@@ -51,6 +50,22 @@ class TestLoginEndpoint(TestCase):
         self.assertEqual(404, response.status_code)
 
 
-
+class TestAgendasByTagEndpoint(TestCase):
+    def test_response(self):
+        tag = Tag(name="Test")
+        tag.save()
+        committee = Committee(name="Council")
+        committee.save()
+        agenda = Agenda(meeting_time=949494949, committee=committee)
+        agenda.save()
+        agenda_item = AgendaItem(title="test", department="test", agenda=agenda )
+        agenda_item.save()
+        agenda_item.tags.add(tag)
+        agenda_item.save()
+        response = self.client.get("/api/tag/Test/agenda/items.json")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual("Test", response.json()['tag'])
+        self.assertEqual(1, len(response.json()['items']))
+        self.assertEqual("test", response.json()['items'][0]['title'])
 
         
