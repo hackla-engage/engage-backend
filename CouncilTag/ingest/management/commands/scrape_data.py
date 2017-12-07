@@ -1,11 +1,13 @@
 from django.core.management.base import BaseCommand, CommandError
-from CouncilTag.injest.models import Committee, Agenda, AgendaItem, AgendaRecommendation
-from CouncilTag.injest.data import get_data
+from CouncilTag.ingest.models import Committee, Agenda, AgendaItem, AgendaRecommendation
+from CouncilTag.ingest.data import get_data
 from django.core.exceptions import *
+from CouncilTag.ingest.tagging import RandomTagEngine
 class Command(BaseCommand):
     help = 'Scrapes the Santa Monica website for meeting information'
 
     def save_agendaitem(self, agenda_item, new_agenda):
+        random_tagger = RandomTagEngine()
         new_agenda_item = AgendaItem()
         for g in agenda_item:
             new_agenda_item.department = g['Department']
@@ -21,6 +23,8 @@ class Command(BaseCommand):
             new_agenda.save()
             new_agenda_item.agenda = new_agenda
             new_agenda_item.save()
+            tags = random_tagger.find_tags(new_agenda_item)
+            random_tagger.apply_tags(new_agenda_item, tags)
             if 'recommendations' in g:
                 for rec in g['recommendations']:
                     new_rec = AgendaRecommendation(recommendation=rec)

@@ -10,6 +10,7 @@ configparser==3.5.0
 dj-database-url==0.4.2
 dj-static==0.0.6
 Django==1.11.5
+django-cors-headers==2.1.0
 django-tools==0.36.0
 djangorestframework==3.6.4
 enum34==1.1.6
@@ -22,6 +23,7 @@ lxml==4.1.1
 mccabe==0.6.1
 psycopg2==2.7.3.1
 pycodestyle==2.3.1
+PyJWT==1.5.3
 pylint==1.7.2
 PyMySQL==0.7.11
 pytz==2017.2

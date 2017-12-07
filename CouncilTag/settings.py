@@ -38,12 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'CouncilTag.injest',
+    'CouncilTag.ingest',
     'rest_framework',
     'CouncilTag.api',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -78,15 +80,20 @@ WSGI_APPLICATION = 'CouncilTag.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'counciltag',
-        'USER': 'postgres',
-        'PASSWORD':'root',
-        'HOST':'localhost',
+if os.environ.get("CouncilTag") == "local":
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'counciltag',
+            'USER': 'postgres',
+            'PASSWORD':'root',
+            'HOST':'localhost',
+        }
     }
-}
+else:
+    DATABASES = {}
+    DATABASES['default'] = dj_database_url.config()
 
 
 # Password validation
@@ -135,6 +142,7 @@ STATICFILES_DIRS = (
 )
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
-DATABASES['default'] = dj_database_url.config()
+CORS_ORIGIN_ALLOW_ALL = True
+AUTHENTICATION_BACKENDS = ['CouncilTag.api.backends.EmailPasswordBackend']
 
-#configure_overrides(globals())
+CORS_URLS_REGEX = r'^/api/.*$'

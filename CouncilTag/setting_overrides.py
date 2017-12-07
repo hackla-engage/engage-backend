@@ -1,16 +1,7 @@
-import os
+from CouncilTag.settings import *
 
-def configure_overrides(settings):
-    #this is the codeship environment
-    if os.getlogin() == "rof":
-        settings['DATABASES'].update(dict(
-            {
-                'default': {
-                    'ENGINE': 'django.db.backends.postgresql',
-                    'NAME': 'test',
-                    'USER': os.environ.get('PGUSER'),
-                    'PASSWORD':os.environ.get('PGPASSWORD'),
-                    'HOST':'127.0.0.1',
-                }
-            }
-        ))
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3'
+    }
+}
