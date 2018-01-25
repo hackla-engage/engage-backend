@@ -50,6 +50,17 @@ class TestLoginEndpoint(TestCase):
         self.assertEqual(404, response.status_code)
 
 
+    def test_user_signup(self):
+        user_info = {
+            "name": "Test Testman",
+            "email": "test@test.com",
+            "password": "test"
+        }
+        response = self.client.post("/api/signup.json", user_info )
+        self.assertEqual(201, response.status_code)
+        user = User.objects.get(email="test@test.com")
+        self.assertEqual(user_info['email'], user.email)
+
 class TestAgendasByTagEndpoint(TestCase):
     def test_response(self):
         tag = Tag(name="Test")
@@ -68,4 +79,13 @@ class TestAgendasByTagEndpoint(TestCase):
         self.assertEqual(1, len(response.json()['items']))
         self.assertEqual("test", response.json()['items'][0]['title'])
 
-        
+
+#class TestAssociateTagWithUser(TestCase):
+#    def test_response(self):
+#        user_to_test_against = User.objects.create_user("test", email="test@test.com", password='test')
+#        response = self.client.post("/api/login.json", {'email':'test@test.com', 'password': 'test'})
+#        self.assertEqual(201, response.status_code)
+#        response = self.client.post("/api/user/add/tag.json", {"tag":"Test"})
+#        self.assertEqual(200, response.status_code)
+
+    

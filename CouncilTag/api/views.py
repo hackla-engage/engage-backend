@@ -6,6 +6,7 @@ from CouncilTag.ingest.models import Agenda, Tag, AgendaItem
 from CouncilTag.api.serializers import AgendaSerializer, TagSerializer, AgendaItemSerializer
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 import jwt, json
 from CouncilTag import settings
 from rest_framework.renderers import JSONRenderer
@@ -14,7 +15,7 @@ from rest_framework.renderers import JSONRenderer
 @api_view(['GET'])
 def list_agendas(request, format=None):
     '''
-    dfsfs22333
+    List all of the agends stored in the database
     '''
     agendas = Agenda.objects.all()
     serializer = AgendaSerializer(agendas, many=True)
@@ -34,7 +35,7 @@ def list_tags(request, format=None):
 @api_view(['POST'])
 def login_user(request, format=None):
     '''
-    Login a current user. Expects a username and password
+    Login a current user. Expects an email address and password
     '''
     email = request.POST['email']
     password = request.POST['password']
@@ -47,6 +48,21 @@ def login_user(request, format=None):
         return Response(status=404, data={"error":"wrong username and password"})
 
 
+
+
+@api_view(['POST'])
+def signup_user(request, format=None):
+    '''
+    Signup a new user. Expects a email address and a password.
+    '''
+    email = request.POST['email']
+    password = request.POST['password']
+    username = request.POST['name']
+    user = User.objects.create_user(username, email, password)
+    token = jwt.encode({"user":user.username}, settings.SECRET_KEY) 
+    return Response({"token": token}, status=201)
+
+
 @api_view(['GET'])
 def get_agendaitem_by_tag(request, tag_name):
     agenda_items = AgendaItem.objects.filter(tags__name = tag_name)
@@ -55,3 +71,8 @@ def get_agendaitem_by_tag(request, tag_name):
     data['tag'] = tag_name
     data['items'] = serialized_items.data
     return Response(data=data)
+
+@login_required
+@api_view(['POST'])
+def add_tag_to_user(request, format=None):
+    return Response(status=200)
