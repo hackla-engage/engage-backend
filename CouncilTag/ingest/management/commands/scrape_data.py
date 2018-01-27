@@ -11,7 +11,7 @@ class Command(BaseCommand):
         new_agenda_item = AgendaItem()
         for g in agenda_item:
             new_agenda_item.department = g['Department']
-            new_agenda_item.title = g['title']
+            new_agenda_item.title = g['Title']
             new_agenda_item.sponsors = g['Sponsors']
             if 'body' in g:
                 if 'other' in g['body']:
