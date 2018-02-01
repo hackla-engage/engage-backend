@@ -1,45 +1,25 @@
 const path = require('path');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+var webpack = require('webpack')
+var config = require("./webpack.config.base")
+var BundleTracker = require('webpack-bundle-tracker')
 
-module.exports = {
-  entry: ["babel-polyfill", "./react-app/app.js"],
-  output: {
-    path: path.join(__dirname, 'CouncilTag', "static"),
-    filename: 'bundle.js'
-  },
-  module: {
-    rules: [
-      {
-        loader: 'babel-loader',
-        test: /\.js$|\.jsx$/,
-        exclude: /node_modules/
-      },
-      {
-        test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader',
-        ]
-      },
-      {
-        test: /\.scss$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          'sass-loader',
-        ]
-      },
-    ]
-  },
-  plugins: [
+
+  config.plugins = config.plugins.concat([
     new UglifyJSPlugin({
       uglifyOptions: {
         sourcemap: false
       }
-    })
-  ],
+    }),
+    new BundleTracker({filename: './webpack-stats-local.json'}),
+
+  ]);
+
+  config.module.loaders.push(
+    // { test: /\.jsx?$/, exclude: /node_modules/, loaders: [babel'] }
+  )
   // Dev tools are provided by webpack
   // Source maps help map errors to original react code
   // devtool: 'cheap-module-eval-source-map',
 
-};
+module.exports = config
