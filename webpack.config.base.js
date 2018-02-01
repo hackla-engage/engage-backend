@@ -28,8 +28,14 @@ module.exports = {
           'sass-loader',
         ]
       },
-    ]
+    ],
+    loaders: []
   },
+  resolve: {
+    modules:["node_modules", "react-app"],
+    extensions: ['.js', '.jsx']
+  },
+  plugins: [],
   // Dev tools are provided by webpack
   // Source maps help map errors to original react code
   devtool: 'cheap-module-eval-source-map',
