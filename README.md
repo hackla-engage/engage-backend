@@ -37,9 +37,12 @@ In order, these commands will 1) create the SQL tables needed, 2) load our list 
 
 11. Now go back to http://localhost:8000 and will see the homepage 
 
+
 ## Continous Delivery
 
 We have setup a continous integration with Heroku. When you push to the `prod` branch on this repo, this will trigger a build on the server. This will also run the Django test suite. If the tests fail, the build will not go through. 
+
+Before you push to `prod`, you will have to do run `npm run-script build` to generate a `bundle.js` that can served from the static folder
 
 
 ## Django documentation

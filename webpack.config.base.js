@@ -35,13 +35,5 @@ module.exports = {
     modules:["node_modules", "react-app"],
     extensions: ['.js', '.jsx']
   },
-  plugins: [],
-  // Dev tools are provided by webpack
-  // Source maps help map errors to original react code
-  devtool: 'cheap-module-eval-source-map',
-
-  // Configuration for webpack-dev-server
-  devServer: {
-    contentBase: path.join(__dirname, 'CouncilTag', 'static')
-  }
+  plugins: []
 };

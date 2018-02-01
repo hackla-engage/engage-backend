@@ -17,6 +17,7 @@
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-env": "^1.6.0",
     "babel-preset-react": "^6.24.1",
+    "core-js": "^2.5.3",
     "css-loader": "^0.28.7",
     "live-server": "^1.2.0",
     "lodash": "^4.17.4",
@@ -24,6 +25,7 @@
     "query-string": "^5.0.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
+    "react-hot-loader": "^1.3.0",
     "react-redux": "^5.0.6",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
@@ -34,9 +36,8 @@
     "sass-loader": "^6.0.6",
     "style-loader": "^0.18.2",
     "uglifyjs-webpack-plugin": "^1.0.1",
-    "react-hot-loader": "^1.3.0",
-    "webpack-bundle-tracker": "0.0.93",
-    "webpack": "^3.6.0"
+    "webpack": "^3.6.0",
+    "webpack-bundle-tracker": "0.0.93"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

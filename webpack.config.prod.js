@@ -2,6 +2,7 @@ const path = require('path');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 var webpack = require('webpack')
 var config = require("./webpack.config.base")
+var BundleTracker = require('webpack-bundle-tracker')
 
 
   config.plugins = config.plugins.concat([
@@ -9,7 +10,9 @@ var config = require("./webpack.config.base")
       uglifyOptions: {
         sourcemap: false
       }
-    })
+    }),
+    new BundleTracker({filename: './webpack-stats-local.json'}),
+
   ]);
 
   config.module.loaders.push(
