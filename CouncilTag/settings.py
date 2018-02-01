@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'CouncilTag.ingest',
     'rest_framework',
     'CouncilTag.api',
+    'CouncilTag.frontend',
     'corsheaders',
 ]
 

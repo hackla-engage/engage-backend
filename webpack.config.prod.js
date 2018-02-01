@@ -1,9 +1,10 @@
 const path = require('path');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = {
   entry: ["babel-polyfill", "./react-app/app.js"],
   output: {
-    path: path.join(__dirname, 'CouncilTag', 'static'),
+    path: path.join(__dirname, 'CouncilTag', "static"),
     filename: 'bundle.js'
   },
   module: {
@@ -30,16 +31,15 @@ module.exports = {
       },
     ]
   },
-  resolve: {
-    modules:["node_modules", "react-app"],
-    extensions: ['.js', '.jsx']
-  },
+  plugins: [
+    new UglifyJSPlugin({
+      uglifyOptions: {
+        sourcemap: false
+      }
+    })
+  ],
   // Dev tools are provided by webpack
   // Source maps help map errors to original react code
-  devtool: 'cheap-module-eval-source-map',
+  // devtool: 'cheap-module-eval-source-map',
 
-  // Configuration for webpack-dev-server
-  devServer: {
-    contentBase: path.join(__dirname, 'CouncilTag', 'static')
-  }
 };
