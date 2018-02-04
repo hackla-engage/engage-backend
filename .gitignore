@@ -103,3 +103,6 @@ ENV/
 council-env/
 council-tag/
 node_modules/
+
+# webpack stats
+webpack-stats-local.json
