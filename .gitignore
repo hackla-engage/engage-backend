@@ -84,6 +84,7 @@ celerybeat-schedule
 
 # virtualenv
 .venv
+.ve3
 venv/
 ENV/
 
@@ -103,3 +104,11 @@ ENV/
 council-env/
 council-tag/
 node_modules/
+
+# vscode folder
+.vscode
+.DS_Store
+
+*.bundle.js
+
+webpack-stats-local.json
