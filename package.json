@@ -19,7 +19,6 @@
     "babel-preset-react": "^6.24.1",
     "core-js": "^2.5.3",
     "css-loader": "^0.28.7",
-    "live-server": "^1.2.0",
     "lodash": "^4.17.4",
     "node-sass": "^4.5.3",
     "query-string": "^5.0.0",
@@ -50,6 +49,7 @@
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^6.0.2",
     "eslint-plugin-react": "^7.4.0",
+    "live-server": "^1.2.0",
     "webpack-dev-server": "^2.8.2"
   }
 }
