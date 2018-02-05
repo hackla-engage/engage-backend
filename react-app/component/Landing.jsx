@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import styles from './Landing.scss';
-// import styles from './Header.scss';
 import {
   Button,
   Container,
@@ -20,7 +19,7 @@ const Landing = (props) =>{
         style={{ position: 'relative', minHeight: 700, padding: '1em 0em' }}
         vertical
       >
-        <Container text style={{}}>
+        <Container text>
           <Header
             as='h1'
             content='Engage'
@@ -43,14 +42,13 @@ const Landing = (props) =>{
           width: '100%',
         }}>
           <Image 
-            src="/static/image/city-council.jpg"
+            src="/static/image/city-council@2x.jpg"
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
               zIndex: -1,
               width: '100%',
-              opacity: 0.4,
               height: 'auto',
               minHeight: '700px',
               objectFit: 'cover',
