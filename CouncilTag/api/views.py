@@ -2,9 +2,8 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from CouncilTag.ingest.models import Agenda, Tag, AgendaItem
+from CouncilTag.ingest.models import Agenda, Tag, AgendaItem, EngageUser
 from CouncilTag.api.serializers import AgendaSerializer, TagSerializer, AgendaItemSerializer
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 import jwt, json
@@ -21,6 +20,20 @@ def list_agendas(request, format=None):
     serializer = AgendaSerializer(agendas, many=True)
     return Response(serializer.data)
 
+@api_view(['GET'])
+def list_agenda_items(request, format=None):
+  '''
+  List the agendas stored in the database ordered by date only
+  for the user's preferred tags
+  '''
+  print("here in list agenda items")
+  print(request.user.tags)
+  # request.body.preferences as in docstring
+  # agenda_items = AgendaItem.objects.filter(tags__in=json_of_body["preferences"]).distinct()
+  # agenda_items_serializer = AgendaItemSerializer(agenda_items, many=True)
+  # return Response(agenda_items_serializer.data)
+  return Response()
+    
 
 @api_view(['GET'])
 def list_tags(request, format=None):
@@ -58,7 +71,7 @@ def signup_user(request, format=None):
     email = request.POST['email']
     password = request.POST['password']
     username = request.POST['name']
-    user = User.objects.create_user(username, email, password)
+    user = EngageUser.objects.create_user(username, email, password)
     token = jwt.encode({"user":user.username}, settings.SECRET_KEY) 
     return Response({"token": token}, status=201)
 

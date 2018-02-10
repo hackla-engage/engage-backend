@@ -32,8 +32,16 @@ class CommitteeMember(models.Model):
     email = models.EmailField()
     committee = models.ForeignKey(Committee, related_name='members')
 
+class OauthProvider(models.Model):
+    provider_name = models.CharField(max_length=250, primary_key=True)
+    oauth_url = models.CharField(max_length=250)
+    access_token_url = models.CharField(max_length=250)
+    base_url = models.CharField(max_length = 250)
 
 class EngageUser(User):
     tags = models.ManyToManyField(Tag)
+    client_id = models.CharField(max_length=255)
+    oauth_provider = models.ForeignKey('OauthProvider', null=True, blank=True)
+
 
 
