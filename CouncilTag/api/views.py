@@ -149,6 +149,11 @@ def del_tag_from_user(request, format=None):
     return Response(status=200)
 
 def array_of_ordereddict_to_list_of_names(tags_ordereddict_array):
+  """
+  Serializers have a funny organization that isn't helpful in making further queries
+  Here we take the list of ordered dictionaries (id: x, name: y) and pull out the name only
+  and put that in a names list to return
+  """
   names = []
   length = len(list(tags_ordereddict_array))
   for i in range(length):
