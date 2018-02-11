@@ -39,7 +39,8 @@ def list_agenda_items(request, format=None):
     tags_serialized = TagSerializer(tags_query_set, many=True)
     # tag_names is a list of strings
     tag_names = array_of_ordereddict_to_list_of_names(tags_serialized.data)
-    agenda_items = AgendaItem.objects.filter(tags__name__contains=tag_names).filter(agenda__meeting_time__contained_by=NumericRange(request._data['begin'], request._data['end']))
+    print(request._data)
+    agenda_items = AgendaItem.objects.filter(tags__name__in=tag_names).filter(agenda__meeting_time__contained_by=NumericRange(request._data['begin'], request._data['end']))
     serialized_items = AgendaItemSerializer(agenda_items, many=True)
     data = {}
     data['tags'] = tag_names
