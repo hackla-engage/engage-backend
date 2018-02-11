@@ -117,10 +117,11 @@ def add_tag_to_user(request, format=None):
     profile = EngageUserProfile.objects.get(user=request.user)
     for tag in request._data["tags"]:
       try:
-        tag_to_add = Tag.objects.get(name=tag)
+        print(tag)
+        tag_to_add = Tag.objects.filter(name__contains=tag).first()
         profile.tags.add(tag_to_add)
       except:
-        print("Could not add tag (" + tag + ") to user ("+request.user+") since it doesn't exist in the ingest_tag table.")
+        print("Could not add tag (" + tag + ") to user ("+request.user.username+") since it doesn't exist in the ingest_tag table.")
     try:
       profile.save()
     except:
@@ -139,7 +140,7 @@ def del_tag_from_user(request, format=None):
       return Response({"error": "tags were not included"}, status=400)
     profile = EngageUserProfile.objects.get(user=request.user)
     for tag in request._data["tags"]:
-      tag_to_remove = Tag.objects.get(name=tag)
+      tag_to_remove = Tag.objects.filter(name__contains=tag).first()
       profile.tags.remove(tag_to_remove)
     try:
       profile.save()
