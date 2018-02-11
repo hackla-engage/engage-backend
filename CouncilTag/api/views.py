@@ -39,7 +39,6 @@ def list_agenda_items(request, format=None):
     tags_serialized = TagSerializer(tags_query_set, many=True)
     # tag_names is a list of strings
     tag_names = array_of_ordereddict_to_list_of_names(tags_serialized.data)
-    print(request._data)
     agenda_items = AgendaItem.objects.filter(tags__name__in=tag_names).filter(agenda__meeting_time__contained_by=NumericRange(request._data['begin'], request._data['end']))
     serialized_items = AgendaItemSerializer(agenda_items, many=True)
     data = {}
@@ -133,7 +132,7 @@ def add_tag_to_user(request, format=None):
 def del_tag_from_user(request, format=None):
     '''
     /user/del/tag/ JSON body attribute should have an array of tags
-    to delete from an EngageUser (an array of 1 at least). The user must
+    to delete from an EngageUserProfile (an array of 1 at least). The user must
     be logged in for this.
     '''
     if len(request._data["tags"]) == 0:
