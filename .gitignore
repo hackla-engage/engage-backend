@@ -112,3 +112,6 @@ node_modules/
 *.bundle.js
 
 webpack-stats-local.json
+
+# migrations?
+migrations/0*.py
