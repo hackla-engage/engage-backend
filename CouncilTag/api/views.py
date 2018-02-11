@@ -117,7 +117,6 @@ def add_tag_to_user(request, format=None):
     profile = EngageUserProfile.objects.get(user=request.user)
     for tag in request._data["tags"]:
       try:
-        print(tag)
         tag_to_add = Tag.objects.filter(name__contains=tag).first()
         profile.tags.add(tag_to_add)
       except:
