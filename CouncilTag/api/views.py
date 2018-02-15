@@ -34,7 +34,6 @@ def list_agenda_items(request, format=None):
     we get the most recent agenda items and return those 
   '''
   # Is there no test for figuring if req.user is of AnonymousUser type?
-  print(type(request.user))
   if (not isinstance(request.user, AnonymousUser)):
     profile = EngageUserProfile.objects.get(user=request.user)
     tags_query_set = profile.tags.all()
