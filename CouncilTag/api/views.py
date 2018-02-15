@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from CouncilTag.ingest.models import Agenda, Tag, AgendaItem, EngageUserProfile
 from CouncilTag.api.serializers import AgendaSerializer, TagSerializer, AgendaItemSerializer
 from django.contrib.auth import login, authenticate
@@ -33,7 +33,9 @@ def list_agenda_items(request, format=None):
   For not logged in users:
     we get the most recent agenda items and return those 
   '''
-  if (request.user is not None):
+  # Is there no test for figuring if req.user is of AnonymousUser type?
+  print(type(request.user))
+  if (not isinstance(request.user, AnonymousUser)):
     profile = EngageUserProfile.objects.get(user=request.user)
     tags_query_set = profile.tags.all()
     tags_serialized = TagSerializer(tags_query_set, many=True)
@@ -45,7 +47,8 @@ def list_agenda_items(request, format=None):
     data['tags'] = tag_names
     data['items'] = serialized_items.data      
   else:
-    agenda_items = AgendaItem.objects.filter(tags__name_contains=tag_names)
+    print("here")
+    agenda_items = AgendaItem.objects.all()
     serialized_items = AgendaItemSerializer(agenda_items, many=True)
     data = {}
     data['tags'] = "all"
