@@ -6,7 +6,7 @@ from CouncilTag.ingest.tagging import RandomTagEngine
 class Command(BaseCommand):
     help = 'Scrapes the Santa Monica website for meeting information'
 
-    def save_agendaitem(self, agenda_item, new_agenda):
+    def save_agendaitem(self, agenda_item, new_agenda, meeting_time):
         random_tagger = RandomTagEngine()
         new_agenda_item = AgendaItem()
         for g in agenda_item:
@@ -14,6 +14,7 @@ class Command(BaseCommand):
             new_agenda_item.department = g['Department']
             new_agenda_item.title = g['Title']
             new_agenda_item.sponsors = g['Sponsors']
+            new_agenda_item.meeting_time = meeting_time
             if 'Body' in g:
               new_agenda_item.body = g['Body']
             else: 
@@ -36,13 +37,12 @@ class Command(BaseCommand):
         except ObjectDoesNotExist:
             Committee(name="City Council").save()
             committee = Committee.objects.get(name="City Council")
-        print(committee)
         agendas = get_data()
         for meeting_time, agenda in agendas.items():
-            new_agenda = Agenda(meeting_time = meeting_time)
-            new_agenda.committee = committee
-            for ag in agenda:
-                
-                ag_item = self.save_agendaitem(ag, new_agenda)
-                
-            new_agenda.save()
+            exists = Agenda.objects.filter(meeting_time = meeting_time).first()
+            if (not exists):
+              new_agenda = Agenda(meeting_time = meeting_time)
+              new_agenda.committee = committee
+              for ag in agenda:      
+                  ag_item = self.save_agendaitem(ag, new_agenda, meeting_time)
+              new_agenda.save()
