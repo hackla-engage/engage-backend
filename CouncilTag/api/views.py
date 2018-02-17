@@ -98,7 +98,7 @@ def signup_user(request, format=None):
 
 @api_view(['GET'])
 def get_agendaitem_by_tag(request, tag_name):
-    agenda_items = AgendaItem.objects.filter(tags__name = tag_name)
+    agenda_items = AgendaItem.objects.filter(tags__name = tag_name).select_related().all()
     serialized_items = AgendaItemSerializer(agenda_items, many=True)
     data = {}
     data['tag'] = tag_name

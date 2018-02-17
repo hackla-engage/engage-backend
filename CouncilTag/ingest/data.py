@@ -110,8 +110,6 @@ def process_staff_report(staff_report_html):
     if body != None:
         body_paragraphs = []
         paragraphs = body.div.div.find_all('p')
-        subject = ""
-        content = ""
         for paragraph in paragraphs:
             cleaned = paragraph.text.replace('\xa0', '').strip()
             if cleaned:
