@@ -102,6 +102,7 @@ ENV/
 .mypy_cache/
 
 council-env/
+.counciltag/
 council-tag/
 node_modules/
 

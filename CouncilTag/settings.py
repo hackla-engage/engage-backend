@@ -26,7 +26,7 @@ SECRET_KEY = '^=azgctyvokgt(iv(sf0*6k0=gj+#c-!x805u6ofg!27!dpjjw'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'council-tag.herokuapp.com', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost','council-tag-dev.herokuapp.com', 'council-tag.herokuapp.com', '127.0.0.1']
 
 # Application definition
 
