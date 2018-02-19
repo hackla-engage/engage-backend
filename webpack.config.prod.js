@@ -11,7 +11,7 @@ var BundleTracker = require('webpack-bundle-tracker')
         sourcemap: false
       }
     }),
-    //new BundleTracker({filename: './webpack-stats-local.json'}),
+    new BundleTracker({filename: './webpack-stats-prod.json'}),
 
   ]);
 
