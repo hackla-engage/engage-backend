@@ -22,6 +22,8 @@ class AgendaItem(models.Model):
     )
     sponsors = models.CharField(max_length=250, null=True)
     agenda = models.ForeignKey(Agenda, related_name='items')
+    meeting_time = models.PositiveIntegerField(default=0)#Unix timestamp
+
     tags = models.ManyToManyField(Tag)
 
 class AgendaRecommendation(models.Model):

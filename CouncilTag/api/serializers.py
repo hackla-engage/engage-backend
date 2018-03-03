@@ -21,7 +21,7 @@ class AgendaItemSerializer(serializers.ModelSerializer):
     recommendations = AgendaRecommendationSerializer(many=True, read_only=True)
     class Meta:
         model = AgendaItem
-        fields = '__all__'
+        exclude = ('tags',)
 
 class AgendaSerializer(serializers.ModelSerializer):
     items = AgendaItemSerializer(many=True, read_only=True)
@@ -30,5 +30,11 @@ class AgendaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Agenda
         fields ='__all__'
+
+
+class UserFeedSerializer(serializers.Serializer):
+    tag = TagSerializer(read_only=True, many=True)
+    item  = AgendaItemSerializer(read_only=True)
+
 
 

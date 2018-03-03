@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'CouncilTag.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-if os.environ.get("CouncilTag") == "local":
+if DEBUG == True:
 
     DATABASES = {
         'default': {

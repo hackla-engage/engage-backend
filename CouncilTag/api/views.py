@@ -1,31 +1,43 @@
 from django.shortcuts import render
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.pagination import LimitOffsetPagination
 from django.contrib.auth.models import User, AnonymousUser
 from CouncilTag.ingest.models import Agenda, Tag, AgendaItem, EngageUserProfile
-from CouncilTag.api.serializers import AgendaSerializer, TagSerializer, AgendaItemSerializer
+from CouncilTag.api.serializers import AgendaSerializer, TagSerializer, AgendaItemSerializer, UserFeedSerializer
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
-import jwt, json
+from datetime import datetime
+import jwt, json, pytz, calendar
 from CouncilTag import settings
 from rest_framework.renderers import JSONRenderer
 from psycopg2.extras import NumericRange
 
-@api_view(['GET'])
-def list_agendas(request, format=None):
-    '''
-    List all of the agends stored in the database
-    '''
-    agendas = Agenda.objects.all()
-    serializer = AgendaSerializer(agendas, many=True)
-    return Response(serializer.data)
 
-@api_view(['POST'])
-def list_agenda_items(request, format=None):
+class SmallResultsPagination(LimitOffsetPagination):
+  default_limit = 2
+
+class MediumResultsPagination(LimitOffsetPagination):
+  default_limit = 10
+
+class AgendaView(generics.ListAPIView):
+  queryset = Agenda.objects.all().order_by('-meeting_time')
+  serializer_class = AgendaSerializer
+  pagination_class = SmallResultsPagination
+
+
+class TagView(generics.ListAPIView):
+  queryset = Tag.objects.all()
+  serializer_class = TagSerializer
+
+
+class UserFeed(generics.ListAPIView):
   '''
   List the agendas stored in the database with different results for logged in users
   or users who are just using the app without logging in.
+  Query Parameters: begin -- start of datetime you want to query
+                    end -- end of datetime you want to query
   For logged in users:
     we get their stored preferred tags from their profile
     return only tags that are contained in a list of the names of those tags
@@ -33,35 +45,36 @@ def list_agenda_items(request, format=None):
   For not logged in users:
     we get the most recent agenda items and return those 
   '''
-  # Is there no test for figuring if req.user is of AnonymousUser type?
-  if (not isinstance(request.user, AnonymousUser)):
-    profile = EngageUserProfile.objects.get(user=request.user)
-    tags_query_set = profile.tags.all()
-    tags_serialized = TagSerializer(tags_query_set, many=True)
-    # tag_names is a list of strings
-    tag_names = array_of_ordereddict_to_list_of_names(tags_serialized.data)
-    agenda_items = AgendaItem.objects.filter(tags__name__in=tag_names).filter(agenda__meeting_time__contained_by=NumericRange(request._data['begin'], request._data['end']))
-    serialized_items = AgendaItemSerializer(agenda_items, many=True)
-    data = {}
-    data['tags'] = tag_names
-    data['items'] = serialized_items.data      
-  else:
-    agenda_items = AgendaItem.objects.all()
-    serialized_items = AgendaItemSerializer(agenda_items, many=True)
-    data = {}
-    data['tags'] = "all"
-    data['items'] = serialized_items.data   
-  return Response(data=data)
-    
+  serializer_class = UserFeedSerializer
+  pagination_class = MediumResultsPagination
+  def get_queryset(self):
+    # Is there no test for figuring if req.user is of AnonymousUser type?
+    data = []
+    now = datetime.now(pytz.UTC)
+    unixnow = calendar.timegm(now.utctimetuple())
 
-@api_view(['GET'])
-def list_tags(request, format=None):
-    '''
-    List all availabe tags in the project
-    '''
-    tags = Tag.objects.all()
-    serializer = TagSerializer(tags, many=True)
-    return Response(serializer.data)
+    if (not isinstance(self.request.user, AnonymousUser)):
+      profile = EngageUserProfile.objects.get(user=self.request.user)
+      tags_query_set = profile.tags.all()
+      agenda_items = AgendaItem.objects.filter(tags__name__in=tag_names).filter(agenda__meeting_time__contained_by=NumericRange(request._data['begin'], request._data['end']))
+      if agenda_items[0].meeting_time > unixnow:
+        meeting_held = False
+      else:
+        meeting_held = True 
+    else:
+      # return the most recent agenda items for the upcoming meeting, 
+      # if there is no upcoming meeting, show the last meeting instead
+      last_run = Agenda.objects.order_by('-meeting_time')[0]
+      if last_run.meeting_time > unixnow:
+        meeting_held = False
+      else:
+        meeting_held = True
+
+      agenda_items = last_run.items.all()
+      
+    for ag_item in agenda_items:
+        data.append({"item":ag_item, "tag": list(ag_item.tags.all()), "meeting_already_held": meeting_held})     
+    return data
 
 
 @api_view(['POST'])
@@ -69,7 +82,6 @@ def login_user(request, format=None):
     '''
     Login a current user. Expects an email address and password
     email because we have loaded 'CouncilTag.api.backends.EmailPasswordBackend'
-    This basically sets the USERNAME_FIELD = email in the User o
     '''
     email = request.POST['email']
     password = request.POST['password']
