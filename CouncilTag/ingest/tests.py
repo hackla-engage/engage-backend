@@ -18,7 +18,6 @@ class TestRandomTagEngine(TestCase):
         for i in range(0, 3):
             Tag(name="Tag" + str(i)).save()
         committee = Committee(name="Council")
-        print(committee)
         committee.save()
         agenda = Agenda(meeting_time=949494949, committee=committee)
         agenda.save()
@@ -34,3 +33,14 @@ class TestRandomTagEngine(TestCase):
         self.tagengine.apply_tags(self.agenda_item, tags_to_apply)
         self.assertEqual(2, len(self.agenda_item.tags.all()))
 
+
+class TestScrapeDataCommand(TestCase):
+
+
+    def setUp(self):
+        
+        pass
+    
+
+    def test_scrape_data_pulls_in_newer_data(self):
+        pass
