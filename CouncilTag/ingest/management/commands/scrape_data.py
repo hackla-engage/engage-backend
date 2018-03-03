@@ -1,6 +1,8 @@
 from django.core.management.base import BaseCommand, CommandError
 from CouncilTag.ingest.models import Committee, Agenda, AgendaItem, AgendaRecommendation
 from CouncilTag.ingest.data import get_data
+from CouncilTag.ingest.utils import time_check
+from datetime import datetime
 from django.core.exceptions import *
 from CouncilTag.ingest.tagging import RandomTagEngine
 class Command(BaseCommand):
@@ -37,6 +39,8 @@ class Command(BaseCommand):
         except ObjectDoesNotExist:
             Committee(name="City Council").save()
             committee = Committee.objects.get(name="City Council")
+        
+         
         agendas = get_data()
         for meeting_time, agenda in agendas.items():
             exists = Agenda.objects.filter(meeting_time = meeting_time).first()
