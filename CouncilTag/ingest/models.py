@@ -5,6 +5,8 @@ from django.contrib.postgres.fields import ArrayField
 # Create your models here.
 class Tag(models.Model):
     name = models.CharField(max_length=100)
+    description = models.TextField(null=True)
+    icon = models.CharField(max_length=100, null=True)
 
 class Committee(models.Model):
     name = models.CharField(max_length=250)

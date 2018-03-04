@@ -47,6 +47,7 @@ class UserFeed(generics.ListAPIView):
   '''
   serializer_class = UserFeedSerializer
   pagination_class = MediumResultsPagination
+  
   def get_queryset(self):
     # Is there no test for figuring if req.user is of AnonymousUser type?
     data = []
