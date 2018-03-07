@@ -84,8 +84,14 @@ class TestAgendasByTagEndpoint(TestCase):
 
 
 class TestSendMessageEndpoint(TestCase):
+    def setUp(self):
+        user = User.objects.create_user("test", email="test@test.com", password="test")
+
+        engage_user = EngageUserProfile(user=user).save()
+
     def test_response(self):
-        response = self.client.post("/api/send/message")
+        self.client.login(username="test@test.com", password="test")
+        response = self.client.post("/api/send/message/")
         self.assertEqual(200, response.status_code)
 
     

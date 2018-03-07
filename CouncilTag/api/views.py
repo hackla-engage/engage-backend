@@ -161,6 +161,17 @@ def del_tag_from_user(request, format=None):
       return Response(status=500)
     return Response(status=200)
 
+
+@login_required(login_url="/api/login")
+@api_view(['POST'])
+def send_message(request, format=None):
+  '''
+  /send/message JSON body attribute should have an object that
+  includes the "to", "from", "message" attributes. The user 
+  must be logged in for this
+  '''
+
+  return Response(status=200)
 def array_of_ordereddict_to_list_of_names(tags_ordereddict_array):
   """
   Serializers have a funny organization that isn't helpful in making further queries

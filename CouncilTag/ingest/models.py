@@ -42,3 +42,8 @@ class EngageUserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
 
+class Message(models.Model):
+    user = models.OneToOneField(User)
+    content = models.TextField()
+    agenda_item = models.ForeignKey(AgendaItem, related_name="messages")
+    sent = models.PositiveIntegerField(default=0) #Unix timestamp
