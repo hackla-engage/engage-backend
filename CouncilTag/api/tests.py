@@ -1,6 +1,6 @@
 from django.test import TestCase
 import json
-from CouncilTag.ingest.models import Agenda, Committee, Tag, AgendaItem
+from CouncilTag.ingest.models import Agenda, Committee, Tag, AgendaItem, EngageUserProfile
 import jwt
 from CouncilTag import settings
 from django.contrib.auth.models import User
@@ -8,11 +8,13 @@ from django.contrib.auth.models import User
 
 # Create your tests here.
 class TestAgendasEndpoint(TestCase):
+
+
     def test_response(self):
         response = self.client.get("/api/agendas.json")
         self.assertEqual(200, response.status_code)
         json_res = response.json()
-        self.assertEqual([], json_res)
+        self.assertEqual([], json_res['results'])
 
     def test_db(self):
         print('dfsdfsds')
@@ -22,7 +24,8 @@ class TestAgendasEndpoint(TestCase):
         Agenda(meeting_time=393939393, committee=committee).save()
         response = self.client.get("/api/agendas.json")
         self.assertEqual(200, response.status_code)
-        self.assertEqual(1, len(response.json()))
+        result_dict = response.json()
+        self.assertEqual(1, len(result_dict['results']))
 
 
 class TestTagsEndpoint(TestCase):
@@ -38,7 +41,7 @@ class TestLoginEndpoint(TestCase):
     
     def test_user_creation(self):
         user_to_test_against = User.objects.create_user("test", email="test@test.com", password='test')       
-        jwt_token = jwt.encode({'user':user_to_test_against.username}, settings.SECRET_KEY)
+        jwt_token = jwt.encode({'email':user_to_test_against.email}, settings.SECRET_KEY)
         response = self.client.post("/api/login.json", {'email':'test@test.com', 'password': 'test'})
         token = response.json()['token']
         #have to decode the jwt_token since it will be a byte-object and not string
@@ -80,12 +83,9 @@ class TestAgendasByTagEndpoint(TestCase):
         self.assertEqual("test", response.json()['items'][0]['title'])
 
 
-#class TestAssociateTagWithUser(TestCase):
-#    def test_response(self):
-#        user_to_test_against = User.objects.create_user("test", email="test@test.com", password='test')
-#        response = self.client.post("/api/login.json", {'email':'test@test.com', 'password': 'test'})
-#        self.assertEqual(201, response.status_code)
-#        response = self.client.post("/api/user/add/tag.json", {"tag":"Test"})
-#        self.assertEqual(200, response.status_code)
+class TestSendMessageEndpoint(TestCase):
+    def test_response(self):
+        response = self.client.post("/api/send/message")
+        self.assertEqual(200, response.status_code)
 
     
