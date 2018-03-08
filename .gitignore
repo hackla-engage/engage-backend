@@ -102,6 +102,7 @@ ENV/
 .mypy_cache/
 
 council-env/
+.counciltag/
 council-tag/
 node_modules/
 
@@ -112,3 +113,6 @@ node_modules/
 *.bundle.js
 
 webpack-stats-local.json
+
+# migrations?
+migrations/0*.py

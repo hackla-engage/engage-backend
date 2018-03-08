@@ -20,8 +20,11 @@ def get_data():
         rows = table.findAll('tr')
         for row in rows:
             cells = row.findChildren('td')
-            date = agenda_date_to_epoch(cells[0])
-            if cells[1].string == "Agenda":
+            try:
+            	date = agenda_date_to_epoch(cells[0])
+            except:
+            	date = None
+            if date and cells[1].string == "Agenda":
                 agenda = sess.get(cells[1].findChildren('a', {'href': True})[0]['href']).text
                 if "CONSENT CALENDAR" in agenda:
                     agendas[date] = scrape_agenda(agenda, sess)         
@@ -107,8 +110,6 @@ def process_staff_report(staff_report_html):
     if body != None:
         body_paragraphs = []
         paragraphs = body.div.div.find_all('p')
-        subject = ""
-        content = ""
         for paragraph in paragraphs:
             cleaned = paragraph.text.replace('\xa0', '').strip()
             if cleaned:

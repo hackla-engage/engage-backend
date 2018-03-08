@@ -1,4 +1,5 @@
 from CouncilTag.settings import *
+DEBUG = False
 
 DATABASES = {
     'default': {

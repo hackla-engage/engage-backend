@@ -1,6 +1,6 @@
 # CouncilTag
 Website: https://council-tag.herokuapp.com
-API documentation: https://app.apiary.io/counciltag/editor
+API documentation: https://council-tag.herokuapp.com/docs
 
 ## Dev Setup
 
@@ -13,7 +13,7 @@ dependecies in the `requirements.txt`.
 
 3. Download the Postgres libraries for your platform and PgAdmin, the GUI database manageer
 
-4. Add the `CouncilTag` environment variable and set it to "local"
+4. Make sure the `DEBUG` value in the `settings.py` file is to True
 
 5. Make sure that your Postgres has a `counciltag` database in it
 
@@ -29,13 +29,7 @@ dependecies in the `requirements.txt`.
 
 In order, these commands will 1) create the SQL tables needed, 2) load our list of tags, 3) load up a set of live data from the City of Santa Monica
 
-8. Run `python manage.py runserver` to stat the python server. You can go to http://localhost:8000 but you won't see anything because you need to start the dev server for the react frontend as well...
-
-9. Run `npm install` in another terminal window
-
-10. Once everything has been downloaded, you can run the development server for the react app by running `npm run-script startdev`
-
-11. Now go back to http://localhost:8000 and will see the homepage 
+8. Run `python manage.py runserver` to stat the python server. You can go to http://localhost:8000/docs 
 
 
 ## Continous Delivery
