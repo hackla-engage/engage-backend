@@ -11,9 +11,11 @@ coreapi==2.3.3
 coreschema==0.0.4
 defusedxml==0.5.0
 dj-database-url==0.4.2
+dj-static==0.0.6
 Django==1.11.5
 django-cors-headers==2.1.0
 django-tools==0.36.0
+django-webpack-loader==0.5.0
 djangorestframework==3.6.4
 enum34==1.1.6
 future==0.16.0
@@ -41,6 +43,7 @@ six==1.10.0
 social-auth-app-django==2.1.0
 social-auth-core==1.6.0
 sodapy==1.4.3
+static3==0.7.0
 uritemplate==3.0.0
 urllib3==1.22
 whitenoise==3.3.1

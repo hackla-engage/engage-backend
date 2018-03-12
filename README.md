@@ -36,6 +36,9 @@ In order, these commands will 1) create the SQL tables needed, 2) load our list 
 
 We have setup a continous integration with Heroku. When you push to the `prod` branch on this repo, this will trigger a build on the server. This will also run the Django test suite. If the tests fail, the build will not go through. 
 
+Before you push to `prod`, you will have to do run `npm run-script build` to generate a `bundle.js` that can served from the static folder
+
+
 ## Django documentation
 If you are new to using Django, you can read up more about it here:
 https://docs.djangoproject.com/en/2.0/
