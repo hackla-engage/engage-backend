@@ -40,9 +40,7 @@ INSTALLED_APPS = [
     'CouncilTag.ingest',
     'rest_framework',
     'CouncilTag.api',
-    'CouncilTag.frontend',
     'corsheaders',
-    'webpack_loader',
 ]
 
 MIDDLEWARE = [
@@ -128,7 +126,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -147,9 +144,3 @@ AUTHENTICATION_BACKENDS = ['CouncilTag.api.backends.EmailPasswordBackend']
 
 CORS_URLS_REGEX = r'^/api/.*$'
 
-WEBPACK_LOADER = {
-    'DEFAULT': {
-        'BUNDLE_DIR_NAME': '/',  # end with slash
-        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats-local.json'),
-    }
-}
