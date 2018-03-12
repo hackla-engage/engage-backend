@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'CouncilTag.api',
     'CouncilTag.frontend',
     'corsheaders',
-    'webpack_loader',
 ]
 
 MIDDLEWARE = [
@@ -147,9 +146,3 @@ AUTHENTICATION_BACKENDS = ['CouncilTag.api.backends.EmailPasswordBackend']
 
 CORS_URLS_REGEX = r'^/api/.*$'
 
-WEBPACK_LOADER = {
-    'DEFAULT': {
-        'BUNDLE_DIR_NAME': '/',  # end with slash
-        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats-local.json'),
-    }
-}
