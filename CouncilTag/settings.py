@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'CouncilTag.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-if DEBUG == True:
+if DEBUG == False:
 
     DATABASES = {
         'default': {
@@ -149,4 +149,4 @@ SENDGRID_API_KEY = os.environ.get('SENDGRID_KEY')
 if DEBUG:
     COUNCIL_CLERK_EMAIL = 'shariq.torres@gmail.com'
 else:
-    COUNCIL_CLERK_EMAIL = 'clerk@smgov.net'
+    COUNCIL_CLERK_EMAIL = 'counciltag@gmail.com'
