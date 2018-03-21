@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
 from django.contrib.auth.models import User, AnonymousUser
-from CouncilTag.ingest.models import Agenda, Tag, AgendaItem, EngageUserProfile
+from CouncilTag.ingest.models import Agenda, Tag, AgendaItem, EngageUserProfile, Message
 from CouncilTag.api.serializers import AgendaSerializer, TagSerializer, AgendaItemSerializer, UserFeedSerializer
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
@@ -167,11 +167,21 @@ def del_tag_from_user(request, format=None):
 def send_message(request, format=None):
   '''
   /send/message JSON body attribute should have an object that
-  includes the "to", "from", "message" attributes. The user 
-  must be logged in for this
+  includes the "content", "ag_item" attributes. The user 
+  must be logged in for this. The "content" is the message that 
+  the user wants to send and the "ag_item" is the id of the 
+  agenda item that the message is referencing
   '''
-
+  now = datetime.now().timestamp()
+  message_info = request.data
+  agenda_item = AgendaItem.objects.get(pk = message_info['ag_item'])
+  new_message = Message(agenda_item=agenda_item, user=request.user, sent=int(now))
+  new_message.save()
   return Response(status=200)
+
+
+
+
 def array_of_ordereddict_to_list_of_names(tags_ordereddict_array):
   """
   Serializers have a funny organization that isn't helpful in making further queries
