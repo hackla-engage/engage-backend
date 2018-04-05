@@ -77,6 +77,13 @@ url="http://localhost:8000/api",
 
 You can go to `http://localhost:8000/swagger/` to look at the docs and interact with the API. 
 
+## To run on Docker
+
+1. Run `docker build .` to build Docker image
+2. Run `make build` to build Docker services
+3. Run `make migrate` migrate postgres database
+4. Run `make populate_tags` and `make scrape_data` to further populate the database in the Docker container.
+5. Run `make run` to run server
 
 ## Continous Delivery
 
