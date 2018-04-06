@@ -77,13 +77,21 @@ url="http://localhost:8000/api",
 
 You can go to `http://localhost:8000/swagger/` to look at the docs and interact with the API. 
 
-## To run on Docker
+## To run locally on Docker
 
 1. Run `docker build .` to build Docker image
 2. Run `make setup` to build Docker services
 3. Run `make migrate` migrate postgres database
 4. Run `make populate_tags` and `make scrape_data` to further populate the database in the Docker container.
 5. Run `make run` to run server
+
+## To deploy Docker container onto Heroku
+
+1. Follow instructions on https://devcenter.heroku.com/articles/container-registry-and-runtime and build the Docker image via: `heroku container:push web`
+2. After image is built and deployed to Heroku, provision Postgres database addon via: `heroku addons:create heroku-postgresql:hobby-dev`
+4. Run migrations on the new database via: `heroku run python manage.py migrate`
+5. Run `heroku run python manage.py populate_tags` and `heroku run python manage.py scrape_data` to further populate the database.
+6. Run `heroku open` to open the browser and test the app.
 
 ## Continous Delivery
 
