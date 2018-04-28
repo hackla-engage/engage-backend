@@ -1,10 +1,11 @@
 from django.test import TestCase
 import json
-from CouncilTag.ingest.models import Agenda, Committee, Tag, AgendaItem, EngageUserProfile
+from CouncilTag.ingest.models import Agenda, Committee, Tag, AgendaItem, EngageUserProfile, Message
 import jwt
 from CouncilTag import settings
 from django.contrib.auth.models import User
-
+from CouncilTag.api.utils import send_mail
+from datetime import datetime
 
 # Create your tests here.
 class TestAgendasEndpoint(TestCase):
@@ -17,10 +18,8 @@ class TestAgendasEndpoint(TestCase):
         self.assertEqual([], json_res['results'])
 
     def test_db(self):
-        print('dfsdfsds')
         committee = Committee(name="test")
         committee.save()
-        print(committee)
         Agenda(meeting_time=393939393, committee=committee).save()
         response = self.client.get("/api/agendas.json")
         self.assertEqual(200, response.status_code)
@@ -86,12 +85,30 @@ class TestAgendasByTagEndpoint(TestCase):
 class TestSendMessageEndpoint(TestCase):
     def setUp(self):
         user = User.objects.create_user("test", email="test@test.com", password="test")
-
-        engage_user = EngageUserProfile(user=user).save()
-
+        self.engage_user = EngageUserProfile(user=user)
+        self.engage_user.save()
+        committee = Committee(name="test")
+        committee.save()
+        self.agenda = Agenda(meeting_time=393939393, committee=committee)
+        self.agenda.save()
+        self.ag_item = AgendaItem(title="test", department="test", agenda=self.agenda)
+        self.ag_item.save()
     def test_response(self):
         self.client.login(username="test@test.com", password="test")
-        response = self.client.post("/api/send/message/")
+        response = self.client.post("/api/send/message/", data=json.dumps({"content":"I support that", "ag_item":self.ag_item.pk}), content_type="application/json")
         self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(Message.objects.all()))
+        sent_message = Message.objects.first()
+        self.assertEqual("test@test.com", sent_message.user.email)
+        self.assertGreater(sent_message.sent, 0)
+    
+    def test_mail_util_func(self):
+        user = self.engage_user.user
+        sent_message = Message(sent=int(datetime.now().timestamp()), content="Hello world", 
+            user=user, agenda_item=self.ag_item )
+        sent_message.save()
+
+        result = send_mail(sent_message)
+        self.assertTrue(result)
 
     
