@@ -77,13 +77,8 @@ WSGI_APPLICATION = 'CouncilTag.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-<<<<<<< HEAD
-if DEBUG == True:
-=======
 
-if DEBUG == False:
->>>>>>> master
-
+if DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',

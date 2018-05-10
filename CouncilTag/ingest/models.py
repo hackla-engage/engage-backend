@@ -10,6 +10,7 @@ class Tag(models.Model):
 
 class Committee(models.Model):
     name = models.CharField(max_length=250)
+    email = models.CharField(max_length=250)
 
 class Agenda(models.Model):
     meeting_time = models.PositiveIntegerField()#Unix timestamp
@@ -43,13 +44,13 @@ class EngageUserProfile(models.Model):
     tags = models.ManyToManyField(Tag)
 
 class Message(models.Model):
-    user = models.OneToOneField(User, blank=True, null=True)
+    user = models.ForeignKey(User, null=True)
+    agenda_item = models.ForeignKey(AgendaItem, null=True)
     content = models.TextField()
-    to = models.OneToOneField(Committee)
+    committee = models.ForeignKey(Committee, null=True)
     first_name = models.TextField(blank=True, null=True)
     last_name = models.TextField(blank=True, null=True)
     zipcode = models.PositiveIntegerField(default=90401)
     email = models.EmailField(blank=True, null=True)
     ethnicity = models.TextField(blank=True, null=True)
-    agenda_item = models.ForeignKey(AgendaItem, related_name="messages")
     sent = models.PositiveIntegerField(default=0) #Unix timestamp

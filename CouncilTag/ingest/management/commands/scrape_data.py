@@ -35,10 +35,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            committee = Committee.objects.get(name="City Council")
+            committee = Committee.objects.get(name="Santa Monica City Council")
         except ObjectDoesNotExist:
-            Committee(name="City Council").save()
-            committee = Committee.objects.get(name="City Council")
+            Committee(name="Santa Monica City Council", email="counciltag@gmail.com").save()
+            committee = Committee.objects.get(name="Santa Monica City Council")
         
          
         agendas = get_data()
