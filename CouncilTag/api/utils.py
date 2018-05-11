@@ -1,10 +1,15 @@
 import sendgrid
 import logging
+import requests
 from CouncilTag import settings
 from sendgrid.helpers.mail import Email, Content, Mail
 
 log = logging.Logger(__name__)
 
+def verify_recaptcha(token):     
+    r = requests.post('https://www.google.com/recaptcha/api/siteverify', data={'secret': '6LcnmVUUAAAAANyYFnJfRH1ypd-rasNDgYmGo90m', 'response': token})
+    response = r.json()
+    return response['success']
 
 def send_mail(message_record):
     sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)

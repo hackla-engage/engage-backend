@@ -9,12 +9,12 @@ from CouncilTag.api.serializers import AgendaSerializer, TagSerializer, AgendaIt
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
+from CouncilTag.api.utils import verify_recaptcha
 import jwt
 import json
 import pytz
 import calendar
 from CouncilTag import settings
-import requests
 from rest_framework.renderers import JSONRenderer
 from psycopg2.extras import NumericRange
 
@@ -192,10 +192,8 @@ def add_message(request, format=None):
     agenda_item = AgendaItem.objects.get(pk=message_info['ag_item'])
     content = message_info['content']
     verify_token = message_info['token']
-
-    r = requests.post('https://www.google.com/recaptcha/api/siteverify', data={'secret': '6LcnmVUUAAAAANyYFnJfRH1ypd-rasNDgYmGo90m', 'response': verify_token})
-    response = r.json()
-    if not response['success']:
+    result = verify_recaptcha(verify_token)
+    if not result:
       return Response(status=400)
     first_name = None
     last_name = None
