@@ -192,6 +192,7 @@ def add_message(request, format=None):
     agenda_item = AgendaItem.objects.get(pk=message_info['ag_item'])
     content = message_info['content']
     verify_token = message_info['token']
+    pro = message_info['pro']
     result = verify_recaptcha(verify_token)
     if not result:
       return Response(status=400)
@@ -213,7 +214,7 @@ def add_message(request, format=None):
     new_message = Message(agenda_item=agenda_item, user=user,
                           first_name=first_name, last_name=last_name,
                           zipcode=zipcode, email=email, ethnicity=ethnicity, 
-                          committee=committee, content=content,
+                          committee=committee, content=content, pro=pro,
                           date=now, sent=0)
     # Default to unsent, will send on weekly basis all sent=0
     new_message.save()
