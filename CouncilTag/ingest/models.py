@@ -46,11 +46,12 @@ class EngageUserProfile(models.Model):
 class Message(models.Model):
     user = models.ForeignKey(User, null=True)
     agenda_item = models.ForeignKey(AgendaItem, null=True)
-    content = models.TextField()
+    content = models.TextField(blank=True, null=True)
     committee = models.ForeignKey(Committee, null=True)
     first_name = models.TextField(blank=True, null=True)
     last_name = models.TextField(blank=True, null=True)
     zipcode = models.PositiveIntegerField(default=90401)
     email = models.EmailField(blank=True, null=True)
     ethnicity = models.TextField(blank=True, null=True)
+    date = models.PositiveIntegerField(default=0) #Unix timestamp
     sent = models.PositiveIntegerField(default=0) #Unix timestamp
