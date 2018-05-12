@@ -77,35 +77,41 @@ class UserFeed(generics.ListAPIView):
         data.append({"item":ag_item, "tag": list(ag_item.tags.all()), "meeting_already_held": meeting_held})     
     return data
 
-
 @api_view(['POST'])
 def login_user(request, format=None):
     '''
     Login a current user. Expects an email address and password
     email because we have loaded 'CouncilTag.api.backends.EmailPasswordBackend'
+    accepts raw JSON or form-data encoded
     '''
-    email = request.POST['email']
-    password = request.POST['password']
+    data = request.data
+    email = data['email']
+    password = data['password']
     user = authenticate(username=email, password=password)
     if user is not None:
-        login(request, user) # This is where attributes to the request are stored
-        token = jwt.encode({'email':user.email}, settings.SECRET_KEY)
-        return Response({'token':token}, status=201)
+        # This is where attributes to the request are stored
+        login(request, user)
+        token = jwt.encode({'email': user.email}, settings.SECRET_KEY)
+        return Response({'token': token}, status=201)
     else:
-        return Response(status=404, data={"error":"wrong username and password"})
+        return Response(status=404, data={"error": "wrong username and password"})
 
 
 @api_view(['POST'])
 def signup_user(request, format=None):
     '''
     Signup a new user. Expects a email address and a password.
+    now in json body type, anyway it seems POST is deprecated
+    also data seems to handle form-data as well as raw json
     '''
-    email = request.POST['email']
-    password = request.POST['password']
-    username = request.POST['name']
+    data = request.data
+    email = data['email']
+    password = data['password']
+    username = data['name']
     user = User.objects.create_user(username, email, password)
-    EngageUserProfile.objects.create(user=user) # Don't need to save any values from it
-    token = jwt.encode({"username":user.email}, settings.SECRET_KEY) 
+    # Don't need to save any values from it
+    EngageUserProfile.objects.create(user=user)
+    token = jwt.encode({"username": user.email}, settings.SECRET_KEY)
     return Response({"token": token}, status=201)
 
 
