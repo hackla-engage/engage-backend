@@ -208,7 +208,6 @@ def add_message(request, format=None):
         last_name = message_info['last']
         zipcode = message_info['zip']
         email = message_info['email']
-        ethnicity = message_info['ethnicity']
     else:
         user = request.user
     new_message = Message(agenda_item=agenda_item, user=user,
