@@ -13,7 +13,8 @@ dependecies in the `requirements.txt`.
 
 3. Download the Postgres libraries for your platform and PgAdmin, the GUI database manageer
 
-4. Make sure the `DEBUG` value in the `settings.py` file is to True
+4. Make sure the `DEBUG` value in the `settings.py` file is set to True if you are running locally
+  1. To set DEBUG to true set environment variable ```CouncilTag=local```
 
 5. Make sure that your Postgres has a `counciltag` database in it
 
