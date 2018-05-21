@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from CouncilTag.ingest.models import Agenda, AgendaItem, Tag, AgendaRecommendation, Committee
+from CouncilTag.ingest.models import Agenda, AgendaItem, Tag, AgendaRecommendation, Committee, Message
 
 class CommitteeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,6 +31,10 @@ class AgendaSerializer(serializers.ModelSerializer):
         model = Agenda
         fields ='__all__'
 
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = '__all__'
 
 class UserFeedSerializer(serializers.Serializer):
     tag = TagSerializer(read_only=True, many=True)

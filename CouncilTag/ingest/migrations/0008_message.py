@@ -18,11 +18,14 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Message',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False, verbose_name='ID')),
                 ('content', models.TextField()),
                 ('sent', models.PositiveIntegerField(default=0)),
-                ('agenda_item', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='messages', to='ingest.AgendaItem')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('agenda_item', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                                  related_name='messages', to='ingest.AgendaItem')),
+                ('user', models.OneToOneField(
+                    on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]
