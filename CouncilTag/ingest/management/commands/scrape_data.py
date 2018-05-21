@@ -12,11 +12,12 @@ class Command(BaseCommand):
         random_tagger = RandomTagEngine()
         new_agenda_item = AgendaItem()
         for g in agenda_item:
-            print(g)
             new_agenda_item.department = g['Department']
             new_agenda_item.title = g['Title']
             new_agenda_item.sponsors = g['Sponsors']
             new_agenda_item.meeting_time = meeting_time
+            new_agenda_item.meeting_id = g['MeetingID']
+            new_agenda_item.agenda_item_id = g['ID']
             if 'Body' in g:
               new_agenda_item.body = g['Body']
             else: 
@@ -29,9 +30,7 @@ class Command(BaseCommand):
             if 'Recommendations' in g:
                   new_rec = AgendaRecommendation(recommendation=g['Recommendations'])
                   new_rec.agenda_item = new_agenda_item
-                  new_rec.save()
-            return agenda_item
-            
+                  new_rec.save()            
 
     def handle(self, *args, **options):
         try:
@@ -39,14 +38,18 @@ class Command(BaseCommand):
         except ObjectDoesNotExist:
             Committee(name="Santa Monica City Council", email="counciltag@gmail.com").save()
             committee = Committee.objects.get(name="Santa Monica City Council")
-        
-         
-        agendas = get_data()
+        years = [2016,2017,2018]
+        agendas = dict()
+        for year in years:
+            agenda_values = get_data(year=year)
+            for time, agenda in agenda_values.items():
+              agendas[time] = agenda
         for meeting_time, agenda in agendas.items():
+                      
             exists = Agenda.objects.filter(meeting_time = meeting_time).first()
             if (not exists):
               new_agenda = Agenda(meeting_time = meeting_time)
               new_agenda.committee = committee
               for ag in agenda:      
-                  ag_item = self.save_agendaitem(ag, new_agenda, meeting_time)
+                  self.save_agendaitem(ag, new_agenda, meeting_time)
               new_agenda.save()
