@@ -26,7 +26,7 @@ SECRET_KEY = '^=azgctyvokgt(iv(sf0*6k0=gj+#c-!x805u6ofg!27!dpjjw'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-if os.environ.get("CouncilTag"):
+if os.environ.get("CouncilTag") == 'local':
   DEBUG= True
 print(DEBUG)
 ALLOWED_HOSTS = ['localhost','engage-backend-dev.herokuapp.com', 'engage-backend.herokuapp.com', '127.0.0.1']
@@ -93,10 +93,8 @@ if DEBUG:
     }
 else:
     DATABASES = {}
-    DATABASES['default'] = dj_database_url.config()
-    
-
-
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+print(DATABASES)
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
