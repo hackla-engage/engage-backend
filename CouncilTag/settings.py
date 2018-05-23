@@ -151,4 +151,6 @@ if DEBUG:
     COUNCIL_CLERK_EMAIL = 'shariq.torres@gmail.com'
 else:
     COUNCIL_CLERK_EMAIL = 'counciltag@gmail.com'
+    
+# According to Heroku, this should be at the end of settings.py
 django_heroku.settings(locals())
