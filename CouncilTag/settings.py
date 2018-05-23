@@ -94,7 +94,7 @@ if DEBUG:
 else:
     DATABASES = {}
     DATABASES['default'] = dj_database_url.config()
-    django_heroku.settings(locals())
+    
 
 
 # Password validation
@@ -153,3 +153,4 @@ if DEBUG:
     COUNCIL_CLERK_EMAIL = 'shariq.torres@gmail.com'
 else:
     COUNCIL_CLERK_EMAIL = 'counciltag@gmail.com'
+django_heroku.settings(locals())
