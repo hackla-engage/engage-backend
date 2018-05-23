@@ -29,7 +29,7 @@ DEBUG = False
 if os.environ.get("CouncilTag") == 'local':
   DEBUG= True
 print(DEBUG)
-ALLOWED_HOSTS = ['localhost','engage-backend-dev.herokuapp.com', 'engage-backend.herokuapp.com', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost','https://engage-santa-monica.herokuapp.com', 'engage-backend-dev.herokuapp.com', 'engage-backend.herokuapp.com', '127.0.0.1']
 
 # Application definition
 print ("Opened settings")
@@ -94,8 +94,10 @@ if DEBUG:
 else:
     DATABASES = {}
     DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+
 print(DATABASES)
 print(os.environ.get("DATABASE_URL"))
+
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
