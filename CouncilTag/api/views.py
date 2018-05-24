@@ -55,6 +55,7 @@ class UserFeed(generics.ListAPIView):
     pagination_class = MediumResultsPagination
 
     def get_queryset(self):
+        print("get queryset")
         # Is there no test for figuring if req.user is of AnonymousUser type?
         data = []
         now = datetime.now(pytz.UTC)
