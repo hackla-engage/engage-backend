@@ -112,3 +112,4 @@ node_modules/
 
 # migrations?
 migrations/0*.py
+nohup.*
