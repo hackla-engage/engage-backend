@@ -31,7 +31,8 @@ jobs:
           name: install dependencies
           command: |
             apt install virtualenv
-            virtualenv -p python3 venv 	
+            ls /usr/bin/python*
+          	virtualenv -p python3 venv 	
             source venv/bin/activate
             pip install -r requirements.txt
 
