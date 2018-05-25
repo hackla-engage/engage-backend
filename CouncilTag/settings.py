@@ -29,7 +29,7 @@ DEBUG = False
 if os.environ.get("CouncilTag") == 'local':
   DEBUG= True
 print(DEBUG)
-ALLOWED_HOSTS = ['localhost','https://engage-santa-monica.herokuapp.com', 'engage-backend-dev.herokuapp.com', 'engage-backend.herokuapp.com', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost','https://engage-santa-monica.herokuapp.com', 'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1']
 
 # Application definition
 print ("Opened settings")
@@ -86,18 +86,18 @@ if DEBUG:
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'counciltag',
-            'USER': 'postgres',
-            'PASSWORD':'root',
+            'USER': 'engagepsql',
+            'PASSWORD':'Hack4LA!',
             'HOST':'localhost',
         }
     }
 else:
     DATABASES = {}
-    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+    DATABASES['default'] = dj_database_url.config()
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
-
+print(DATABASES['default'])
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',

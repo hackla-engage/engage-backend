@@ -1,0 +1,14 @@
+[24/May/2018 21:28:05] "GET /api/agendas/ HTTP/1.0" 500 27
+[24/May/2018 21:28:15] "GET /api/login HTTP/1.0" 301 0
+[24/May/2018 21:28:15] "GET /api/login/ HTTP/1.0" 500 27
+[24/May/2018 21:30:17] "POST /api/signup/ HTTP/1.0" 500 27
+[24/May/2018 21:30:30] "GET /api/login/ HTTP/1.0" 500 27
+True
+Opened settings
+[24/May/2018 22:19:28] "GET / HTTP/1.0" 404 74
+[24/May/2018 22:19:30] "GET / HTTP/1.0" 404 74
+[25/May/2018 01:07:55] "GET /api/login/ HTTP/1.0" 500 27
+[25/May/2018 01:07:56] "GET /favicon.ico HTTP/1.0" 404 85
+[25/May/2018 01:08:00] "GET /api/lagendas HTTP/1.0" 404 86
+[25/May/2018 01:08:04] "GET /api/lagendas/ HTTP/1.0" 404 87
+[25/May/2018 01:08:16] "GET /api/agendas/ HTTP/1.0" 500 27
