@@ -27,11 +27,13 @@ jobs:
     machine: 
       enabled: true
     steps:
+      - add_ssh_keys:
+            fingerprints:
+              - "90:67:7a:e6:e2:67:33:79:93:cc:6e:ec:38:fe:f5:1d"
       - run:
             name: Deploy over SSH
             command: |
                 ssh $SSH_USER@$SSH_HOST "./deploy.sh"
-
 workflows:
   version: 2
   build-and-deploy:
