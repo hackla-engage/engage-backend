@@ -23,14 +23,16 @@ jobs:
             - ".venv"
             - "/usr/local/bin"
             - "/usr/local/lib/python3.6/site-packages"
+  deploy-job:
+    steps:
+      - add_ssh_keys:
+            fingerprints:
+              - "90:67:7a:e6:e2:67:33:79:93:cc:6e:ec:38:fe:f5:1d"
   deploy:
     working_directory: ~/
     machine: 
       enabled: true
     steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "90:67:7a:e6:e2:67:33:79:93:cc:6e:ec:38:fe:f5:1d"
       - run:
         name: Deploy over SSH
         command: |
