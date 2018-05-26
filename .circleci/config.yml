@@ -33,7 +33,7 @@ jobs:
       - run:
             name: Deploy over SSH
             command: |
-                ssh $SSH_USER@$SSH_HOST "./deploy.sh"
+                ssh $SSH_USER@$SSH_HOST "./deploy.sh &"
 workflows:
   version: 2
   build-and-deploy:
