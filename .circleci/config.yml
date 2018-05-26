@@ -35,6 +35,6 @@ jobs:
       enabled: true
     steps:
       - run:
-        name: Deploy over SSH
-        command: |
-          ssh $SSH_USER@$SSH_HOST "./deploy.sh"
+          name: Deploy over SSH
+          command: |
+            ssh $SSH_USER@$SSH_HOST "./deploy.sh"
