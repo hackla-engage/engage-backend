@@ -8,7 +8,6 @@ from calendar import timegm
 import re
 
 local_tz = pytz.timezone("America/Los_Angeles")
-current_year = datetime.date.today().year
 city_council_agendas_url = "https://www.smgov.net/departments/clerk/agendas.aspx"
 
 
@@ -34,7 +33,7 @@ def get_data(year):
         for row in rows:
             cells = row.findChildren('td')
             try:
-                date = agenda_date_to_epoch(cells[0])
+                date = agenda_date_to_epoch(cells[0], year)
             except:
                 date = None
             if date and cells[1].string == "Agenda":
@@ -45,10 +44,10 @@ def get_data(year):
     return agendas
 
 
-def agenda_date_to_epoch(date_str):
+def agenda_date_to_epoch(date_str, year):
     '''Transforms scraped date to epoch time'''
     naive_dt = datetime.datetime.strptime(
-        str(current_year) + " " + date_str.string.strip(), '%Y %B %d %I:%M %p')
+        str(year) + " " + date_str.string.strip(), '%Y %B %d %I:%M %p')
     local_dt = local_tz.localize(naive_dt, is_dst=None)
     utc_dt = local_dt.astimezone(pytz.utc)
     utc_timetuple = utc_dt.timetuple()
