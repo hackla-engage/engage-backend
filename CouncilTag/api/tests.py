@@ -3,9 +3,10 @@ import json
 from CouncilTag.ingest.models import Agenda, Committee, Tag, AgendaItem, EngageUserProfile, Message
 import jwt
 from CouncilTag import settings
-from django.contrib.auth.models import User
 from CouncilTag.api.utils import send_mail
 from datetime import datetime
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 # Create your tests here.
 class TestAgendasEndpoint(TestCase):

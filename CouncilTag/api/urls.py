@@ -11,7 +11,9 @@ urlpatterns = [
     url(r'^tag/(?P<tag_name>[a-zA-Z _]+)/agenda/items', views.get_agendaitem_by_tag),
     url(r'^user/add/tag/$', views.add_tag_to_user),
     url(r'^user/del/tag/$', views.del_tag_from_user),
+    url(r'^user/get/tags/$', views.get_user_tags),
     url(r'^add/message/$', views.add_message),
+
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

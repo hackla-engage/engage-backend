@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
 
 # Create your models here.
@@ -9,6 +9,12 @@ class Tag(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(null=True)
     icon = models.CharField(max_length=100, null=True)
+
+
+class EngageUser(AbstractUser):
+    email = models.EmailField(unique=True)
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
 
 
 class Committee(models.Model):
@@ -50,8 +56,12 @@ class CommitteeMember(models.Model):
 
 
 class EngageUserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(EngageUser, on_delete=models.CASCADE)
+    ethnicity = models.IntegerField(null=True, blank=True)
+    zipcode = models.PositiveIntegerField(default=90401)
+    verified = models.BooleanField(default=False)
     tags = models.ManyToManyField(Tag)
+
 
 
 class Message(models.Model):
@@ -60,7 +70,7 @@ class Message(models.Model):
     unprocessed messges. Messages will then be grouped by item and separated 
     by pro and con and have summaries produced which gauge their sentiment 
     '''
-    user = models.ForeignKey(User, null=True)
+    user = models.ForeignKey(EngageUser, null=True)
     agenda_item = models.ForeignKey(AgendaItem, null=True)
     content = models.TextField(blank=True, null=True)
     committee = models.ForeignKey(Committee, null=True)

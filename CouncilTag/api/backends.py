@@ -1,5 +1,7 @@
 from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.models import User
+from CouncilTag.ingest.models import EngageUser
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 class EmailPasswordBackend(ModelBackend):
     def authenticate(self, username=None, password=None, **kwargs):
