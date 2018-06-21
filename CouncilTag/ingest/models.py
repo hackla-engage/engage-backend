@@ -81,4 +81,4 @@ class Message(models.Model):
     ethnicity = models.TextField(blank=True, null=True)
     date = models.PositiveIntegerField(default=0)  # Unix timestamp
     sent = models.PositiveIntegerField(default=0)  # Unix timestamp
-    pro = models.BooleanField(default=False)
+    pro = models.PositiveIntegerField(default=0, null=False)
