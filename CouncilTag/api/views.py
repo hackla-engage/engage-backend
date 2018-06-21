@@ -3,8 +3,10 @@ from rest_framework import status, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
-from django.contrib.auth.models import User, AnonymousUser
-from CouncilTag.ingest.models import Agenda, Tag, AgendaItem, EngageUserProfile, Message, Committee
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth import get_user_model
+User = get_user_model()
+from CouncilTag.ingest.models import Agenda, Tag, AgendaItem, EngageUserProfile, Message, Committee, EngageUser
 from CouncilTag.api.serializers import AgendaSerializer, TagSerializer, AgendaItemSerializer, UserFeedSerializer, CommitteeSerializer
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
@@ -61,8 +63,8 @@ class UserFeed(generics.ListAPIView):
         now = datetime.now(pytz.UTC)
         unixnow = calendar.timegm(now.utctimetuple())
         if (not isinstance(self.request.user, AnonymousUser)):
-            profile = EngageUserProfile.objects.get(user=self.request.user)
-            tags_query_set = profile.tags.all()
+            user = EngageUser.objects.get(user=self.request.user)
+            tags_query_set = user.tags.all()
             agenda_items = AgendaItem.objects.filter(tags__name__in=tag_names).filter(
                 agenda__meeting_time__contained_by=NumericRange(self.request.data['begin'], self.request.data['end']))
             if agenda_items[0].meeting_time > unixnow:
@@ -84,6 +86,7 @@ class UserFeed(generics.ListAPIView):
             data.append({"item": ag_item, "tag": list(
                 ag_item.tags.all()), "meeting_already_held": meeting_held})
         return data
+
 
 @api_view(['POST'])
 def login_user(request, format=None):
@@ -135,6 +138,17 @@ def get_agendaitem_by_tag(request, tag_name):
 
 
 @login_required
+@api_view(['GET'])
+def get_user_tags(request, format=None):
+    user = EngageUserProfile.objects.get(user=request.user)
+    tags = user.tags.all()
+    tags_list = []
+    for tag in tags:
+      tags_list.append(tag.name)
+    return Response(data=tags_list)
+
+
+@login_required
 @api_view(['POST'])
 def add_tag_to_user(request, format=None):
     '''
@@ -144,16 +158,16 @@ def add_tag_to_user(request, format=None):
     '''
     if len(request.data["tags"]) == 0:
         return Response({"error": "tags were not included"}, status=400)
-    profile = EngageUserProfile.objects.get(user=request.user)
+    user = EngageUserProfile.objects.get(user=request.user)
     for tag in request.data["tags"]:
         try:
             tag_to_add = Tag.objects.filter(name__contains=tag).first()
-            profile.tags.add(tag_to_add)
+            user.tags.add(tag_to_add)
         except:
             print("Could not add tag (" + tag + ") to user (" + request.user.username +
                   ") since it doesn't exist in the ingest_tag table.")
     try:
-        profile.save()
+        user.save()
     except:
         return Response(status=500)
     return Response(status=200)
@@ -169,12 +183,12 @@ def del_tag_from_user(request, format=None):
     '''
     if len(request.data["tags"]) == 0:
         return Response({"error": "tags were not included"}, status=400)
-    profile = EngageUserProfile.objects.get(user=request.user)
+    user = EngageUserProfile.objects.get(user=request.user)
     for tag in request.data["tags"]:
         tag_to_remove = Tag.objects.filter(name__contains=tag).first()
-        profile.tags.remove(tag_to_remove)
+        user.tags.remove(tag_to_remove)
     try:
-        profile.save()
+        user.save()
     except:
         return Response(status=500)
     return Response(status=200)
@@ -200,13 +214,13 @@ def add_message(request, format=None):
     pro = message_info['pro']
     result = verify_recaptcha(verify_token)
     if not result:
-      return Response(status=400)
+        return Response(status=400)
     first_name = None
     last_name = None
     zipcode = 90401
     user = None
     ethnicity = None
-    email=None
+    email = None
     user = None
     if (isinstance(request.user, AnonymousUser)):
         first_name = message_info['first']
@@ -217,7 +231,7 @@ def add_message(request, format=None):
         user = request.user
     new_message = Message(agenda_item=agenda_item, user=user,
                           first_name=first_name, last_name=last_name,
-                          zipcode=zipcode, email=email, ethnicity=ethnicity, 
+                          zipcode=zipcode, email=email, ethnicity=ethnicity,
                           committee=committee, content=content, pro=pro,
                           date=now, sent=0)
     # Default to unsent, will send on weekly basis all sent=0

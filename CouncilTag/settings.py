@@ -141,6 +141,7 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 CORS_ORIGIN_ALLOW_ALL = True
 AUTHENTICATION_BACKENDS = ['CouncilTag.api.backends.EmailPasswordBackend']
+AUTH_USER_MODEL = 'ingest.EngageUser'
 
 CORS_URLS_REGEX = r'^/api/.*$'
 
