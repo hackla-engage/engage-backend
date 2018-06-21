@@ -198,11 +198,18 @@ def del_tag_from_user(request, format=None):
 @api_view(['POST'])
 def add_message(request, format=None):
     '''
-    /send/message JSON body attribute should have an object that
-    includes keys: ["content", "ag_item", "to", ""]. The user 
-    must be logged in for this. The "content" is the message that 
-    the user wants to send and the "ag_item" is the id of the 
-    agenda item that the message is referencing
+    /send/message JSON body
+    Required Keys:
+    @committee: string committee name, e.g. "Santa Monica City Council", must be same as in agenda item.
+    @ag_item: item id, integer
+    @content: string, no format required
+    @token: token string from Google recaptcha
+    @pro: boolean, True == Pro, False == Con
+    If not signed in:
+    @first: string
+    @last: string
+    @zip: integer
+    @email: string
     '''
     now = datetime.now().timestamp()
     message_info = request.data
