@@ -200,16 +200,17 @@ def add_message(request, format=None):
     '''
     /send/message JSON body
     Required Keys:
-    @committee: string committee name, e.g. "Santa Monica City Council", must be same as in agenda item.
-    @ag_item: item id, integer
-    @content: string, no format required
-    @token: token string from Google recaptcha
-    @pro: boolean, True == Pro, False == Con
+    committee: string committee name, e.g. "Santa Monica City Council", must be same as in agenda item.
+    ag_item: item id, integer
+    content: string, no format required
+    token: token string from Google recaptcha
+    pro: boolean, True == Pro, False == Con
+    
     If not signed in:
-    @first: string
-    @last: string
-    @zip: integer
-    @email: string
+    first: string
+    last: string
+    zip: integer
+    email: string
     '''
     now = datetime.now().timestamp()
     message_info = request.data
