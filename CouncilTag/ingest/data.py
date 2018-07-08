@@ -1,15 +1,150 @@
-from bs4 import BeautifulSoup
 import requests
-import json
-import io
+from bs4 import BeautifulSoup
+import unicodedata
 import datetime
 import pytz
 from calendar import timegm
-import re
 
 local_tz = pytz.timezone("America/Los_Angeles")
 city_council_agendas_url = "https://www.smgov.net/departments/clerk/agendas.aspx"
 
+list_of_sections = [u'SPECIAL AGENDA ITEMS', u'CONSENT CALENDAR', u'STUDY SESSION',
+                    u'CONTINUED ITEMS', u'ADMINISTRATIVE PROCEEDINGS', u'ORDINANCES',
+                    u'STAFF ADMINISTRATIVE ITEMS', u'PUBLIC HEARINGS']
+
+def agenda_date_to_epoch(date_str, year):
+    '''Transforms scraped date to epoch time'''
+    naive_dt = datetime.datetime.strptime(
+        str(year) + " " + date_str.string.strip(), '%Y %B %d %I:%M %p')
+    local_dt = local_tz.localize(naive_dt, is_dst=None)
+    utc_dt = local_dt.astimezone(pytz.utc)
+    utc_timetuple = utc_dt.timetuple()
+    return timegm(utc_timetuple)
+
+
+def parse_query_params(params):
+    '''
+    Takes the split key value pairs which are made up of ["key=value", "key=value", "key="]
+    value may be empty except for MeetingID and ID keys
+    Returns a dictionary with two keys "MeetingID" and "ID"
+    '''
+    query = dict()
+    for param in params:
+        split_param = param.split("=")
+        query[split_param[0]] = split_param[1]
+    return query
+
+def process_information_section(body):
+    table_body = body.find('table')
+    if table_body is not None:
+        table_row = table_body.find('tr')
+        if table_row is not None:
+            td_children = table_row.find_all('td')
+            department = td_children[0].get_text().replace('&amp;', 'and')
+            sponsors = td_children[1].get_text()
+            if sponsors == '':
+                sponsors = None
+    return department, sponsors
+
+def process_actions_section(body):
+    actions = []
+    paragraphs = body.find_all('p')
+    list_actions = body.find('ol')
+    if list_actions is not None:
+        # preferred method
+        next = list_actions.find('li')
+        while next is not None:
+            if next.name == 'ol':
+                actions[-1] += unicodedata.normalize("NFKD", next.get_text())
+            else:
+                actions.append(unicodedata.normalize("NFKD", next.get_text()))
+            next = next.next_sibling
+    else:
+        paragraphs = paragraphs[1:]
+        for paragraph in paragraphs:
+            actions.append(unicodedata.normalize("NFKD", paragraph.get_text()))
+    if len(actions) > 0 and actions[0] == 'Staff recommends that the City Council:':
+        actions = actions[1:]
+    return actions
+
+def process_agenda_item(session, prefix, href):
+    agenda_item = dict()
+    agenda_item_url = prefix + href
+    query = href.split('?')
+    query_params = query[1].split("&")
+    if query[0] != 'Detail_LegiFile.aspx':
+        return
+    r = session.get(agenda_item_url)
+    agenda_item_soup = BeautifulSoup(r.text, 'html.parser')
+    
+    params = parse_query_params(query_params)
+    ID = params['ID']
+    MeetingID = params['MeetingID']
+    Title = agenda_item_soup.find(
+        'h1', {'id': 'ContentPlaceholder1_lblLegiFileTitle'}).get_text().strip()
+    bodies = agenda_item_soup.find_all(
+        'div', {'class': 'LegiFileSectionContents'})
+    agenda_item['Title'] = Title
+    agenda_item['ID'] = ID
+    agenda_item['MeetingID'] = MeetingID
+    agenda_item['Body'] = []
+
+    for i in range(len(bodies)):
+        body = bodies[i]
+        if i == 0:
+            # Information
+            Department, Sponsors = process_information_section(body)
+            agenda_item['Department'] = Department
+            agenda_item['Sponsors'] = Sponsors
+        elif i == 1:
+            # Recommended Action
+            Actions = process_actions_section(body)
+            agenda_item['Recommendations'] = Actions
+        else:
+            # Staff Report Body
+            Body = body.find_all('p')
+            for body_element in Body:
+                text = unicodedata.normalize("NFKD", body_element.get_text()).strip()
+                if text != '':
+                    agenda_item['Body'].append(text)
+    return agenda_item
+
+def process_siblings(section_begin, section_end):
+    next = section_begin
+    as_for_section = []
+    while next != section_end:
+        links = next.find_all('a')
+        for a in links:
+            a_parent_prev_sibs = a.find_parent().find_previous_siblings()
+            if len(a_parent_prev_sibs) == 2:
+                as_for_section.append(a.get('href'))
+        next = next.find_next_sibling()
+    return as_for_section
+
+def scrape_agenda(agenda, sess):
+    soup_agenda = BeautifulSoup(agenda, 'html.parser')
+    meeting = soup_agenda.find('table', {'id': 'MeetingDetail'})
+    sections = meeting.find_all('td', {'class': 'Title'})
+    main_sections = []
+    processed_sections = {}
+    agenda_items = []
+    for section in sections:
+        strong = section.find('strong')
+        if strong is not None and strong.get_text() in list_of_sections:
+            parent_tr = section.find_parent()
+            main_sections.append(parent_tr)
+    for i in range(len(main_sections) - 1):
+        processed_sections[main_sections[i].get_text().split(
+            ". ")[1]] = process_siblings(main_sections[i], main_sections[i + 1])
+    for key, values in processed_sections.items():
+        for value in values:
+            if value is None:
+                continue
+            agenda_item = process_agenda_item(
+                sess, 'http://santamonicacityca.iqm2.com/Citizens/', value)
+            if agenda_item is not None:
+                agenda_items.append(agenda_item)
+    return agenda_items
 
 def get_data(year):
     with requests.Session() as sess:
@@ -42,112 +177,3 @@ def get_data(year):
                 if "CONSENT CALENDAR" in agenda:
                     agendas[date] = scrape_agenda(agenda, sess)
     return agendas
-
-
-def agenda_date_to_epoch(date_str, year):
-    '''Transforms scraped date to epoch time'''
-    naive_dt = datetime.datetime.strptime(
-        str(year) + " " + date_str.string.strip(), '%Y %B %d %I:%M %p')
-    local_dt = local_tz.localize(naive_dt, is_dst=None)
-    utc_dt = local_dt.astimezone(pytz.utc)
-    utc_timetuple = utc_dt.timetuple()
-    return timegm(utc_timetuple)
-
-
-def scrape_agenda(agenda, sess):
-    # Searches the entire HTML text for the words since it's not yet parsed into html by BS
-    soup_agenda = BeautifulSoup(agenda, 'html.parser')
-    tableMeeting = soup_agenda.find('table', {'id': 'MeetingDetail'})
-    string_sections = tableMeeting.find_all('strong')
-    parent = string_sections[0].find_parent("tr")
-    next_siblings = parent.find_next_siblings("tr")
-    # staff_reports = {} This and commented code block below can be used to automatically group reports by Category
-    staff_reports = []
-    reports_holder = []
-
-    for sibling in next_siblings:
-        if sibling.find('strong'):
-            if len(reports_holder) != 0:
-                staff_reports.append(reports_holder)
-                reports_holder = []
-            #     staff_reports[agenda_group] = reports_holder
-            #     reports_holder = []
-            # agenda_heading = re.match('^(\d+)\..*', sibling.text)
-            # if agenda_heading:
-            #     agenda_group = agenda_heading.group(1)
-        else:
-            cells = sibling.find_all('td')
-            if len(cells) > 2 and u'Title' in cells[2]['class']:
-                staff_report = cells[2].find('a', {'href': True})
-                if staff_report is None:
-                    continue
-                staff_report_href = 'http://santamonicacityca.iqm2.com/Citizens/' + \
-                    staff_report['href']
-                try:
-                    staff_report_r = sess.get(staff_report_href)
-                    staff_report_html = staff_report_r.text
-                    s_r_processed = process_staff_report(staff_report_html)
-                    key_values = staff_report_href.split("?")
-                    key_values = key_values[1].split("&")
-                    dict_values = process_kvs(key_values)
-                    if len(s_r_processed) != 0:
-                        s_r_processed["MeetingID"] = dict_values["MeetingID"]
-                        s_r_processed["ID"] = dict_values["ID"]
-                        reports_holder.append(s_r_processed)
-                except Exception as e:
-                    # We should create a log file to capture this output rather than just printing...
-                    print("coult not get: " + staff_report_href)
-                    print(e)
-                    exit()
-    return staff_reports
-
-
-def process_kvs(key_values):
-    '''
-    Takes the split key value pairs which are made up of ["key=value", "key=value", "key="]
-    value may be empty except for MeetingID and ID keys
-    Returns a dictionary with two keys "MeetingID" and "ID"
-    '''
-    dictionary_vals = dict()
-    for kv in key_values:
-        key_value = kv.split("=")
-        if key_value[0] in {"MeetingID", "ID"}:
-            dictionary_vals[key_value[0]] = key_value[1]
-    return dictionary_vals
-
-
-def process_staff_report(staff_report_html):
-    '''
-    staff_report_html is the HTML text
-    '''
-    staff_report_soup = BeautifulSoup(staff_report_html, 'html.parser')
-    title = staff_report_soup.find('div', {'class': 'LegiFileTitle'})
-    if title:
-        title = title.text.strip()
-    else:
-        return []
-    info = staff_report_soup.find('div', {'class': 'LegiFileInfo'})
-    info_dict = dict()
-    info_dict['Title'] = title
-    if info:
-        info_rows = info.div.table.find_all(['tr'])
-        for info_row in info_rows:
-            info_headers = info_row.find_all('th')
-            info_values = info_row.find_all('td')
-            for i in enumerate(info_headers):
-                info_dict[i[1].strong.string] = info_values[i[0]].string
-    discussion = staff_report_soup.find('div', {'id': 'divItemDiscussion'})
-    if discussion != None:
-        discussion = discussion.text.replace(
-            'Recommended Action', '').replace('\xa0', '').strip()
-        info_dict['Recommendations'] = discussion
-    body = staff_report_soup.find('div', {'id': 'divBody'})
-    if body != None:
-        body_paragraphs = []
-        paragraphs = body.div.div.find_all('p')
-        for paragraph in paragraphs:
-            cleaned = paragraph.text.replace('\xa0', '').strip()
-            if cleaned:
-                body_paragraphs.append(cleaned)
-        info_dict['Body'] = body_paragraphs
-    return info_dict
