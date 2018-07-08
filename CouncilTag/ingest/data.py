@@ -83,30 +83,29 @@ def process_agenda_item(session, prefix, href):
     Title = agenda_item_soup.find(
         'h1', {'id': 'ContentPlaceholder1_lblLegiFileTitle'}).get_text().strip()
     bodies = agenda_item_soup.find_all(
-        'div', {'class': 'LegiFileSectionContents'})
+        'div', {'class': 'LegiFileSection'})
+    info = agenda_item_soup.find('div', {'class': 'LegiFileInfo'})
     agenda_item['Title'] = Title
     agenda_item['ID'] = ID
     agenda_item['MeetingID'] = MeetingID
+    if info is not None:
+        info_body = info.find('div', {'class': 'LegiFileSectionContents'})
+        Department, Sponsors = process_information_section(info_body)
+        agenda_item['Department'] = Department
+        agenda_item['Sponsors'] = Sponsors
+    recommendations_body = agenda_item_soup.find('div', {'id': 'divItemDiscussion'})
+    summary_body = agenda_item_soup.find('div', {'id': 'divBody'})
+    if recommendations_body is not None:
+        agenda_item['Recommendations'] = process_actions_section(recommendations_body)
+    else:
+        agenda_item['Recommendations'] = []
     agenda_item['Body'] = []
-
-    for i in range(len(bodies)):
-        body = bodies[i]
-        if i == 0:
-            # Information
-            Department, Sponsors = process_information_section(body)
-            agenda_item['Department'] = Department
-            agenda_item['Sponsors'] = Sponsors
-        elif i == 1:
-            # Recommended Action
-            Actions = process_actions_section(body)
-            agenda_item['Recommendations'] = Actions
-        else:
-            # Staff Report Body
-            Body = body.find_all('p')
-            for body_element in Body:
-                text = unicodedata.normalize("NFKD", body_element.get_text()).strip()
-                if text != '':
-                    agenda_item['Body'].append(text)
+    if summary_body is not None:
+        Body = summary_body.find_all('p')
+        for body_element in Body:
+            text = unicodedata.normalize("NFKD", body_element.get_text()).strip()
+            if text != '':
+                agenda_item['Body'].append(text)
     return agenda_item
 
 def process_siblings(section_begin, section_end):

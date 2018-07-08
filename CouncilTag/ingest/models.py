@@ -43,7 +43,7 @@ class AgendaItem(models.Model):
 
 class AgendaRecommendation(models.Model):
     agenda_item = models.ForeignKey(AgendaItem, related_name="recommendations")
-    recommendation = models.TextField()
+    recommendation = ArrayField(models.TextField(), default=list())
 
 
 class CommitteeMember(models.Model):
