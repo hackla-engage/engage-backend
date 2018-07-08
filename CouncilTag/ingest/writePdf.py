@@ -12,9 +12,9 @@ import io
 
 def paragraphize_comments(comments, contents):
     ps_email = ParagraphStyle(
-        "email", fontSize=10, leftIndent=0.25*inch, textColor="#0000FF")
+        "email", fontSize=10, leftIndent=0.25 * inch, textColor="#0000FF")
     ps_comment = ParagraphStyle(
-        "comment", fontSize=10, leftIndent=0.25*inch, textColor="#00FF00")
+        "comment", fontSize=10, leftIndent=0.25 * inch, textColor="#00FF00")
     for comment in comments:
         if comment.email is not None:
             email = "email: " + comment.email
@@ -22,7 +22,7 @@ def paragraphize_comments(comments, contents):
         elif comment.user is not None:
             email = "email: " + comment.user.email
             comment = "comment: " + comment.content
-        else :
+        else:
             continue
         contents.append(Paragraph(email, ps_email))
         contents.append(Paragraph(comment, ps_comment))
@@ -36,7 +36,10 @@ def writePdfForAgendaItems(agenda_items):
                                 rightMargin=72, leftMargin=72,
                                 topMargin=72, bottomMargin=18)
         contents = []
-        ps_title = ParagraphStyle("title", fontSize=14, alignment=TA_JUSTIFY, spaceAfter=0.2*inch)
+
+        # Paragraph styles
+        ps_title = ParagraphStyle(
+            "title", fontSize=14, alignment=TA_JUSTIFY, spaceAfter=0.2 * inch)
         ps_id = ParagraphStyle("id", fontSize=10)
         ps_pro = ParagraphStyle(
             'pro', fontSize=10, backColor='#0000FF', textColor="#FFFFFF")
@@ -44,6 +47,7 @@ def writePdfForAgendaItems(agenda_items):
             'con', fontSize=10, backColor='#FF0000', textColor='#FFFFFF')
         ps_need_info = ParagraphStyle(
             'need_info', fontSize=10, backColor='#000000', textColor='#FFFFFF')
+        
         for upcoming_agenda_item in agenda_items:
             contents.append(
                 Paragraph("Title: " + upcoming_agenda_item.title, ps_title))
@@ -60,21 +64,20 @@ def writePdfForAgendaItems(agenda_items):
                 agenda_item=upcoming_agenda_item, pro=2
             )
             contents.append(Paragraph("Pro comments", ps_pro))
-            contents.append(Spacer(1,0.2*inch))
+            contents.append(Spacer(1, 0.2 * inch))
             paragraphize_comments(pro_comments_on_agenda_item, contents)
-            contents.append(Spacer(1,0.5*inch))
+            contents.append(Spacer(1, 0.5 * inch))
             contents.append(Paragraph("Con comments", ps_con))
-            contents.append(Spacer(1,0.2*inch))
+            contents.append(Spacer(1, 0.2 * inch))
             paragraphize_comments(con_comments_on_agenda_item, contents)
-            contents.append(Spacer(1,0.5*inch))
-            contents.append(Paragraph("Need more information comments", ps_need_info))
-            contents.append(Spacer(1,0.2*inch))
+            contents.append(Spacer(1, 0.5 * inch))
+            contents.append(
+                Paragraph("Need more information comments", ps_need_info))
+            contents.append(Spacer(1, 0.2 * inch))
             paragraphize_comments(need_info_comments_on_agenda_item, contents)
-            contents.append(Spacer(1,0.5*inch))
+            contents.append(Spacer(1, 0.5 * inch))
             contents.append(PageBreak())
-        print("DOC BUILD", contents[-3].height)
         doc.build(contents)
-        
         print("DONE")
         return True
     except:
