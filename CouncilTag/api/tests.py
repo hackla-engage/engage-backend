@@ -3,7 +3,7 @@ import json
 from CouncilTag.ingest.models import Agenda, Committee, Tag, AgendaItem, EngageUserProfile, Message
 import jwt
 from CouncilTag import settings
-from CouncilTag.api.utils import send_mail
+from CouncilTag.api.utils import send_message
 from datetime import datetime
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -108,8 +108,7 @@ class TestSendMessageEndpoint(TestCase):
         sent_message = Message(sent=int(datetime.now().timestamp()), content="Hello world", 
             user=user, agenda_item=self.ag_item )
         sent_message.save()
-
-        result = send_mail(sent_message)
+        result = send_message(sent_message)
         self.assertTrue(result)
 
     

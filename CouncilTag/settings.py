@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'CouncilTag.api',
     'corsheaders',
+    'drf_yasg'
 ]
 
 MIDDLEWARE = [
