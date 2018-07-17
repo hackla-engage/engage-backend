@@ -255,6 +255,42 @@ def update_profile(request, format=None):
     return Response(status=404)
 
 
+@swagger_auto_schema(
+    manual_parameters=[
+        openapi.Parameter(
+            name='type', in_=openapi.IN_FORM,
+            type=openapi.TYPE_STRING,
+            description="either email or signup",
+            required=True
+        ),
+        openapi.Parameter(
+            name='email', in_=openapi.IN_FORM,
+            type=openapi.TYPE_STRING,
+            description="email address of either user or message sender",
+            required=True
+        ),
+        openapi.Parameter(
+            name='id', in_=openapi.IN_FORM,
+            type=openapi.TYPE_INTEGER,
+            description="id for Message from DB",
+            required=True
+        ),
+        openapi.Parameter(
+            name='code', in_=openapi.IN_FORM,
+            type=openapi.TYPE_STRING,
+            description="8 character string emailed to user for verification.",
+            required=True
+        )
+    ],
+    responses={
+        status.HTTP_200_OK: openapi.Response(
+            description="Successfully verified message"
+        ),
+        status.HTTP_404_NOT_FOUND: openapi.Response(
+            description="Incorrect value, see error in data")
+    },
+    method='post'
+)
 @api_view(['POST'])
 def verify(request, format=None):
     """Verify signup for user or email message for non-user"""
@@ -293,6 +329,7 @@ def check_auth_code(plain_code, hashed):
     if dec == hashed:
         return True
     return False
+
 
 @swagger_auto_schema(
     manual_parameters=[
