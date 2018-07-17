@@ -289,7 +289,8 @@ def verify(request, format=None):
 
 
 def check_auth_code(plain_code, hashed):
-    if bcrypt.hashpw(plain_code, hashed) == hashed:
+    dec = bcrypt.hashpw(plain_code.encode('utf-8'), hashed.encode('utf-8')).decode('utf-8')
+    if dec == hashed:
         return True
     return False
 
@@ -313,7 +314,7 @@ def signup_user(request, format=None):
     rand_begin = random.randint(0, 32 - CODE_LENGTH)
     authcode = str(uuid.uuid1()).replace(
         "-", "")[rand_begin:rand_begin + CODE_LENGTH].encode('utf-8')
-    authcode_hashed = bcrypt.hashpw(authcode, bcrypt.gensalt())
+    authcode_hashed = bcrypt.hashpw(authcode, bcrypt.gensalt()).decode('utf-8')
     
     if 'home_owner' in data and data['home_owner']:
         home_owner = True
