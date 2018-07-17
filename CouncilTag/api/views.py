@@ -259,25 +259,24 @@ def update_profile(request, format=None):
 def verify(request, format=None):
     """Verify signup for user or email message for non-user"""
     data = request.data
-    if 'type' not in data or 'code' not in data or 'email' not in data or 'item' not in data:
+    if 'type' not in data or 'code' not in data or 'email' not in data or 'id' not in data:
         return Response(data={"error": "Data object must contain code, email, item, and type"}, status=404)
     if data['type'] not in ["email", "signup"]:
         return Response(data={"error": "Data object's type must be signup or email"}, status=404)
     user = User.objects.get(email=data["email"])
-    if user is None:
-        return Response(data={"error": "User not found"}, status=404)
     if data['type'] == 'email':
-        email = Message.objects.filter(
-            user=user, agenda_item__agenda_item_id=data['item'])
-        if len(email) > 1:
-            return Response(data={"error": "More than one email found for current agenda item"}, status=404)
-        authcode = email[0].authcode
+        message = Message.objects.get(id=data['id'])
+        if message is None:
+            return Response(data={"error": "Message was not found"}, status=404)
+        authcode = message.authcode
         if not check_auth_code(data['code'], authcode):
             return Response(data={"error": "Authcodes do not match for email"}, status=404)
-        email[0].authcode = None
-        email[0].save()
+        message.authcode = None
+        message.save()
         return Response(status=200)
     elif data['type'] == 'signup':
+        if user is None:
+            return Response(data={"error": "User not found"}, status=404)
         profile = EngageUserProfile.objects.get(user=user)
         authcode = profile.authcode
         if not check_auth_code(data['code'], authcode):
@@ -289,7 +288,8 @@ def verify(request, format=None):
 
 
 def check_auth_code(plain_code, hashed):
-    dec = bcrypt.hashpw(plain_code.encode('utf-8'), hashed.encode('utf-8')).decode('utf-8')
+    dec = bcrypt.hashpw(plain_code.encode('utf-8'),
+                        hashed.encode('utf-8')).decode('utf-8')
     if dec == hashed:
         return True
     return False
@@ -315,7 +315,7 @@ def signup_user(request, format=None):
     authcode = str(uuid.uuid1()).replace(
         "-", "")[rand_begin:rand_begin + CODE_LENGTH].encode('utf-8')
     authcode_hashed = bcrypt.hashpw(authcode, bcrypt.gensalt()).decode('utf-8')
-    
+
     if 'home_owner' in data and data['home_owner']:
         home_owner = True
     else:
@@ -353,7 +353,7 @@ def signup_user(request, format=None):
             "code": authcode,
             "email": email,
             "type": "signup",
-            "item": ""
+            "id": ""
         })
         print("ZXY:", query_parameters)
         query_string = 'https://engage-santa-monica.herokuapp.com/#/emailConfirmation?' + query_parameters
@@ -369,7 +369,6 @@ def signup_user(request, format=None):
     except:
         print("Unexpected error:", sys.exc_info()[0])
         return Response(status=404)
-
 
 
 @api_view(['GET'])
@@ -615,7 +614,7 @@ def add_message(request, format=None):
     rand_begin = random.randint(0, 32 - CODE_LENGTH)
     authcode = str(uuid.uuid1()).replace(
         "-", "")[rand_begin:rand_begin + CODE_LENGTH].encode('utf-8')
-    authcode_hashed = bcrypt.hashpw(authcode, bcrypt.gensalt())
+    authcode_hashed = bcrypt.hashpw(authcode, bcrypt.gensalt()).decode('utf-8')
     if (isinstance(request.user, AnonymousUser)):
         first_name = message_info['first']
         last_name = message_info['last']
@@ -644,12 +643,14 @@ def add_message(request, format=None):
                           committee=committee, content=content, pro=pro, authcode=authcode_hashed,
                           date=now, sent=0, home_owner=home_owner, business_owner=business_owner,
                           resident=resident, works=works, school=school, child_school=child_school)
+    new_message.save()
+    print(new_message.id)
     if authcode_hashed is not None:
         query_parameters = urllib.parse.urlencode({
             "code": authcode,
             "email": email,
             "type": "email",
-            "item": str(agenda_item.id)
+            "id": str(new_message.id)
         })
         query_string = 'https://engage-santa-monica.herokuapp.com/#/emailConfirmation?' + query_parameters
         content = '<h3>Thanks for voicing your opinion,</h3> Before we process your comment, please click <a href="' + \
@@ -659,7 +660,6 @@ def add_message(request, format=None):
             {"user": {"email": email}, "subject": "Verify message regarding agenda item: " + agenda_item.agenda_item_id,
              "content": content})
     # Default to unsent, will send on weekly basis all sent=0
-    new_message.save()
     return Response(status=200)
 
 

@@ -19,7 +19,10 @@ def send_mail(mail_message):
     APIKEY = os.environ["SENDGRIDKEY"]
     sg = sendgrid.SendGridAPIClient(apikey=APIKEY)
     from_email = Email("do-not-reply@engage.town")
-    to_email = Email(mail_message["user"].email)
+    if type(mail_message["user"]) is dict:
+        to_email = Email(mail_message["user"]["email"])    
+    else:
+        to_email = Email(mail_message["user"].email)
     subject = mail_message["subject"]
     content = Content('text/html', (mail_message["content"]))
     mail = Mail(from_email=from_email, subject=subject,
