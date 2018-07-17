@@ -24,7 +24,7 @@ schema_view = get_schema_view(
    openapi.Info(
       title="Engage Backend API Documentation",
       default_version='v1',
-      description="Test description",
+      description="Engage Documentation",
       contact=openapi.Contact(email="api@engage.town"),
       license=openapi.License(name="Apache License v2.0"),
    ),

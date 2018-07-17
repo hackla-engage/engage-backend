@@ -31,7 +31,9 @@ dependecies in the `requirements.txt`.
 
 In order, these commands will 1) create the SQL tables needed, 2) load our list of tags, 3) load up a set of live data from the City of Santa Monica
 
-8. Run `python manage.py runserver` to stat the python server. You can go to `http://localhost:8000/swagger/` to look at the docs and interact with the API. 
+8. Run `python manage.py runserver` to stat the python server. 
+
+You can go to `http://localhost:8000/swagger/` to look at the docs and interact with the API. 
 
 
 ## Continous Delivery

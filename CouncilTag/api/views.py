@@ -16,9 +16,17 @@ import jwt
 import json
 import pytz
 import calendar
+import uuid
+import urllib
+import random
+import bcrypt
+import sys
 from CouncilTag import settings
 from rest_framework.renderers import JSONRenderer
 from psycopg2.extras import NumericRange
+from drf_yasg import openapi
+from drf_yasg.inspectors import SwaggerAutoSchema
+from drf_yasg.utils import swagger_auto_schema
 
 
 class SmallResultsPagination(LimitOffsetPagination):
@@ -100,7 +108,7 @@ def calculateTallies(messages_qs):
     child_school = 0
     total = 0
     for message in messages_qs:
-        if message.authcode != "":
+        if message.authcode != None:
             continue
         if message.pro == 0:
             con += 1
@@ -124,6 +132,30 @@ def calculateTallies(messages_qs):
     return {"home_owner": home_owner, "business_owner": business_owner,
             "resident": resident, "works": works, "school": school,
             "child_school": child_school, "pro": pro, "con": con, "more_info": more_info, "total": total}
+
+
+@api_view(['GET'])
+def get_agenda(request, meeting_id):
+    '''
+    Returns specified JSON serialized agenda if it exists
+    '''
+    agenda = Agenda.objects.get(meeting_id=meeting_id)
+    if agenda_item is None:
+        return Response(data={"error": "No agenda item with id:" + str(agenda_item_id)}, status=404)
+    data = AgendaItemSerializer(agenda_item, many=False).data
+    return Response(data=data, status=200)
+
+
+@api_view(['GET'])
+def get_agenda_item(request, agenda_item_id):
+    '''
+    Returns JSON serialized agenda item
+    '''
+    agenda_item = AgendaItem.objects.get(agenda_item_id=agenda_item_id)
+    if agenda_item is None:
+        return Response(data={"error": "No agenda item with id:" + str(agenda_item_id)}, status=404)
+    data = AgendaItemSerializer(agenda_item, many=False).data
+    return Response(data=data, status=200)
 
 
 @api_view(['GET'])
@@ -224,6 +256,45 @@ def update_profile(request, format=None):
 
 
 @api_view(['POST'])
+def verify(request, format=None):
+    """Verify signup for user or email message for non-user"""
+    data = request.data
+    if 'type' not in data or 'code' not in data or 'email' not in data or 'item' not in data:
+        return Response(data={"error": "Data object must contain code, email, item, and type"}, status=404)
+    if data['type'] not in ["email", "signup"]:
+        return Response(data={"error": "Data object's type must be signup or email"}, status=404)
+    user = User.objects.get(email=data["email"])
+    if user is None:
+        return Response(data={"error": "User not found"}, status=404)
+    if data['type'] == 'email':
+        email = Message.objects.filter(
+            user=user, agenda_item__agenda_item_id=data['item'])
+        if len(email) > 1:
+            return Response(data={"error": "More than one email found for current agenda item"}, status=404)
+        authcode = email[0].authcode
+        if not check_auth_code(data['code'], authcode):
+            return Response(data={"error": "Authcodes do not match for email"}, status=404)
+        email[0].authcode = None
+        email[0].save()
+        return Response(status=200)
+    elif data['type'] == 'signup':
+        profile = EngageUserProfile.objects.get(user=user)
+        authcode = profile.authcode
+        if not check_auth_code(data['code'], authcode):
+            return Response(data={"error": "Authcodes do not match for email"}, status=404)
+        profile.authcode = None
+        profile.save()
+        return Response(status=200)
+    return Response(status=500)
+
+
+def check_auth_code(plain_code, hashed):
+    if bcrypt.hashpw(plain_code, hashed) == hashed:
+        return True
+    return False
+
+
+@api_view(['POST'])
 def signup_user(request, format=None):
     '''
     post:
@@ -238,6 +309,12 @@ def signup_user(request, format=None):
     username = data['username']
     first_name = data['first_name']
     last_name = data['last_name']
+    CODE_LENGTH = 8
+    rand_begin = random.randint(0, 32 - CODE_LENGTH)
+    authcode = str(uuid.uuid1()).replace(
+        "-", "")[rand_begin:rand_begin + CODE_LENGTH].encode('utf-8')
+    authcode_hashed = bcrypt.hashpw(authcode, bcrypt.gensalt())
+    
     if 'home_owner' in data and data['home_owner']:
         home_owner = True
     else:
@@ -270,11 +347,28 @@ def signup_user(request, format=None):
         # Don't need to save any values from it
         EngageUserProfile.objects.create(
             user=user, home_owner=home_owner, resident=resident, business_owner=business_owner,
-            works=works, school=school, child_school=child_school)
+            works=works, school=school, child_school=child_school, authcode=authcode_hashed)
+        query_parameters = urllib.parse.urlencode({
+            "code": authcode,
+            "email": email,
+            "type": "signup",
+            "item": ""
+        })
+        print("ZXY:", query_parameters)
+        query_string = 'https://engage-santa-monica.herokuapp.com/#/emailConfirmation?' + query_parameters
+        content = '<html><body><h3>Welcome to the Engage platform for Santa Monica,</h3> Please click <a href="' + \
+            query_string + '">here</a> to authenticate.<br/><br/>Thank you for your interest in your local government!<br/><br/> If you are receiving this in error, please email: <a href="mailto:engage@engage.town">engage@engage.town</a>.</body></html>'
+        print(content)
+        sent_mail = send_mail(
+            {"user": user, "subject": "Please authenticate your email for the Engage platform",
+             "content": content})
+        print("SENT MAIL:", sent_mail)
         token = jwt.encode({"username": user.email}, settings.SECRET_KEY)
         return Response({"token": token}, status=201)
     except:
         print("Unexpected error:", sys.exc_info()[0])
+        return Response(status=404)
+
 
 
 @api_view(['GET'])
@@ -372,17 +466,119 @@ def del_tag_from_user(request, format=None):
     return Response(status=200)
 
 
-# @login_required(login_url="/api/login")
+@swagger_auto_schema(
+    manual_parameters=[
+        openapi.Parameter(
+            name='committee', in_=openapi.IN_FORM,
+            type=openapi.TYPE_STRING,
+            description="string committee name",
+            required=True
+        ),
+        openapi.Parameter(
+            name='ag_item', in_=openapi.IN_FORM,
+            type=openapi.TYPE_INTEGER,
+            description="Agenda item id",
+            required=True
+        ),
+        openapi.Parameter(
+            name='content', in_=openapi.IN_FORM,
+            type=openapi.TYPE_STRING,
+            description="No format required. Limit of 255 characters",
+            required=True
+        ),
+        openapi.Parameter(
+            name='pro', in_=openapi.IN_FORM,
+            type=openapi.TYPE_INTEGER,
+            description="0=con, 1=pro, 2=neither",
+            required=True
+        ),
+        openapi.Parameter(
+            name='token', in_=openapi.IN_FORM,
+            type=openapi.TYPE_STRING,
+            description="Google reCaptcha v2 token to verify",
+            required=True
+        ),
+        openapi.Parameter(
+            name='first_name', in_=openapi.IN_FORM,
+            type=openapi.TYPE_STRING,
+            description="Required if not logged in. May be null or undefined if logged in",
+            required=True
+        ),
+        openapi.Parameter(
+            name='last_name', in_=openapi.IN_FORM,
+            type=openapi.TYPE_STRING,
+            description="Required if not logged in. May be null or undefined if logged in",
+            required=True
+        ),
+        openapi.Parameter(
+            name='zipcode', in_=openapi.IN_FORM,
+            type=openapi.TYPE_INTEGER,
+            description="Defaults to 90401. May be null or undefined if logged in",
+            required=True,
+            default=90401
+        ),
+        openapi.Parameter(
+            name='home_owner', in_=openapi.IN_FORM,
+            type=openapi.TYPE_BOOLEAN,
+            description="Defaults to False. May be null or undefined if logged in",
+            required=True,
+            default=False
+        ),
+        openapi.Parameter(
+            name='resident', in_=openapi.IN_FORM,
+            type=openapi.TYPE_BOOLEAN,
+            description="Defaults to False. May be null or undefined if logged in",
+            required=True,
+            default=False
+        ),
+        openapi.Parameter(
+            name='business_owner', in_=openapi.IN_FORM,
+            type=openapi.TYPE_BOOLEAN,
+            description="Defaults to False. May be null or undefined if logged in",
+            required=True,
+            default=False
+        ),
+        openapi.Parameter(
+            name='works', in_=openapi.IN_FORM,
+            type=openapi.TYPE_BOOLEAN,
+            description="Defaults to False. May be null or undefined if logged in",
+            required=True,
+            default=False
+        ),
+        openapi.Parameter(
+            name='school', in_=openapi.IN_FORM,
+            type=openapi.TYPE_BOOLEAN,
+            description="Defaults to False. May be null or undefined if logged in",
+            required=True,
+            default=False
+        ),
+        openapi.Parameter(
+            name='child_school', in_=openapi.IN_FORM,
+            type=openapi.TYPE_BOOLEAN,
+            description="Defaults to False. May be null or undefined if logged in",
+            required=True,
+            default=False
+        ),
+
+    ],
+    responses={
+        status.HTTP_200_OK: openapi.Response(
+            description="Successfully uploaded message"
+        )
+    },
+    method='post'
+)
 @api_view(['POST'])
 def add_message(request, format=None):
     '''
+    post method
     /send/message JSON body
     Required Keys:
-    committee: string committee name, e.g. "Santa Monica City Council", must be same as in agenda item.
+    :param committee: string committee name, e.g. "Santa Monica City Council", must be same as in agenda item.
     ag_item: item id, integer
     content: string, no format required
     token: token string from Google recaptcha
-    pro: boolean, True == Pro, False == Con
+    pro: integer, 1 == Pro, 0 == Con, 2 == neither
 
     If not signed in:
     first: string
@@ -408,18 +604,59 @@ def add_message(request, format=None):
     ethnicity = None
     email = None
     user = None
+    home_owner = False
+    business_owner = False
+    resident = False
+    works = False
+    school = False
+    child_school = False
+    CODE_LENGTH = 8
+    rand_begin = random.randint(0, 32 - CODE_LENGTH)
+    authcode = str(uuid.uuid1()).replace(
+        "-", "")[rand_begin:rand_begin + CODE_LENGTH].encode('utf-8')
+    authcode_hashed = bcrypt.hashpw(authcode, bcrypt.gensalt())
     if (isinstance(request.user, AnonymousUser)):
         first_name = message_info['first']
         last_name = message_info['last']
         zipcode = message_info['zip']
         email = message_info['email']
+        home_owner = message_info['home_owner']
+        business_owner = message_info['business_owner']
+        resident = message_info['resident']
+        works = message_info['works']
+        school = message_info['school']
+        child_school = message_info['child_school']
     else:
         user = request.user
+        profile = EngageUserProfile.objects.get(user_id=request.user.id)
+        home_owner = profile.home_owner
+        business_owner = profile.business_owner
+        resident = profile.resident
+        works = profile.works
+        school = profile.school
+        child_school = profile.child_school
+        if profile.authcode == None:
+            authcode_hashed = None
     new_message = Message(agenda_item=agenda_item, user=user,
                           first_name=first_name, last_name=last_name,
                           zipcode=zipcode, email=email, ethnicity=ethnicity,
-                          committee=committee, content=content, pro=pro,
-                          date=now, sent=0)
+                          committee=committee, content=content, pro=pro, authcode=authcode_hashed,
+                          date=now, sent=0, home_owner=home_owner, business_owner=business_owner,
+                          resident=resident, works=works, school=school, child_school=child_school)
+    if authcode_hashed is not None:
+        query_parameters = urllib.parse.urlencode({
+            "code": authcode,
+            "email": email,
+            "type": "email",
+            "item": str(agenda_item.id)
+        })
+        query_string = 'https://engage-santa-monica.herokuapp.com/#/emailConfirmation?' + query_parameters
+        content = '<h3>Thanks for voicing your opinion,</h3> Before we process your comment, please click <a href="' + \
+            query_string + '">here</a> to authenticate.<br/><br/>If you create and authenticate an account you will never have to authenticate for messages again.<br/><br/> Thank you for your interest in your local government!<br/><br/> If you are receiving this in error, please email: <a href="mailto:engage@engage.town">engage@engage.town</a>. '
+
+        send_mail(
+            {"user": {"email": email}, "subject": "Verify message regarding agenda item: " + agenda_item.agenda_item_id,
+             "content": content})
     # Default to unsent, will send on weekly basis all sent=0
     new_message.save()
     return Response(status=200)

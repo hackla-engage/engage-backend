@@ -81,7 +81,13 @@ def process_agenda_item(session, prefix, href):
     ID = params['ID']
     MeetingID = params['MeetingID']
     Title = agenda_item_soup.find(
-        'h1', {'id': 'ContentPlaceholder1_lblLegiFileTitle'}).get_text().strip()
+        'h1', {'id': 'ContentPlaceholder1_lblLegiFileTitle'})
+    if Title is None:
+        print("TITLE NONE FOR: ", agenda_item_url)
+        Title = "SOME TITLE"
+        return None
+    else:
+        Title = Title.get_text().strip()
     bodies = agenda_item_soup.find_all(
         'div', {'class': 'LegiFileSection'})
     info = agenda_item_soup.find('div', {'class': 'LegiFileInfo'})
