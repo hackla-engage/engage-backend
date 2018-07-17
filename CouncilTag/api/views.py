@@ -270,16 +270,15 @@ def update_profile(request, format=None):
             required=True
         ),
         openapi.Parameter(
-            name='id', in_=openapi.IN_FORM,
-            type=openapi.TYPE_INTEGER,
-            description="id for Message from DB",
-            required=True
-        ),
-        openapi.Parameter(
             name='code', in_=openapi.IN_FORM,
             type=openapi.TYPE_STRING,
             description="8 character string emailed to user for verification.",
             required=True
+        ),
+        openapi.Parameter(
+            name='id', in_=openapi.IN_FORM,
+            type=openapi.TYPE_INTEGER,
+            description="id for Message from DB",
         )
     ],
     responses={
@@ -289,18 +288,21 @@ def update_profile(request, format=None):
         status.HTTP_404_NOT_FOUND: openapi.Response(
             description="Incorrect value, see error in data")
     },
-    method='post'
+    method='post',
+
 )
 @api_view(['POST'])
 def verify(request, format=None):
     """Verify signup for user or email message for non-user"""
     data = request.data
-    if 'type' not in data or 'code' not in data or 'email' not in data or 'id' not in data:
+    if 'type' not in data or 'code' not in data or 'email' not in data:
         return Response(data={"error": "Data object must contain code, email, id, and type"}, status=404)
     if data['type'] not in ["email", "signup"]:
         return Response(data={"error": "Data object's type must be signup or email"}, status=404)
     user = User.objects.get(email=data["email"])
     if data['type'] == 'email':
+        if 'id' not in data:
+            return Response(data={"error": "Data object must contain code, email, id, and type, for email message"}, status=404)
         message = Message.objects.get(id=data['id'])
         if message is None:
             return Response(data={"error": "Message id: " + data['id'] + "was not found"}, status=404)
