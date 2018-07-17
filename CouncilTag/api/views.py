@@ -260,14 +260,14 @@ def verify(request, format=None):
     """Verify signup for user or email message for non-user"""
     data = request.data
     if 'type' not in data or 'code' not in data or 'email' not in data or 'id' not in data:
-        return Response(data={"error": "Data object must contain code, email, item, and type"}, status=404)
+        return Response(data={"error": "Data object must contain code, email, id, and type"}, status=404)
     if data['type'] not in ["email", "signup"]:
         return Response(data={"error": "Data object's type must be signup or email"}, status=404)
     user = User.objects.get(email=data["email"])
     if data['type'] == 'email':
         message = Message.objects.get(id=data['id'])
         if message is None:
-            return Response(data={"error": "Message was not found"}, status=404)
+            return Response(data={"error": "Message id: " + data['id'] + "was not found"}, status=404)
         authcode = message.authcode
         if not check_auth_code(data['code'], authcode):
             return Response(data={"error": "Authcodes do not match for email"}, status=404)
@@ -294,13 +294,100 @@ def check_auth_code(plain_code, hashed):
         return True
     return False
 
+@swagger_auto_schema(
+    manual_parameters=[
+        openapi.Parameter(
+            name='username', in_=openapi.IN_FORM,
+            type=openapi.TYPE_STRING,
+            description="username",
+            required=True
+        ),
+        openapi.Parameter(
+            name='password', in_=openapi.IN_FORM,
+            type=openapi.TYPE_STRING,
+            description="password plaintext",
+            required=True
+        ),
+        openapi.Parameter(
+            name='email', in_=openapi.IN_FORM,
+            type=openapi.TYPE_STRING,
+            description="email address",
+            required=True
+        ),
+        openapi.Parameter(
+            name='first_name', in_=openapi.IN_FORM,
+            type=openapi.TYPE_STRING,
+            description="Required if not logged in. May be null or undefined if logged in",
+            required=True
+        ),
+        openapi.Parameter(
+            name='last_name', in_=openapi.IN_FORM,
+            type=openapi.TYPE_STRING,
+            description="Required if not logged in. May be null or undefined if logged in",
+            required=True
+        ),
+        openapi.Parameter(
+            name='zipcode', in_=openapi.IN_FORM,
+            type=openapi.TYPE_INTEGER,
+            description="Defaults to 90401. May be null or undefined if logged in",
+            required=True,
+            default=90401
+        ),
+        openapi.Parameter(
+            name='home_owner', in_=openapi.IN_FORM,
+            type=openapi.TYPE_BOOLEAN,
+            description="Defaults to False. May be null or undefined if logged in",
+            required=True,
+            default=False
+        ),
+        openapi.Parameter(
+            name='resident', in_=openapi.IN_FORM,
+            type=openapi.TYPE_BOOLEAN,
+            description="Defaults to False. May be null or undefined if logged in",
+            required=True,
+            default=False
+        ),
+        openapi.Parameter(
+            name='business_owner', in_=openapi.IN_FORM,
+            type=openapi.TYPE_BOOLEAN,
+            description="Defaults to False. May be null or undefined if logged in",
+            required=True,
+            default=False
+        ),
+        openapi.Parameter(
+            name='works', in_=openapi.IN_FORM,
+            type=openapi.TYPE_BOOLEAN,
+            description="Defaults to False. May be null or undefined if logged in",
+            required=True,
+            default=False
+        ),
+        openapi.Parameter(
+            name='school', in_=openapi.IN_FORM,
+            type=openapi.TYPE_BOOLEAN,
+            description="Defaults to False. May be null or undefined if logged in",
+            required=True,
+            default=False
+        ),
+        openapi.Parameter(
+            name='child_school', in_=openapi.IN_FORM,
+            type=openapi.TYPE_BOOLEAN,
+            description="Defaults to False. May be null or undefined if logged in",
+            required=True,
+            default=False
+        ),
 
+    ],
+    responses={
+        status.HTTP_200_OK: openapi.Response(
+            description="Successfully uploaded message"
+        )
+    },
+    method='post'
+)
 @api_view(['POST'])
 def signup_user(request, format=None):
     '''
-    post:
-    Signup a new user. Expects a username, email address, password, 
-    first_name, and last_name. Handles form-data as well as raw json.
+    Signup new user. Must be unique username and email. Will create authcode and email to user.
     '''
     data = request.data
     if 'first_name' not in data or 'last_name' not in data or 'username' not in data or 'password' not in data or 'email' not in data:
