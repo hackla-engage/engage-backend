@@ -1,6 +1,7 @@
 import sendgrid
 import logging
 import requests
+import os
 from CouncilTag import settings
 from sendgrid.helpers.mail import Email, Content, Mail
 
@@ -15,11 +16,12 @@ def verify_recaptcha(token):
 
 
 def send_mail(mail_message):
-    sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
+    APIKEY = os.environ["SENDGRIDKEY"]
+    sg = sendgrid.SendGridAPIClient(apikey=APIKEY)
     from_email = Email("do-not-reply@engage.town")
-    to_email = Email(mail_message.user.email)
-    subject = mail_message.subject
-    content = Content('text/html', mail_message.content)
+    to_email = Email(mail_message["user"].email)
+    subject = mail_message["subject"]
+    content = Content('text/html', (mail_message["content"]))
     mail = Mail(from_email=from_email, subject=subject,
                 to_email=to_email, content=content)
     response = sg.client.mail.send.post(request_body=mail.get())
@@ -35,7 +37,7 @@ def send_mail(mail_message):
 
 def send_message(message_record):
     sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
-    from_email = Email(message_record.user.email)
+    from_email = Email(message_record["user"].email)
     to_email = Email(settings.COUNCIL_CLERK_EMAIL)
     subject = "Comment on {}".format(message_record.agenda_item.title)
     content = Content('text/html', message_record.content)

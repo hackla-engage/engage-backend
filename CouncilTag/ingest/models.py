@@ -25,6 +25,7 @@ class Committee(models.Model):
 class Agenda(models.Model):
     meeting_time = models.PositiveIntegerField()  # Unix timestamp
     committee = models.ForeignKey(Committee, on_delete='CASCADE')
+    meeting_id = models.CharField(max_length=20, null=True)  # Agenda ID
 
 
 class AgendaItem(models.Model):
@@ -34,7 +35,6 @@ class AgendaItem(models.Model):
     sponsors = models.CharField(max_length=250, null=True)
     agenda = models.ForeignKey(Agenda, related_name="items", on_delete='CASCADE')
     meeting_time = models.PositiveIntegerField(default=0)  # Unix timestamp
-    meeting_id = models.CharField(max_length=20, null=True)  # Agenda ID
     agenda_item_id = models.CharField(
         max_length=20, null=True
     )  # Agenda Item ID from server
@@ -64,6 +64,7 @@ class EngageUserProfile(models.Model):
     works = models.BooleanField(default=False)
     school = models.BooleanField(default=False)
     child_school = models.BooleanField(default=False)
+    authcode = models.CharField(max_length=255, null=True)
     tags = models.ManyToManyField(Tag)
 
 
@@ -75,7 +76,7 @@ class Message(models.Model):
     """
     user = models.ForeignKey(EngageUser, null=True, on_delete='CASCADE')
     agenda_item = models.ForeignKey(AgendaItem, null=True, on_delete='CASCADE')
-    content = models.TextField(blank=True, null=True)
+    content = models.CharField(max_length=254, blank=True, null=True)
     committee = models.ForeignKey(Committee, null=True, on_delete='CASCADE')
     first_name = models.CharField(max_length=250, blank=True, null=True)
     last_name = models.CharField(max_length=250, blank=True, null=True)
@@ -88,9 +89,7 @@ class Message(models.Model):
     works = models.BooleanField(default=False)
     school = models.BooleanField(default=False)
     child_school = models.BooleanField(default=False)
-    authcode = models.TextField(
-        max_length=10, blank=True, null=True
-    )  # code challenge for user
+    authcode = models.CharField(max_length=255, null=True)  # code challenge for user
     date = models.PositiveIntegerField(default=0)  # Unix timestamp
     sent = models.PositiveIntegerField(default=0)  # Unix timestamp
     pro = models.PositiveIntegerField(default=0, null=False) # 0 = Con, 1 = Pro, 2 = Need more info

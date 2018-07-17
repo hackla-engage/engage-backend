@@ -15,7 +15,6 @@ class Command(BaseCommand):
         new_agenda_item.title = agenda_item['Title']
         new_agenda_item.sponsors = agenda_item['Sponsors']
         new_agenda_item.meeting_time = meeting_time
-        new_agenda_item.meeting_id = agenda_item['MeetingID']
         new_agenda_item.agenda_item_id = agenda_item['ID']
         if 'Body' in agenda_item:
             new_agenda_item.body = agenda_item['Body']
@@ -46,6 +45,8 @@ class Command(BaseCommand):
                     if found_agenda is None:
                         found_agenda = Agenda(meeting_time = time)
                         found_agenda.committee = committee
+                        print(time, agenda)
+                        found_agenda.meeting_id = agenda[0]['MeetingID']
                     for ag_item in agenda:      
                         self.save_agendaitem(ag_item, found_agenda, time)
                     found_agenda.save()
