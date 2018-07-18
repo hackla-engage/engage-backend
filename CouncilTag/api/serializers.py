@@ -46,15 +46,17 @@ class VerifySerializer(serializers.Serializer):
     email=serializers.EmailField()
     code=serializers.CharField()
     id=serializers.IntegerField()
-    class Meta:
-        ref_name = None
+
+class LoginSerializer(serializers.Serializer):
+    email=serializers.CharField(required=True)
+    password = serializers.CharField(required=True)
 
 class SignupSerializer(serializers.Serializer):
-    username=serializers.CharField()
-    password=serializers.CharField()
-    email=serializers.EmailField()
-    first_name=serializers.CharField()
-    last_name=serializers.CharField()
+    username=serializers.CharField(required=True)
+    password=serializers.CharField(required=True)
+    email=serializers.EmailField(required=True)
+    first_name=serializers.CharField(required=True)
+    last_name=serializers.CharField(required=True)
     zipcode=serializers.IntegerField(default=90401, required=False)
     home_owner=serializers.BooleanField(default=False, required=False)
     resident=serializers.BooleanField(default=False, required=False)
@@ -63,11 +65,11 @@ class SignupSerializer(serializers.Serializer):
     school=serializers.BooleanField(default=False, required=False)
     child_school=serializers.BooleanField(default=False, required=False)
     class Meta:
-        ref_name = None
+        extra_kwargs = {'password': {'write_only': True}}
 
 class AddMessageSerializer(serializers.Serializer):
     committee = serializers.CharField(default="Santa Monica City Council")
-    agenda_item = serializers.IntegerField(required=True)
+    ag_item = serializers.CharField(required=True)
     content = serializers.CharField(required=True)
     verify_token = serializers.CharField(required=True)
     pro = serializers.IntegerField(required=True)
