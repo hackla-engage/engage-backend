@@ -12,9 +12,7 @@ urlpatterns = [
     url(r'^feed/$', views.UserFeed.as_view()),
     url(r'^profile/$', views.update_profile),
     url(r'^tag/(?P<tag_name>[a-zA-Z _]+)/agenda/items/$', views.get_agendaitem_by_tag),
-    url(r'^user/add/tag/$', views.add_tag_to_user),
-    url(r'^user/del/tag/$', views.del_tag_from_user),
-    url(r'^user/get/tags/$', views.get_user_tags),
+    url(r'^user/tags/$', views.UserTagView.as_view()),
     url(r'^add/message/$', views.AddMessageView.as_view()),
     url(r'^verify/$', views.VerifyView.as_view())
 
