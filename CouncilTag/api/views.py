@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 
 User = get_user_model()
 from CouncilTag.ingest.models import Agenda, Tag, AgendaItem, EngageUserProfile, Message, Committee, EngageUser
-from CouncilTag.api.serializers import AgendaSerializer, TagSerializer, AgendaItemSerializer, UserFeedSerializer, CommitteeSerializer, VerifySerializer, SignupSerializer, AddMessageSerializer
+from CouncilTag.api.serializers import AgendaSerializer, TagSerializer, AgendaItemSerializer, UserFeedSerializer, CommitteeSerializer, VerifySerializer, SignupSerializer, AddMessageSerializer, LoginSerializer
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
@@ -29,8 +29,10 @@ from psycopg2.extras import NumericRange
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
+
 class SmallResultsPagination(LimitOffsetPagination):
     default_limit = 2
+
 
 class MediumResultsPagination(LimitOffsetPagination):
     default_limit = 10
@@ -170,6 +172,7 @@ def get_agenda_item_detail(request, agenda_item_id):
     return Response(data=tallyDict, status=200)
 
 
+@swagger_auto_schema(request_body=LoginSerializer, method='post')
 @api_view(['POST'])
 def login_user(request, format=None):
     '''
@@ -253,6 +256,7 @@ def update_profile(request, format=None):
         print("Unexpected error:", sys.exc_info()[0])
     return Response(status=404)
 
+
 class VerifyView(APIView):
     @swagger_auto_schema(request_body=VerifySerializer)
     def post(self, request):
@@ -290,7 +294,6 @@ class VerifyView(APIView):
             profile.save()
             return Response(status=200)
         return Response(status=500)
-        
 
 
 def check_auth_code(plain_code, hashed):
@@ -299,6 +302,7 @@ def check_auth_code(plain_code, hashed):
     if dec == hashed:
         return True
     return False
+
 
 class SignupView(APIView):
     @swagger_auto_schema(request_body=SignupSerializer)
@@ -318,7 +322,8 @@ class SignupView(APIView):
         rand_begin = random.randint(0, 32 - CODE_LENGTH)
         authcode = str(uuid.uuid1()).replace(
             "-", "")[rand_begin:rand_begin + CODE_LENGTH].encode('utf-8')
-        authcode_hashed = bcrypt.hashpw(authcode, bcrypt.gensalt()).decode('utf-8')
+        authcode_hashed = bcrypt.hashpw(
+            authcode, bcrypt.gensalt()).decode('utf-8')
 
         if 'home_owner' in data and data['home_owner']:
             home_owner = True
@@ -366,7 +371,7 @@ class SignupView(APIView):
             print(content)
             sent_mail = send_mail(
                 {"user": user, "subject": "Please authenticate your email for the Engage platform",
-                "content": content})
+                 "content": content})
             print("SENT MAIL:", sent_mail)
             token = jwt.encode({"username": user.email}, settings.SECRET_KEY)
             return Response({"token": token}, status=201)
@@ -469,22 +474,30 @@ def del_tag_from_user(request, format=None):
         return Response(status=500)
     return Response(status=200)
 
+
 class AddMessageView(APIView):
     '''Email message comments for either registered or non-registered users'''
-    @swagger_auto_schema(request_body=AddMessageSerializer)
+    @swagger_auto_schema(request_body=AddMessageSerializer, responses={'404': "Either committee or ", '401': 'Recaptcha v2 was incorrect or', '400': 'Incorrect parameters'})
     def post(self, request):
         '''Add a new message to list to be sent to city council'''
         now = datetime.now().timestamp()
         message_info = request.data
-        committee = Committee.objects.get(
+        if 'ag_item' not in message_info or 'committee' not in message_info or 'content' not in message_info or 'token' not in message_info or 'pro' not in message_info:
+            return Response(status=400, data={"error": "Missing or incorrect body parameters"})
+        committee = Committee.objects.filter(
             name__contains=message_info['committee'])
+        print(committee)
+        if committee is None:
+            return Response(data={"error": "Could not find committee matching:" + data['committee']}, status=404)
         agenda_item = AgendaItem.objects.get(pk=message_info['ag_item'])
+        if agenda_item is None:
+            return Response(data={"error": "Could not find agenda item matching:" + data['ag_item']}, status=404)
         content = message_info['content']
         verify_token = message_info['token']
         pro = message_info['pro']
         result = verify_recaptcha(verify_token)
         if not result:
-            return Response(status=400)
+            return Response(status=401)
         first_name = None
         last_name = None
         zipcode = 90401
@@ -502,11 +515,23 @@ class AddMessageView(APIView):
         rand_begin = random.randint(0, 32 - CODE_LENGTH)
         authcode = str(uuid.uuid1()).replace(
             "-", "")[rand_begin:rand_begin + CODE_LENGTH].encode('utf-8')
-        authcode_hashed = bcrypt.hashpw(authcode, bcrypt.gensalt()).decode('utf-8')
+        authcode_hashed = bcrypt.hashpw(
+            authcode, bcrypt.gensalt()).decode('utf-8')
         if (isinstance(request.user, AnonymousUser)):
-            first_name = message_info['first']
-            last_name = message_info['last']
-            zipcode = message_info['zip']
+            if 'first_name' not in message_info or message_info['first_name'] is None or \
+                'last_name' not in message_info or message_info['last_name'] is None or \
+                'zipcode' not in message_info or message_info['zipcode'] is None or \
+                'email' not in message_info or message_info['email'] is None or \
+                'home_owner' not in message_info or message_info['home_owner'] is None or \
+                'business_owner' not in message_info or message_info['business_owner'] is None or \
+                'resident' not in message_info or message_info['resident'] is None or \
+                'works' not in message_info or message_info['works'] is None or \
+                'school' not in message_info or message_info['school'] is None or \
+                'child_school' not in message_info or message_info['child_school'] is None:
+                return Response(status=400, data={"error": "Missing or incorrect body parameters"})
+            first_name = message_info['first_name']
+            last_name = message_info['last_name']
+            zipcode = message_info['zipcode']
             email = message_info['email']
             home_owner = message_info['home_owner']
             business_owner = message_info['business_owner']
@@ -526,11 +551,11 @@ class AddMessageView(APIView):
             if profile.authcode == None:
                 authcode_hashed = None
         new_message = Message(agenda_item=agenda_item, user=user,
-                            first_name=first_name, last_name=last_name,
-                            zipcode=zipcode, email=email, ethnicity=ethnicity,
-                            committee=committee, content=content, pro=pro, authcode=authcode_hashed,
-                            date=now, sent=0, home_owner=home_owner, business_owner=business_owner,
-                            resident=resident, works=works, school=school, child_school=child_school)
+                              first_name=first_name, last_name=last_name,
+                              zipcode=zipcode, email=email, ethnicity=ethnicity,
+                              committee=committee, content=content, pro=pro, authcode=authcode_hashed,
+                              date=now, sent=0, home_owner=home_owner, business_owner=business_owner,
+                              resident=resident, works=works, school=school, child_school=child_school)
         new_message.save()
         print(new_message.id)
         if authcode_hashed is not None:
@@ -546,7 +571,7 @@ class AddMessageView(APIView):
 
             send_mail(
                 {"user": {"email": email}, "subject": "Verify message regarding agenda item: " + agenda_item.agenda_item_id,
-                "content": content})
+                 "content": content})
         # Default to unsent, will send on weekly basis all sent=0
         return Response(status=200)
 

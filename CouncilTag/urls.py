@@ -34,6 +34,8 @@ schema_view = get_schema_view(
         license=openapi.License(name="Apache License v2.0"),
     ),
     url="https://backend.engage.town/api",
+    # url="http://localhost:8000/api",
+    
     validators=['flex', 'ssv'],
     public=True,
     permission_classes=(permissions.AllowAny,),
