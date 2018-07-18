@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'CouncilTag.api',
     'corsheaders',
-    'drf_yasg'
+    'drf_yasg',
+    'drf_openapi'
 ]
 
 MIDDLEWARE = [
@@ -58,6 +59,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning'
+}
 
 ROOT_URLCONF = 'CouncilTag.urls'
 
