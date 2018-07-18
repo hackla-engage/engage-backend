@@ -422,7 +422,6 @@ def get_agendaitem_by_tag(request, tag_name):
 class UserTagView(LoginRequiredMixin, APIView):
     @swagger_auto_schema(request_body=no_body)
     def get(self, request):
-        print("XXXXX")
         user = EngageUserProfile.objects.get(user=request.user)
         tags = user.tags.all()
         tags_list = []
