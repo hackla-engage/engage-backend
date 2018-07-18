@@ -66,4 +66,17 @@ class SignupSerializer(serializers.Serializer):
         ref_name = None
 
 class AddMessageSerializer(serializers.Serializer):
-    pass
+    committee = serializers.CharField(default="Santa Monica City Council")
+    agenda_item = serializers.IntegerField(required=True)
+    content = serializers.CharField(required=True)
+    verify_token = serializers.CharField(required=True)
+    pro = serializers.IntegerField(required=True)
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    zipcode=serializers.IntegerField(default=90401)
+    home_owner=serializers.BooleanField(default=False, required=False)
+    resident=serializers.BooleanField(default=False, required=False)
+    business_owner=serializers.BooleanField(default=False, required=False)
+    works=serializers.BooleanField(default=False, required=False)
+    school=serializers.BooleanField(default=False, required=False)
+    child_school=serializers.BooleanField(default=False, required=False)
