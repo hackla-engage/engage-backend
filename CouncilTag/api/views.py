@@ -7,10 +7,11 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.views import APIView
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 User = get_user_model()
 from CouncilTag.ingest.models import Agenda, Tag, AgendaItem, EngageUserProfile, Message, Committee, EngageUser
-from CouncilTag.api.serializers import AgendaSerializer, TagSerializer, AgendaItemSerializer, UserFeedSerializer, CommitteeSerializer, VerifySerializer, SignupSerializer, AddMessageSerializer, LoginSerializer
+from CouncilTag.api.serializers import AgendaSerializer, TagSerializer, AgendaItemSerializer, UserFeedSerializer, CommitteeSerializer
+from CouncilTag.api.serializers import VerifySerializer, SignupSerializer, AddMessageSerializer, LoginSerializer, ModifyTagSerializer
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
@@ -27,7 +28,7 @@ import sys
 from CouncilTag import settings
 from psycopg2.extras import NumericRange
 from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema, no_body
 
 
 class SmallResultsPagination(LimitOffsetPagination):
@@ -418,66 +419,62 @@ def get_agendaitem_by_tag(request, tag_name):
     return Response(data=data)
 
 
-@login_required
-@api_view(['GET'])
-def get_user_tags(request, format=None):
-    user = EngageUserProfile.objects.get(user=request.user)
-    tags = user.tags.all()
-    tags_list = []
-    for tag in tags:
-        tags_list.append(tag.name)
-    return Response(data=tags_list)
+class UserTagView(LoginRequiredMixin, APIView):
+    @swagger_auto_schema(request_body=no_body)
+    def get(self, request):
+        print("XXXXX")
+        user = EngageUserProfile.objects.get(user=request.user)
+        tags = user.tags.all()
+        tags_list = []
+        for tag in tags:
+            tags_list.append(tag.name)
+        return Response(data=tags_list)
 
-
-@login_required
-@api_view(['POST'])
-def add_tag_to_user(request, format=None):
-    '''
-    /user/add/tag/ JSON body attribute should have an array of tags
-    to add to an EngageUserProfile (an array of 1 at least). The user must
-    be logged in for this.
-    '''
-    if len(request.data["tags"]) == 0:
-        return Response({"error": "tags were not included"}, status=400)
-    user = EngageUserProfile.objects.get(user=request.user)
-    for tag in request.data["tags"]:
+    @swagger_auto_schema(request_body=ModifyTagSerializer)
+    def post(self, request):
+        '''
+        Add new tags (array of tag names) to user's profile
+        '''
+        if len(request.data["tags"]) == 0:
+            return Response({"error": "tags were not included"}, status=400)
+        user = EngageUserProfile.objects.get(user=request.user)
+        for tag in request.data["tags"]:
+            try:
+                tag_to_add = Tag.objects.filter(name__contains=tag).first()
+                if tag_to_add is not None:
+                    user.tags.add(tag_to_add)
+            except:
+                print("Could not add tag (" + tag + ") to user (" + request.user.username +
+                    ") since it doesn't exist in the ingest_tag table.")
         try:
-            tag_to_add = Tag.objects.filter(name__contains=tag).first()
-            user.tags.add(tag_to_add)
+            user.save()
         except:
-            print("Could not add tag (" + tag + ") to user (" + request.user.username +
-                  ") since it doesn't exist in the ingest_tag table.")
-    try:
-        user.save()
-    except:
-        return Response(status=500)
-    return Response(status=200)
+            return Response(status=500)
+        return Response(status=200)
 
 
-@login_required
-@api_view(['POST'])
-def del_tag_from_user(request, format=None):
-    '''
-    /user/del/tag/ JSON body attribute should have an array of tags
-    to delete from an EngageUserProfile (an array of 1 at least). The user must
-    be logged in for this.
-    '''
-    if len(request.data["tags"]) == 0:
-        return Response({"error": "tags were not included"}, status=400)
-    user = EngageUserProfile.objects.get(user=request.user)
-    for tag in request.data["tags"]:
-        tag_to_remove = Tag.objects.filter(name__contains=tag).first()
-        user.tags.remove(tag_to_remove)
-    try:
-        user.save()
-    except:
-        return Response(status=500)
-    return Response(status=200)
+    @swagger_auto_schema(request_body=ModifyTagSerializer)
+    def delete(self, request):
+        '''
+        Delete array of existing tags from user
+        '''
+        if len(request.data["tags"]) == 0:
+            return Response({"error": "tags were not included"}, status=400)
+        user = EngageUserProfile.objects.get(user=request.user)
+        for tag in request.data["tags"]:
+            tag_to_remove = Tag.objects.filter(name__contains=tag).first()
+            if tag_to_remove is not None:
+                user.tags.remove(tag_to_remove)
+        try:
+            user.save()
+        except:
+            return Response(status=500)
+        return Response(status=200)
 
 
 class AddMessageView(APIView):
     '''Email message comments for either registered or non-registered users'''
-    @swagger_auto_schema(request_body=AddMessageSerializer, responses={'404': "Either committee or ", '401': 'Recaptcha v2 was incorrect or', '400': 'Incorrect parameters'})
+    @swagger_auto_schema(request_body=AddMessageSerializer, responses={'404': "Either committee or ", '401': 'Recaptcha v2 was incorrect or', '400': 'Incorrect parameters', '201': 'OK, message added'})
     def post(self, request):
         '''Add a new message to list to be sent to city council'''
         now = datetime.now().timestamp()
@@ -573,7 +570,7 @@ class AddMessageView(APIView):
                 {"user": {"email": email}, "subject": "Verify message regarding agenda item: " + agenda_item.agenda_item_id,
                  "content": content})
         # Default to unsent, will send on weekly basis all sent=0
-        return Response(status=200)
+        return Response(status=201)
 
 
 def array_of_ordereddict_to_list_of_names(tags_ordereddict_array):

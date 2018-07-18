@@ -46,6 +46,8 @@ class VerifySerializer(serializers.Serializer):
     email=serializers.EmailField()
     code=serializers.CharField()
     id=serializers.IntegerField()
+class ModifyTagSerializer(serializers.Serializer):
+    tags=serializers.ListField(child=serializers.CharField(), min_length=1)
 
 class LoginSerializer(serializers.Serializer):
     email=serializers.CharField(required=True)
