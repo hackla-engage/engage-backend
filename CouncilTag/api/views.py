@@ -7,7 +7,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.views import APIView
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 User = get_user_model()
 from CouncilTag.ingest.models import Agenda, Tag, AgendaItem, EngageUserProfile, Message, Committee, EngageUser
 from CouncilTag.api.serializers import AgendaSerializer, TagSerializer, AgendaItemSerializer, UserFeedSerializer, CommitteeSerializer
@@ -28,7 +28,7 @@ import sys
 from CouncilTag import settings
 from psycopg2.extras import NumericRange
 from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema, no_body
 
 
 class SmallResultsPagination(LimitOffsetPagination):
@@ -418,9 +418,11 @@ def get_agendaitem_by_tag(request, tag_name):
     data['items_returned'] = num_returned
     return Response(data=data)
 
-class UserTagView(APIView):
-    @login_required
+
+class UserTagView(LoginRequiredMixin, APIView):
+    @swagger_auto_schema(request_body=no_body)
     def get(self, request):
+        print("XXXXX")
         user = EngageUserProfile.objects.get(user=request.user)
         tags = user.tags.all()
         tags_list = []
@@ -429,7 +431,6 @@ class UserTagView(APIView):
         return Response(data=tags_list)
 
     @swagger_auto_schema(request_body=ModifyTagSerializer)
-    @login_required    
     def post(self, request):
         '''
         Add new tags (array of tag names) to user's profile
@@ -453,7 +454,6 @@ class UserTagView(APIView):
 
 
     @swagger_auto_schema(request_body=ModifyTagSerializer)
-    @login_required
     def delete(self, request):
         '''
         Delete array of existing tags from user
