@@ -142,9 +142,9 @@ def get_agenda(request, meeting_id):
     Returns specified JSON serialized agenda if it exists
     '''
     agenda = Agenda.objects.get(meeting_id=meeting_id)
-    if agenda_item is None:
-        return Response(data={"error": "No agenda item with id:" + str(agenda_item_id)}, status=404)
-    data = AgendaItemSerializer(agenda_item, many=False).data
+    if agenda is None:
+        return Response(data={"error": "No agenda item with id:" + str(meeting_id)}, status=404)
+    data = AgendaSerializer(agenda, many=False).data
     return Response(data=data, status=200)
 
 
