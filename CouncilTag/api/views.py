@@ -420,7 +420,7 @@ def get_agendaitem_by_tag(request, tag_name):
 
 
 class UserTagView(LoginRequiredMixin, APIView):
-    @swagger_auto_schema(request_body=no_body)
+    @swagger_auto_schema(request_body=no_body, responses={"404": "Not logged in, should be 401", "200": "OK, retrieved tags"})
     def get(self, request):
         user = EngageUserProfile.objects.get(user=request.user)
         tags = user.tags.all()
@@ -429,7 +429,7 @@ class UserTagView(LoginRequiredMixin, APIView):
             tags_list.append(tag.name)
         return Response(data=tags_list)
 
-    @swagger_auto_schema(request_body=ModifyTagSerializer)
+    @swagger_auto_schema(request_body=ModifyTagSerializer, responses={"404": "Not logged in, should be 401", "200": "OK, added tags"})
     def post(self, request):
         '''
         Add new tags (array of tag names) to user's profile
@@ -452,7 +452,7 @@ class UserTagView(LoginRequiredMixin, APIView):
         return Response(status=200)
 
 
-    @swagger_auto_schema(request_body=ModifyTagSerializer)
+    @swagger_auto_schema(request_body=ModifyTagSerializer, responses={"404": "Not logged in, should be 401", "200": "OK, removed tags"})
     def delete(self, request):
         '''
         Delete array of existing tags from user
