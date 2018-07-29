@@ -8,20 +8,25 @@ from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
 from reportlab.pdfbase import pdfmetrics
 from CouncilTag.ingest.models import Message
 import io
+from django.core import mail
+from datetime import datetime, date
+import os
+
+
 
 
 def paragraphize_comments(comments, contents):
     ps_email = ParagraphStyle(
-        "email", fontSize=10, leftIndent=0.25 * inch, textColor="#0000FF")
+        "Email", fontSize=10, leftIndent=0.25 * inch, textColor="#000000")
     ps_comment = ParagraphStyle(
-        "comment", fontSize=10, leftIndent=0.25 * inch, textColor="#00FF00")
+        "Comment", fontSize=10, leftIndent=0.25 * inch, textColor="#000000")
     for comment in comments:
         if comment.email is not None:
-            email = "email: " + comment.email
-            comment = "comment: " + comment.content
+            email = "Email: " + comment.email
+            comment = "Comment: " + comment.content
         elif comment.user is not None:
-            email = "email: " + comment.user.email
-            comment = "comment: " + comment.content
+            email = "Email: " + comment.user.email
+            comment = "Comment: " + comment.content
         else:
             continue
         contents.append(Paragraph(email, ps_email))
@@ -30,8 +35,16 @@ def paragraphize_comments(comments, contents):
 
 
 def writePdfForAgendaItems(agenda_items):
+    root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    static = 'PDF_Reports'
+    full_path = os.path.join(root_dir,static)
+    today = datetime.today()
+
+    if not os.path.exists(full_path):
+        os.mkdir(full_path)
+
     try:
-        doc = SimpleDocTemplate(str(agenda_items[0].agenda.meeting_time) + ".pdf",
+        doc = SimpleDocTemplate(str(full_path) + "/Meeting_" + str(datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + f"_{today.strftime('%Y%m%d')}.pdf",
                                 pagesize=letter,
                                 rightMargin=72, leftMargin=72,
                                 topMargin=72, bottomMargin=18)
@@ -78,7 +91,18 @@ def writePdfForAgendaItems(agenda_items):
             contents.append(Spacer(1, 0.5 * inch))
             contents.append(PageBreak())
         doc.build(contents)
-        print("DONE")
+
+        try:
+            connection = mail.get_connection()
+        except:
+            raise 'Error establishing connection'
+        email_body = f"Greetings from engage Santa Monica.\n\nPlease find attached the comment submissions for the {datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%m/%d/%Y')} Council meeting for {today.strftime('%Y-%m-%d')}.\n\nFor any questions, please contact engage@engage.town.\n\nYour Engage team."
+        email = mail.EmailMessage(f"Council Meeting {datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%m/%d/%Y')} - Comment Submission {today.strftime('%Y-%m-%d')}",email_body,'engage@engage.town',['teddy.crepineau@gmail.com'], connection=connection)
+        email.attach_file(str(full_path) + "/Meeting_" + str(datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + f"_{today.strftime('%Y%m%d')}.pdf", "application/pdf")
+        try:
+            email.send()
+        except:
+            raise 'Error sending email'
         return True
     except:
         return False
