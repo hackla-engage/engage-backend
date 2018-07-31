@@ -16,6 +16,8 @@ class EngageUser(AbstractUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
+class Ethnicity(models.Model):
+    name = models.CharField(max_length=50, blank=True, null=True)
 
 class Committee(models.Model):
     name = models.CharField(max_length=250)
@@ -26,7 +28,6 @@ class Agenda(models.Model):
     meeting_time = models.PositiveIntegerField()  # Unix timestamp
     committee = models.ForeignKey(Committee, on_delete='CASCADE')
     meeting_id = models.CharField(max_length=20, null=True)  # Agenda ID
-
 
 class AgendaItem(models.Model):
     title = models.TextField()
@@ -82,7 +83,7 @@ class Message(models.Model):
     last_name = models.CharField(max_length=250, blank=True, null=True)
     zipcode = models.PositiveIntegerField(default=90401)
     email = models.EmailField(blank=True, null=True)
-    ethnicity = models.TextField(blank=True, null=True)
+    ethnicity = models.ForeignKey(Ethnicity, null=True, on_delete=models.CASCADE)
     home_owner = models.BooleanField(default=False)
     business_owner = models.BooleanField(default=False)
     resident = models.BooleanField(default=False)
