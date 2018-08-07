@@ -93,4 +93,3 @@ class Message(models.Model):
     date = models.PositiveIntegerField(default=0)  # Unix timestamp
     sent = models.PositiveIntegerField(default=0)  # Unix timestamp
     pro = models.PositiveIntegerField(default=0, null=False) # 0 = Con, 1 = Pro, 2 = Need more info
-    
