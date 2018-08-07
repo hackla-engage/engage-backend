@@ -8,9 +8,9 @@ from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
 from reportlab.pdfbase import pdfmetrics
 from CouncilTag.ingest.models import Message
 import io
-from django.core import mail
 from datetime import datetime, date
 import os
+from CouncilTag.ingest.sendEmail import sendEmail
 
 
 
@@ -92,17 +92,15 @@ def writePdfForAgendaItems(agenda_items):
             contents.append(PageBreak())
         doc.build(contents)
 
-        try:
-            connection = mail.get_connection()
-        except:
-            raise 'Error establishing connection'
+        attachment = str(full_path) + "/Meeting_" + str(datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + f"_{today.strftime('%Y%m%d')}.pdf"
+        attachment_type = "application/pdf"
         email_body = f"Greetings from engage Santa Monica.\n\nPlease find attached the comment submissions for the {datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%m/%d/%Y')} Council meeting for {today.strftime('%Y-%m-%d')}.\n\nFor any questions, please contact engage@engage.town.\n\nYour Engage team."
-        email = mail.EmailMessage(f"Council Meeting {datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%m/%d/%Y')} - Comment Submission {today.strftime('%Y-%m-%d')}",email_body,'engage@engage.town',['teddy.crepineau@gmail.com'], connection=connection)
-        email.attach_file(str(full_path) + "/Meeting_" + str(datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + f"_{today.strftime('%Y%m%d')}.pdf", "application/pdf")
-        try:
-            email.send()
-        except:
-            raise 'Error sending email'
+        subject = f"Council Meeting {datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%m/%d/%Y')} - Comment Submission {today.strftime('%Y-%m-%d')}"
+        sender = 'engage@engage.town'
+        recipient = ['teddy.crepineau@gmail.com']
+        
+        sendEmail(subject, email_body, sender, recipient, attachment, attachment_type)
+        
         return True
     except:
         return False

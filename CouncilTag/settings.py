@@ -174,10 +174,11 @@ if os.environ.get("CouncilTag") == 'local':
     # Display output of the email in the console
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 else:
-    EMAIL_HOST = ''
-    EMAIL_HOST_USER = ''
-    EMAIL_HOST_PASSWORD = ''
-    EMAIL_PORT = 00
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.sendgrid.net'
+    EMAIL_HOST_USER = os.environ.get('USERNAME')
+    EMAIL_HOST_PASSWORD = os.environ.get('PASSWORD')
+    EMAIL_PORT = 587
     EMAIL_USE_TLS = False
     EMAIL_USE_TLS = False
     EMAIL_USE_SSL = False
