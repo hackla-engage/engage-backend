@@ -101,8 +101,8 @@ if DEBUG:
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'counciltag',
-            'USER': 'engagepsql',
-            'PASSWORD':'Hack4LA!',
+            'USER': 'postgres',
+            'PASSWORD':'',
             'HOST':'localhost',
         }
     }
@@ -169,3 +169,19 @@ else:
     
 # According to Heroku, this should be at the end of settings.py
 django_heroku.settings(locals())
+
+if os.environ.get("CouncilTag") == 'local':
+    # Display output of the email in the console
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.sendgrid.net'
+    EMAIL_HOST_USER = os.environ.get('USERNAME')
+    EMAIL_HOST_PASSWORD = os.environ.get('PASSWORD')
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = False
+    EMAIL_USE_TLS = False
+    EMAIL_USE_SSL = False
+    EMAIL_TIMEOUT = False
+    EMAIL_SSL_KEYFILE = False
+    EMAIL_SSL_CERTFILE = False
