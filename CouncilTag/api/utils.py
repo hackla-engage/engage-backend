@@ -10,7 +10,7 @@ log = logging.Logger(__name__)
 
 def verify_recaptcha(token):
     r = requests.post('https://www.google.com/recaptcha/api/siteverify', data={
-                      'secret': '6LcnmVUUAAAAANyYFnJfRH1ypd-rasNDgYmGo90m', 'response': token})
+                      'secret': os.environ["RECAPTCHAKEY"], 'response': token})
     response = r.json()
     return response['success']
 
