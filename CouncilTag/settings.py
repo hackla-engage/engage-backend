@@ -27,12 +27,13 @@ SECRET_KEY = '^=azgctyvokgt(iv(sf0*6k0=gj+#c-!x805u6ofg!27!dpjjw'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 if os.environ.get("CouncilTag") == 'local':
-  DEBUG= True
+    DEBUG = True
 print(DEBUG)
-ALLOWED_HOSTS = ['localhost','https://engage-santa-monica.herokuapp.com', 'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', 'https://engage-santa-monica.herokuapp.com',
+                 'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1']
 
 # Application definition
-print ("Opened settings")
+print("Opened settings")
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -61,16 +62,19 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning'
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
+    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.SessionAuthentication'],
 }
 SWAGGER_SETTINGS = {
-   'SECURITY_DEFINITIONS': {
-      'Bearer': {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'name': 'Authentication',
             'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
-      }
-   }
+            'in': 'header',
+        }
+    },
+    'USE_SESSION_AUTH': True,
+    
 }
 
 ROOT_URLCONF = 'CouncilTag.urls'
@@ -102,13 +106,14 @@ if DEBUG:
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'counciltag',
             'USER': 'engagepsql',
-            'PASSWORD':'Hack4LA!',
-            'HOST':'localhost',
+            'PASSWORD': 'Hack4LA!',
+            'HOST': 'localhost',
         }
     }
 else:
     DATABASES = {}
-    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+    DATABASES['default'] = dj_database_url.config(
+        conn_max_age=600, ssl_require=True)
 print(os.environ.get('DATABASE_URL'))
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -166,6 +171,6 @@ if DEBUG:
     COUNCIL_CLERK_EMAIL = 'shariq.torres@gmail.com'
 else:
     COUNCIL_CLERK_EMAIL = 'counciltag@gmail.com'
-    
+
 # According to Heroku, this should be at the end of settings.py
 django_heroku.settings(locals())
