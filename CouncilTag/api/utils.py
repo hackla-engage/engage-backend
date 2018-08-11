@@ -10,7 +10,7 @@ log = logging.Logger(__name__)
 
 def verify_recaptcha(token):
     r = requests.post('https://www.google.com/recaptcha/api/siteverify', data={
-                      'secret': '6LcnmVUUAAAAANyYFnJfRH1ypd-rasNDgYmGo90m', 'response': token})
+                      'secret': os.environ["RECAPTCHAKEY"], 'response': token})
     response = r.json()
     return response['success']
 
@@ -20,7 +20,7 @@ def send_mail(mail_message):
     sg = sendgrid.SendGridAPIClient(apikey=APIKEY)
     from_email = Email("do-not-reply@engage.town")
     if type(mail_message["user"]) is dict:
-        to_email = Email(mail_message["user"]["email"])    
+        to_email = Email(mail_message["user"]["email"])
     else:
         to_email = Email(mail_message["user"].email)
     subject = mail_message["subject"]
