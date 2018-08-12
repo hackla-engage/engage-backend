@@ -20,7 +20,7 @@ class Command(BaseCommand):
         
         now_time_stamp = int(now.timestamp())
         now_plus_tenh_time_stamp = int(now_plus_tenh.timestamp())
-        print(now_plus_tenh_time_stamp)
+
         upcoming_agendas = Agenda.objects.filter(meeting_time__contained_by=NumericRange(
             now_time_stamp, now_plus_tenh_time_stamp))
 
