@@ -6,12 +6,11 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
 from reportlab.pdfbase import pdfmetrics
-from CouncilTag.ingest.models import Message
+from CouncilTag.ingest.models import Message, Committee
+from CouncilTag.api.utils import send_mail
 import io
 from datetime import datetime, date
 import os
-from CouncilTag.ingest.sendEmail import sendEmail
-
 
 
 
@@ -44,7 +43,7 @@ def writePdfForAgendaItems(agenda_items):
         os.mkdir(full_path)
 
     try:
-        doc = SimpleDocTemplate(str(full_path) + "/Meeting_" + str(datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + f"_{today.strftime('%Y%m%d')}.pdf",
+        doc = SimpleDocTemplate(str(full_path) + "/Meeting_" + str(datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + ".pdf",
                                 pagesize=letter,
                                 rightMargin=72, leftMargin=72,
                                 topMargin=72, bottomMargin=18)
@@ -60,7 +59,7 @@ def writePdfForAgendaItems(agenda_items):
             'con', fontSize=10, backColor='#FF0000', textColor='#FFFFFF')
         ps_need_info = ParagraphStyle(
             'need_info', fontSize=10, backColor='#000000', textColor='#FFFFFF')
-        
+
         for upcoming_agenda_item in agenda_items:
             contents.append(
                 Paragraph("Title: " + upcoming_agenda_item.title, ps_title))
@@ -92,14 +91,35 @@ def writePdfForAgendaItems(agenda_items):
             contents.append(PageBreak())
         doc.build(contents)
 
-        attachment = str(full_path) + "/Meeting_" + str(datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + f"_{today.strftime('%Y%m%d')}.pdf"
+        attachment_file_path = str(full_path) + "/Meeting_" + str(datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + ".pdf"
         attachment_type = "application/pdf"
-        email_body = f"Greetings from engage Santa Monica.\n\nPlease find attached the comment submissions for the {datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%m/%d/%Y')} Council meeting for {today.strftime('%Y-%m-%d')}.\n\nFor any questions, please contact engage@engage.town.\n\nYour Engage team."
-        subject = f"Council Meeting {datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%m/%d/%Y')} - Comment Submission {today.strftime('%Y-%m-%d')}"
-        sender = 'engage@engage.town'
-        recipient = ['teddy.crepineau@gmail.com']
-        
-        sendEmail(subject, email_body, sender, recipient, attachment, attachment_type)
+        attachment_name = "Agenda_Comments_Council_Meeting_" + str(datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + f".pdf"
+
+        email_body = """<html>
+            <head>
+                <style>
+                    body {
+                        font-family: sans-serif;
+                        font-size: 12px;
+                        color: #000;
+                    }
+                </style>
+            </head>
+            <body>
+                <p>Greetings from Engage</p>
+                <p>Please find attached the latest report for the upcoming Council Meeting.</p>
+                <p>Thank you,</p>
+                <p>Your Engage team</p>
+                <hr>
+                <p><i>This is an automated message, for any questions please contact <a hrek=mailto:contact@engage.town?subject=Feedback%20Agenda%20Comments%20Report>contact@engage.town</a></i></p>
+            </body
+        </html>
+        """
+
+        subject = f"Council Meeting {datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%m/%d/%Y')} - Agenda Recommendations, Comment Submissions for {today.strftime('%m/%d/%Y')}"
+        recipient = Committee.objects.filter(name="Santa Monica City Council")[0]
+
+        send_mail({"user":recipient,"subject":subject,"content":email_body,"attachment_file_path":attachment_file_path,"attachment_type":attachment_type,"attachment_file_name":attachment_name})
         
         return True
     except:
