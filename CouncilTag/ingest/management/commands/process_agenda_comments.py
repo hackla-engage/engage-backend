@@ -16,7 +16,7 @@ class Command(BaseCommand):
         #now = datetime.utcnow()
         now = datetime(datetime.now().year, datetime.now().month, datetime.now().day, datetime.now().hour, datetime.now().minute, datetime.now().second, datetime.now().microsecond)
         # Find agenda between today and next 10 days.
-        now_plus_tenh = now + timedelta(days=10) 
+        now_plus_tenh = now + timedelta(hours=10) 
         
         now_time_stamp = int(now.timestamp())
         now_plus_tenh_time_stamp = int(now_plus_tenh.timestamp())

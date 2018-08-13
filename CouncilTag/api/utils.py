@@ -3,7 +3,8 @@ import logging
 import requests
 import os
 from CouncilTag import settings
-from sendgrid.helpers.mail import Email, Content, Mail
+from sendgrid.helpers.mail import Email, Content, Mail, Attachment
+import base64
 
 log = logging.Logger(__name__)
 
@@ -27,6 +28,20 @@ def send_mail(mail_message):
     content = Content('text/html', (mail_message["content"]))
     mail = Mail(from_email=from_email, subject=subject,
                 to_email=to_email, content=content)
+
+    if "attachment_file_path" in mail_message:
+        with open(mail_message["attachment_file_path"], 'rb') as f:
+            data = f.read()
+            f.close()
+
+        encode = base64.b64encode(data).decode()
+        attachment = Attachment()
+        attachment.content = encode
+        attachment.type = mail_message["attachment_type"]
+        attachment.filename = mail_message["attachment_file_name"]
+        attachment.disposition = "attachment"
+        mail.add_attachment(attachment)
+
     response = sg.client.mail.send.post(request_body=mail.get())
     if response.status_code == 200 or response.status_code == 202:
         return True
