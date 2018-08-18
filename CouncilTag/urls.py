@@ -33,8 +33,8 @@ schema_view = get_schema_view(
         contact=openapi.Contact(email="engage@engage.town"),
         license=openapi.License(name="Apache License v2.0"),
     ),
-    # url="https://backend.engage.town/api",
-    url="http://localhost:8000/api",
+    url="https://backend.engage.town/api",
+    # url="http://localhost:8000/api",
     
     validators=['flex', 'ssv'],
     public=True,
