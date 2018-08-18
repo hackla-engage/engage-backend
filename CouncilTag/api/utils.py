@@ -5,7 +5,9 @@ import os
 from CouncilTag import settings
 from sendgrid.helpers.mail import Email, Content, Mail, Attachment
 import base64
-
+import pytz
+from datetime import datetime, timedelta
+import googlemaps
 log = logging.Logger(__name__)
 
 
@@ -14,6 +16,20 @@ def verify_recaptcha(token):
                       'secret': os.environ["RECAPTCHAKEY"], 'response': token})
     response = r.json()
     return response['success']
+
+
+def isCommentAllowed(timestamp, cutoff_days_offset, cutoff_hours, cutoff_minutes):
+    gmaps = googlemaps.Client(key=os.environ.get("GOOGLETZAPIKEY"))
+    tz_obj = gmaps.timezone(location="34.0195,-118.4912", timestamp=timestamp)
+    tz_offset = abs(tz_obj["dstOffset"] + tz_obj["rawOffset"])
+    dt = datetime.utcfromtimestamp(timestamp)
+    dt = dt + timedelta(days=cutoff_days_offset)
+    dt = dt.replace(hour=cutoff_hours, minute=cutoff_minutes)
+    dt = dt + timedelta(minutes = tz_offset)
+    now = datetime.now()
+    if (now > dt):
+      return False
+    return True
 
 
 def send_mail(mail_message):

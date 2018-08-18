@@ -13,7 +13,7 @@ urlpatterns = [
     url(r'^profile/$', views.update_profile),
     url(r'^tag/(?P<tag_name>[a-zA-Z _]+)/agenda/items/$', views.get_agendaitem_by_tag),
     url(r'^user/tags/$', views.UserTagView().as_view()),
-    url(r'^add/message/$', views.AddMessageView.as_view()),
+    url(r'^add/message/$', views.addMessage),
     url(r'^verify/$', views.VerifyView.as_view())
 
 ]

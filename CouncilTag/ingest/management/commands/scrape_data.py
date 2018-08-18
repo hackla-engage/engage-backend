@@ -40,9 +40,9 @@ class Command(BaseCommand):
         try:
             committee = Committee.objects.get(name="Santa Monica City Council")
         except ObjectDoesNotExist:
-            Committee(name="Santa Monica City Council",
-                      email="counciltag@gmail.com").save()
-            committee = Committee.objects.get(name="Santa Monica City Council")
+            committee = Committee(name="Santa Monica City Council", email="engage@engage.town",
+                                  cutoff_offset_days=0, cutoff_hour=11, cutoff_minute=59)
+            committee.save()
         years = [2016, 2017, 2018]
         for year in years:
             agenda_values = get_data(year=year)
