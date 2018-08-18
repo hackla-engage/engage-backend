@@ -30,6 +30,7 @@ drf-yasg==1.9.1
 enum34==1.1.6
 flex==6.13.2
 future==0.16.0
+googlemaps==3.0.2
 gunicorn==19.7.1
 html-codec==1.0.0
 html-json-forms==1.0.0
