@@ -20,6 +20,9 @@ class EngageUser(AbstractUser):
 class Committee(models.Model):
     name = models.CharField(max_length=250)
     email = models.CharField(max_length=250)
+    cutoff_offset_days = models.IntegerField(default=0)
+    cutoff_hour = models.PositiveIntegerField(default=11)
+    cutoff_minute = models.PositiveIntegerField(default=59)
 
 
 class Agenda(models.Model):
@@ -33,7 +36,8 @@ class AgendaItem(models.Model):
     department = models.CharField(max_length=250)
     body = ArrayField(models.TextField(blank=True), default=list())
     sponsors = models.CharField(max_length=250, null=True)
-    agenda = models.ForeignKey(Agenda, related_name="items", on_delete='CASCADE')
+    agenda = models.ForeignKey(
+        Agenda, related_name="items", on_delete='CASCADE')
     meeting_time = models.PositiveIntegerField(default=0)  # Unix timestamp
     agenda_item_id = models.CharField(
         max_length=20, null=True
@@ -42,7 +46,8 @@ class AgendaItem(models.Model):
 
 
 class AgendaRecommendation(models.Model):
-    agenda_item = models.ForeignKey(AgendaItem, related_name="recommendations", on_delete='CASCADE')
+    agenda_item = models.ForeignKey(
+        AgendaItem, related_name="recommendations", on_delete='CASCADE')
     recommendation = ArrayField(models.TextField(), default=list())
 
 
@@ -50,12 +55,12 @@ class CommitteeMember(models.Model):
     firstname = models.CharField(max_length=250)
     lastname = models.CharField(max_length=250)
     email = models.EmailField()
-    committee = models.ForeignKey(Committee, related_name="members", on_delete='CASCADE')
+    committee = models.ForeignKey(
+        Committee, related_name="members", on_delete='CASCADE')
 
 
 class EngageUserProfile(models.Model):
     user = models.OneToOneField(EngageUser, on_delete=models.CASCADE)
-    ethnicity = models.IntegerField(null=True, blank=True)
     zipcode = models.PositiveIntegerField(default=90401)
     verified = models.BooleanField(default=False)
     home_owner = models.BooleanField(default=False)
@@ -64,7 +69,7 @@ class EngageUserProfile(models.Model):
     works = models.BooleanField(default=False)
     school = models.BooleanField(default=False)
     child_school = models.BooleanField(default=False)
-    authcode = models.CharField(max_length=255, null=True)
+    authcode = models.CharField(max_length=255, null=True, blank=True)
     tags = models.ManyToManyField(Tag)
 
 
@@ -82,14 +87,15 @@ class Message(models.Model):
     last_name = models.CharField(max_length=250, blank=True, null=True)
     zipcode = models.PositiveIntegerField(default=90401)
     email = models.EmailField(blank=True, null=True)
-    ethnicity = models.TextField(blank=True, null=True)
     home_owner = models.BooleanField(default=False)
     business_owner = models.BooleanField(default=False)
     resident = models.BooleanField(default=False)
     works = models.BooleanField(default=False)
     school = models.BooleanField(default=False)
     child_school = models.BooleanField(default=False)
-    authcode = models.CharField(max_length=255, null=True)  # code challenge for user
+    # code challenge for user
+    authcode = models.CharField(max_length=255, null=True)
     date = models.PositiveIntegerField(default=0)  # Unix timestamp
     sent = models.PositiveIntegerField(default=0)  # Unix timestamp
-    pro = models.PositiveIntegerField(default=0, null=False) # 0 = Con, 1 = Pro, 2 = Need more info
+    # 0 = Con, 1 = Pro, 2 = Need more info
+    pro = models.PositiveIntegerField(default=0, null=False)

@@ -31,7 +31,7 @@ if os.environ.get("CouncilTag") == 'local':
 print(DEBUG)
 ALLOWED_HOSTS = ['localhost', 'https://engage-santa-monica.herokuapp.com',
                  'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1']
-
+APPEND_SLASH=True
 # Application definition
 print("Opened settings")
 INSTALLED_APPS = [
