@@ -28,6 +28,14 @@ jobs:
             - ".venv"
             - "/usr/local/bin"
             - "/usr/local/lib/python3.6/site-packages"
+      - run:
+          command: |
+            pipenv run "python manage.py test"
+          - store_test_results:
+              path: test-results
+          - store_artifacts:
+              path: test-results
+              destination: tr1
   deploy:
     machine: 
       enabled: true
