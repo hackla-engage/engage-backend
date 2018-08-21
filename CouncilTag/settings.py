@@ -202,3 +202,5 @@ else:
     EMAIL_TIMEOUT = False
     EMAIL_SSL_KEYFILE = False
     EMAIL_SSL_CERTFILE = False
+
+SENDGRID_API_KEY = os.environ.get('SENDGRIDKEY')
