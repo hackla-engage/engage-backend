@@ -55,7 +55,9 @@ class TestLoginEndpoint(TestCase):
 
     def test_user_signup(self):
         user_info = {
-            "name": "Test Testman",
+            "first_name": "Test",
+            "last_name": "Testman",
+            "username": "test_testman",
             "email": "test@test.com",
             "password": "test"
         }
