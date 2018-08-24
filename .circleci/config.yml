@@ -6,16 +6,18 @@ jobs:
       - image: circleci/python:3.6.4
         environment:
           PIPENV_VENV_IN_PROJECT: true
-          DATABASE_URL: postgresql://root@localhost/circle_test?sslmode=allow
+          DATABASE_URL: postgresql://root@localhost/circle_test?ssl=true
           DJANGO_SECRET_KEY: examplesecretkeydonotuseinprod
       - image: circleci/postgres:9.6.2
         environment:
           TEST_DB_USER: root
           TEST_DB_NAME: circle_test
+          TEST_DB_PASS:
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+      - run: sudo apt-get install -y postgresql-client
       - restore_cache:
           key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
@@ -28,6 +30,8 @@ jobs:
             - ".venv"
             - "/usr/local/bin"
             - "/usr/local/lib/python3.6/site-packages"
+       # Wait for DB
+      - run: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
           command: |
             pipenv run "python manage.py test"
