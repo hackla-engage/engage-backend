@@ -6,7 +6,7 @@ jobs:
       - image: circleci/python:3.6.4
         environment:
           PIPENV_VENV_IN_PROJECT: true
-          DATABASE_URL: postgresql://root@localhost/circle_test?sslmode=true
+          DATABASE_URL: postgresql://postgres@localhost/circle_test?sslmode=true
           DJANGO_SECRET_KEY: examplesecretkeydonotuseinprod
       - image: nimbustech/postgres-ssl:9.5
         environment:
