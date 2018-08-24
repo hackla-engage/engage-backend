@@ -98,12 +98,17 @@ class TestSendMessageEndpoint(TestCase):
         self.ag_item.save()
     def test_response(self):
         self.client.login(username="test@test.com", password="test")
-        response = self.client.post("/api/add/message/", data=json.dumps({"content":"I support that", "ag_item":self.ag_item.pk}), content_type="application/json")
-        self.assertEqual(200, response.status_code)
+        response = self.client.post("/api/add/message/", data=json.dumps({
+                "token": "faketoken123",
+                "committee": "test",
+                "pro": 4,
+                "content":"I support that",
+                "ag_item":self.ag_item.pk}), content_type="application/json")
+        self.assertEqual(201, response.status_code)
         self.assertEqual(1, len(Message.objects.all()))
         sent_message = Message.objects.first()
         self.assertEqual("test@test.com", sent_message.user.email)
-        self.assertGreater(sent_message.sent, 0)
+        self.assertEqual(0, sent_message.sent)
 
     '''
     To Work in CircleCI, this test needs to
