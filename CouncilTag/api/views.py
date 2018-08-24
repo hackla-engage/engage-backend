@@ -378,10 +378,11 @@ class SignupView(APIView):
             content = '<html><body><h3>Welcome to the Engage platform for Santa Monica,</h3> Please click <a href="' + \
                 query_string + '">here</a> to authenticate.<br/><br/>Thank you for your interest in your local government!<br/><br/> If you are receiving this in error, please email: <a href="mailto:engage@engage.town">engage@engage.town</a>.</body></html>'
             print(content)
-            sent_mail = send_mail(
-                {"user": user, "subject": "Please authenticate your email for the Engage platform",
-                 "content": content})
-            print("SENT MAIL:", sent_mail)
+            if not settings.DEBUG:
+                sent_mail = send_mail(
+                    {"user": user, "subject": "Please authenticate your email for the Engage platform",
+                     "content": content})
+                print("SENT MAIL:", sent_mail)
             token = jwt.encode({"username": user.email}, settings.SECRET_KEY)
             return Response({"token": token}, status=201)
         except:
