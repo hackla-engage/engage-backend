@@ -8,7 +8,7 @@ jobs:
           PIPENV_VENV_IN_PROJECT: true
           DATABASE_URL: postgresql://root@localhost/circle_test?sslmode=true
           DJANGO_SECRET_KEY: examplesecretkeydonotuseinprod
-      - image: postgres:9.5
+      - image: nimbustech/postgres-ssl:9.5
         environment:
           TEST_DB_USER: root
           TEST_DB_NAME: circle_test
