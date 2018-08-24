@@ -8,6 +8,7 @@ jobs:
           PIPENV_VENV_IN_PROJECT: true
           DATABASE_URL: postgresql://postgres@localhost/circle_test?sslmode=true
           DJANGO_SECRET_KEY: examplesecretkeydonotuseinprod
+          SENDGRIDKEY: SG.-thisisnotarealkeylol
       - image: nimbustech/postgres-ssl:9.5
         environment:
           TEST_DB_USER: postgres
@@ -17,7 +18,7 @@ jobs:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
-      # - run: sudo apt-get install -y postgresql-client
+
       - restore_cache:
           key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
