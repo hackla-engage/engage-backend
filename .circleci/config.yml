@@ -7,6 +7,7 @@ jobs:
         environment:
           PIPENV_VENV_IN_PROJECT: true
           DATABASE_URL: postgresql://postgres@localhost/circle_test?sslmode=true
+          CouncilTag: local
           DJANGO_SECRET_KEY: examplesecretkeydonotuseinprod
           SENDGRIDKEY: SG.-thisisnotarealkeylol
       - image: nimbustech/postgres-ssl:9.5
