@@ -71,7 +71,7 @@ def send_mail(mail_message):
 
 def send_message(message_record):
     sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
-    from_email = Email(message_record["user"].email)
+    from_email = Email(message_record.user.email)
     to_email = Email(settings.COUNCIL_CLERK_EMAIL)
     subject = "Comment on {}".format(message_record.agenda_item.title)
     content = Content('text/html', message_record.content)
