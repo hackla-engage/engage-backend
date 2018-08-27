@@ -6,42 +6,61 @@ jobs:
       - image: circleci/python:3.6.4
         environment:
           PIPENV_VENV_IN_PROJECT: true
+          DATABASE_URL: postgresql://postgres@localhost/circle_test?sslmode=true
+          CouncilTag: local
+          DJANGO_SECRET_KEY: examplesecretkeydonotuseinprod
+          SENDGRIDKEY: SG.-thisisnotarealkeylol
+      - image: nimbustech/postgres-ssl:9.5
+        environment:
+          TEST_DB_USER: postgres
+          TEST_DB_NAME: circle_test
+          TEST_DB_PASS:
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+
       - restore_cache:
-          key: depsx-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           command: |
             sudo pip install pipenv
-            pipenv install
-            # pipenv run "pip install -r requirements.txt"
+            pipenv run "pip install -r requirements.txt"
       - save_cache:
-          key: depsx-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
           paths:
             - ".venv"
             - "/usr/local/bin"
             - "/usr/local/lib/python3.6/site-packages"
-  deploy:
-    machine: 
-      enabled: true
-    steps:
-      - add_ssh_keys:
-            fingerprints:
-              - "f0:c5:81:4b:96:55:2e:99:91:96:ad:d6:60:05:97:e6"
+       # Wait for DB
+      - run: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
-            name: Deploy over SSH
-            command: |
-                ssh -f $SSH_USER@$SSH_HOST "./deploy.sh"
-workflows:
-  version: 2
-  build-and-deploy:
-    jobs:
-      - build
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
+          command: |
+            pipenv run "python manage.py test"
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
+          destination: tr1
+#  deploy:
+#    machine:
+#      enabled: true
+#    steps:
+#      - add_ssh_keys:
+#            fingerprints:
+#              - "f0:c5:81:4b:96:55:2e:99:91:96:ad:d6:60:05:97:e6"
+#      - run:
+#            name: Deploy over SSH
+#            command: |
+#                ssh -f $SSH_USER@$SSH_HOST "./deploy.sh"
+#workflows:
+#  version: 2
+#  build-and-deploy:
+#    jobs:
+#      - build
+#      - deploy:
+#          requires:
+#            - build
+#          filters:
+#            branches:
+#              only: master

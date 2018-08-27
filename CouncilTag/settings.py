@@ -108,12 +108,26 @@ if DEBUG:
             'USER': os.environ.get("DB_USER"),
             'PASSWORD': os.environ.get("DB_PASS"),
             'HOST': 'localhost',
-        }
+            'TEST': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': os.environ.get("TEST_DB_NAME"),
+                'USER': os.environ.get("TEST_DB_USER"),
+                'PASSWORD': os.environ.get("TEST_DB_PASS"),
+                'HOST': 'localhost',
+            },
+        },
     }
 else:
     DATABASES = {}
     DATABASES['default'] = dj_database_url.config(
         conn_max_age=600, ssl_require=True)
+    DATABASES['default']['TEST'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get("TEST_DB_NAME"),
+        'USER': os.environ.get("TEST_DB_USER"),
+        'PASSWORD': os.environ.get("TEST_DB_PASS"),
+        'HOST': 'localhost',
+    }
 print(os.environ.get('DATABASE_URL'))
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -188,3 +202,5 @@ else:
     EMAIL_TIMEOUT = False
     EMAIL_SSL_KEYFILE = False
     EMAIL_SSL_CERTFILE = False
+
+SENDGRID_API_KEY = os.environ.get('SENDGRIDKEY')

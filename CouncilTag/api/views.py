@@ -378,10 +378,11 @@ class SignupView(APIView):
             content = '<html><body><h3>Welcome to the Engage platform for Santa Monica,</h3> Please click <a href="' + \
                 query_string + '">here</a> to authenticate.<br/><br/>Thank you for your interest in your local government!<br/><br/> If you are receiving this in error, please email: <a href="mailto:engage@engage.town">engage@engage.town</a>.</body></html>'
             print(content)
-            sent_mail = send_mail(
-                {"user": user, "subject": "Please authenticate your email for the Engage platform",
-                 "content": content})
-            print("SENT MAIL:", sent_mail)
+            if not settings.DEBUG:
+                sent_mail = send_mail(
+                    {"user": user, "subject": "Please authenticate your email for the Engage platform",
+                     "content": content})
+                print("SENT MAIL:", sent_mail)
             token = jwt.encode({"username": user.email}, settings.SECRET_KEY)
             return Response({"token": token}, status=201)
         except:
@@ -496,7 +497,7 @@ def addMessage(request, format=None):
     agenda_item = AgendaItem.objects.get(pk=message_info['ag_item'])
     if agenda_item is None:
         return Response(data={"error": "Could not find agenda item matching:" + message_info['ag_item']}, status=404)
-    if not isCommentAllowed(agenda_item.meeting_time, committee.cutoff_offset_days, committee.cutoff_hour, committee.cutoff_minute):
+    if not settings.DEBUG and not isCommentAllowed(agenda_item.meeting_time, committee.cutoff_offset_days, committee.cutoff_hour, committee.cutoff_minute):
         return Response(status=401, data={"error": "Could not add comment about agenda item because past the cutoff time"})
     content = message_info['content']
     verify_token = message_info['token']
