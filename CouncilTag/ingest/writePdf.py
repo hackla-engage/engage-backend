@@ -61,7 +61,7 @@ def writePdfForAgendaItems(agenda_items, committee):
 
         # Paragraph styles
         ps_title = ParagraphStyle(
-            "title", fontSize=14, alignment=TA_JUSTIFY, spaceAfter=0.2 * inch)
+            "title", fontSize=14, spaceAfter=0.2 * inch, leading=14)
         ps_id = ParagraphStyle("id", fontSize=10)
         ps_pro = ParagraphStyle(
             'pro', fontSize=10, backColor='#27ae60', textColor="#FFFFFF", spaceBefore=7, borderPadding=(5, 5, 5, 5))
@@ -92,7 +92,7 @@ def writePdfForAgendaItems(agenda_items, committee):
 
         for upcoming_agenda_item in agenda_items:
             contents.append(
-                Paragraph("Title: " + upcoming_agenda_item.title, ps_title))
+                Paragraph(upcoming_agenda_item.title, ps_title))
             contents.append(
                 Paragraph("ID: " + upcoming_agenda_item.agenda_item_id, ps_id)
             )
@@ -105,21 +105,21 @@ def writePdfForAgendaItems(agenda_items, committee):
             need_info_comments_on_agenda_item = Message.objects.filter(
                 agenda_item=upcoming_agenda_item, pro=2
             )
-            contents.append(Paragraph("Pro comments", ps_pro))
+            contents.append(Paragraph("Comments agreeing with the recommendations:", ps_pro))
             contents.append(Spacer(1, 0.2 * inch))
             if len(pro_comments_on_agenda_item) > 0:
                 paragraphize_comments(pro_comments_on_agenda_item, contents)
             else:
                 contents.append(
-                    Paragraph("No pro comments on this item.", ps_no_comments))
+                    Paragraph("No comments agreeing with recommendations on this item.", ps_no_comments))
             contents.append(Spacer(1, 0.5 * inch))
-            contents.append(Paragraph("Con comments", ps_con))
+            contents.append(Paragraph("Comments disagreeing with the recommendations:", ps_con))
             contents.append(Spacer(1, 0.2 * inch))
             if len(con_comments_on_agenda_item) > 0:
                 paragraphize_comments(con_comments_on_agenda_item, contents)
             else:
                 contents.append(
-                    Paragraph("No con comments on this item.", ps_no_comments))
+                    Paragraph("No comments disagreeing with recommendations on this item.", ps_no_comments))
             contents.append(Spacer(1, 0.5 * inch))
             contents.append(
                 Paragraph("Need more information comments", ps_need_info))

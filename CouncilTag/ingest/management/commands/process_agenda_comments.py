@@ -15,7 +15,7 @@ class Command(BaseCommand):
         '''
 
     def handle(self, *args, **options):
-        now = datetime.utcnow()
+        now = datetime.now()
         # Find agenda between today and next 10 days.
         now_time_stamp = int(now.timestamp())
         committees = Committee.objects.all()
@@ -33,19 +33,13 @@ class Command(BaseCommand):
             upcoming_agendas = Agenda.objects.filter(processed=False)
             if (len(upcoming_agendas) == 0):
                 # No agendas
-                print("no agendas")
                 return 
             for agenda in upcoming_agendas:
-                print(agenda.meeting_time)
                 meeting_time = agenda.meeting_time
                 cutoff_datetime = getLocationBasedDate(
                     meeting_time, cutoff_offset_days, cutoff_hour, cutoff_minute, lat, lng)
                 cutoff_timestamp = int(cutoff_datetime.timestamp())
-                print(cutoff_timestamp)
-                print(now_time_stamp)
-                print(now_time_stamp-time_delta < cutoff_timestamp < now_time_stamp + time_delta)
                 if (now_time_stamp - time_delta < cutoff_timestamp < now_time_stamp + time_delta):
-                    print("agenda is in time")
                     agenda.processed = True
                     agenda.save()
                     upcoming_agenda_items = AgendaItem.objects.filter(
@@ -54,4 +48,4 @@ class Command(BaseCommand):
                         print(
                             "No upcoming agenda items on {meeting_time} for {committee.name}")
                         continue
-                    writePdfForAgendaItems(upcoming_agenda_items, committee.email)
+                    writePdfForAgendaItems(upcoming_agenda_items, committee)
