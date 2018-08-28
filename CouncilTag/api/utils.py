@@ -27,18 +27,11 @@ def getLocationBasedDate(timestamp, cutoff_days_offset, cutoff_hours, cutoff_min
     @lng float longitude of location
     """
     gmaps = googlemaps.Client(key=os.environ.get("GOOGLETZAPIKEY"))
-    tz_obj = gmaps.timezone(location=f"{lat},{lng}", timestamp=timestamp)
-    tz_offset = tz_obj["dstOffset"] + tz_obj["rawOffset"]
     dt = datetime.fromtimestamp(timestamp)
     if cutoff_days_offset is not None:
         dt = dt + timedelta(days=cutoff_days_offset)
-        print(cutoff_days_offset)
-        print("X", dt.timestamp())
     if cutoff_hours is not None:
         dt = dt.replace(hour=cutoff_hours, minute=cutoff_minutes)
-        print("Y", dt.timestamp())
-    dt = dt + timedelta(seconds=tz_offset)
-    print("Z", dt.timestamp())
     return dt
 
 def isCommentAllowed(timestamp, cutoff_days_offset, cutoff_hours, cutoff_minutes, lat, lng):
