@@ -29,7 +29,7 @@ class Command(BaseCommand):
             cutoff_minute = committee.cutoff_minute
             lat = committee.location_lat
             lng = committee.location_lng
-            time_delta = 21600  # 1200 seconds, 20m * 60s/m # 21600 is 6 hours
+            time_delta = 1200  # 1200 seconds, 20m * 60s/m # 21600 is 6 hours
             upcoming_agendas = Agenda.objects.filter(processed=False)
             if (len(upcoming_agendas) == 0):
                 # No agendas
