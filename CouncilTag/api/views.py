@@ -488,7 +488,7 @@ def addMessage(request, format=None):
     '''Add a new message to list to be sent to city council'''
     now = datetime.now()
     message_info = request.data
-    if 'ag_item' not in message_info or 'committee' not in message_info or 'content' not in message_info or 'token' not in message_info or 'pro' not in message_info:
+    if 'ag_item' not in message_info or 'committee' not in message_info or 'content' not in message_info or 'pro' not in message_info:
         return Response(status=400, data={"error": "Missing or incorrect body parameters?"})
     committee = Committee.objects.get(
         name__contains=message_info['committee'])
@@ -500,11 +500,7 @@ def addMessage(request, format=None):
     if not settings.DEBUG and not isCommentAllowed(agenda_item.meeting_time, committee.cutoff_offset_days, committee.cutoff_hour, committee.cutoff_minute):
         return Response(status=401, data={"error": "Could not add comment about agenda item because past the cutoff time"})
     content = message_info['content']
-    verify_token = message_info['token']
     pro = message_info['pro']
-    result = verify_recaptcha(verify_token)
-    if not result:
-        return Response(status=401)
     first_name = None
     last_name = None
     zipcode = 90401
@@ -521,6 +517,12 @@ def addMessage(request, format=None):
     rand_begin = random.randint(0, 32 - CODE_LENGTH)
     authcode_hashed = None
     if (isinstance(request.user, AnonymousUser)):
+        if 'token' not in message_info:
+            return Response(status=400, data={"error": "Not logged in user must use recaptcha."})
+        verify_token = message_info['token']
+        result = verify_recaptcha(verify_token)
+        if not result:
+            return Response(status=401)
         authcode = str(uuid.uuid1()).replace(
             "-", "")[rand_begin:rand_begin + CODE_LENGTH].encode('utf-8')
         authcode_hashed = bcrypt.hashpw(
