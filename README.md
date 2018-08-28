@@ -1,6 +1,6 @@
 
 # CouncilTag
-Website: https://council-tag.herokuapp.com
+Website: https://engage-santa-monica.herokuapp.com/#/
 API documentation: https://council-tag.herokuapp.com/docs
 
 ## Dev Setup
