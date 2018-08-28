@@ -289,7 +289,7 @@ class VerifyView(APIView):
                 return Response(data={"error": "Authcodes do not match for email"}, status=404)
             message.authcode = None
             message.save()
-            return Response(status=200)
+            return Response(status=200, data={"success":True})
         elif data['type'] == 'signup':
             if user is None:
                 return Response(data={"error": "User not found"}, status=404)
@@ -301,7 +301,7 @@ class VerifyView(APIView):
                 return Response(data={"error": "Authcodes do not match for email"}, status=404)
             profile.authcode = None
             profile.save()
-            return Response(status=200)
+            return Response(status=200, data={"success": True})
         return Response(status=500)
 
 
@@ -502,10 +502,7 @@ def addMessage(request, format=None):
     content = message_info['content']
     verify_token = message_info['token']
     pro = message_info['pro']
-    if not settings.DEBUG:
-        result = verify_recaptcha(verify_token)
-    else:
-        result = True
+    result = verify_recaptcha(verify_token)
     if not result:
         return Response(status=401)
     first_name = None
