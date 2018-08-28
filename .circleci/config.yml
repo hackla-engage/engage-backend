@@ -15,6 +15,8 @@ jobs:
           TEST_DB_USER: postgres
           TEST_DB_NAME: circle_test
           TEST_DB_PASS:
+    environment:
+        TEST_REPORTS: /tmp/test-reports
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
@@ -25,7 +27,7 @@ jobs:
           command: |
             sudo pip install pipenv
             pipenv run "pip install -r requirements.txt"
-            mkdir ~/CouncilTag-Django/test-results
+            mkdir -p ${TEST_REPORTS}
       - save_cache:
           key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
           paths:
@@ -38,9 +40,9 @@ jobs:
           command: |
             pipenv run "python manage.py test"
       - store_test_results:
-          path: test-results
+          path: /tmp/test-results
       - store_artifacts:
-          path: test-results
+          path: /tmp/test-results
           destination: tr1
   deploy:
     machine:
