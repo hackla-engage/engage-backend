@@ -1,7 +1,7 @@
 
 # CouncilTag
-Website: https://council-tag.herokuapp.com
-API documentation: https://council-tag.herokuapp.com/docs
+Website: https://engage-santa-monica.herokuapp.com/
+API documentation: https://backend.engage.town/swagger/
 
 ## Dev Setup
 
