@@ -1,7 +1,7 @@
 
 # CouncilTag
 
-- Live Website: https://engage-santa-monica.herokuapp.com
+- Live Website: https://sm.engage.town
 - Live API Endpoint: http://backend.engage.town/api/
 - Live API Documentation: https://backend.engage.town/swagger/
 - Local API Endpoint http://localhost:8000/api
@@ -56,9 +56,9 @@ You can go to `http://localhost:8000/swagger/` to look at the docs and interact 
 
 ## Continous Delivery
 
-We have setup continous integration and deployment with Heroku and CircleCI.
+We have setup continous integration and deployment on CircleCI.
 
-When you push to the `prod` branch on this repo, this will trigger a build on the server and also run the Django test suite. If the tests fail, the build will not go through.
+When you push to the `master` branch on this repo, this will trigger a build on the server and also run the Django test suite. If the tests fail, the build will not go through.
 
 
 ## Django Documentation
