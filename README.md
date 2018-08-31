@@ -29,6 +29,8 @@ To setup the development environment:
  DB_USER=REPLACEME
  DB_PASSWORD=REPLACEME
  DJANGO_SECRET_KEY=someuniqueunpredictablevalue
+ SENDGRIDKEY="SG.-some_long_string"
+ RECAPTCHAKEY="some_string"
  CouncilTag=local
  ```
 
@@ -47,7 +49,15 @@ To setup the development environment:
 url="http://localhost:8000/api",
 ```
 
-9. Finally, start the server.
+9. (optional) If you want to process the PDFs for upcoming committee meetings you must start the celery worker. My recommendation is to output the errors and logs to a text file like worker.tst
+
+`celery -A CouncilTag worker -l debug > worker.tst 2>&1 &`
+
+10. (optional) If you want to scrape agendas nightly for a committee you must start the celery beat worker. My recommendation is to output the errors and logs to a text file like beats.tst
+
+`celery -A CouncilTag beat -l debug > beat.tst 2>&1 &`
+
+11. Finally, start the server.
 
 `python manage.py runserver`
 
