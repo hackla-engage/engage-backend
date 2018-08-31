@@ -1,46 +1,68 @@
 
 # CouncilTag
-Website: https://engage-santa-monica.herokuapp.com/
-API documentation: https://backend.engage.town/swagger/
+
+- Live Website: https://engage-santa-monica.herokuapp.com
+- Live API Endpoint: http://backend.engage.town/api/
+- Live API Documentation: https://backend.engage.town/swagger/
+- Local API Endpoint http://localhost:8000/api
+- Local API Documentation http://localhost:8000/swagger/
 
 ## Dev Setup
-
-To setup development environment:
+To setup the development environment:
 
 1. Clone this repo
 
-2. Download virtualenv, if not already installed. After creating an virtualenv, download 
-dependecies in the `requirements.txt`.
+2. Setup a virtualenv and install all Python packages.
 
-3. Download the Postgres libraries for your platform and PgAdmin, the GUI database manageer
+`pip install -r requirements.txt`
 
-4. Make sure the `DEBUG` value in the `settings.py` file is set to True if you are running locally
-  1. To set DEBUG to true set environment variable ```CouncilTag=local```
+3. Setup Postgres and PgAdmin for your platform if needed. PgAdmin is a useful GUI database manager.
 
-5. Make sure that your Postgres has a `counciltag` database in it
+4. Create the `counciltag` database if it does not exist.
 
-6. Open PgAdmin 
+5. Create a database user, give the user a password and grant the user permissions for `counciltag`.
 
-7. If its your first time, setting up the dev environment, type the following commands:
+6. Add the following environmental variables for the project. You'll need database info, django secret key and 'CouncilTag' to run the project in DEBUG mode. 
 
-`python manage.py migrate`
+ ```
+ DB_NAME=counciltag
+ DB_USER=REPLACEME
+ DB_PASSWORD=REPLACEME
+ DJANGO_SECRET_KEY=someuniqueunpredictablevalue
+ CouncilTag=local
+ ```
 
-`python manage.py populate_tags`
+7. If it's your first time setting up the dev environment, run the following commands. In this order, these commands will 1) create the SQL tables needed, 2) load our list of tags, 3) scrape live data from the City of Santa Monica.
 
-`python manage.py scrape_data`
+`python manage.py migrate` 
 
-In order, these commands will 1) create the SQL tables needed, 2) load our list of tags, 3) load up a set of live data from the City of Santa Monica
+`python manage.py populate_tags` 
 
-8. Run `python manage.py runserver` to stat the python server. 
+`python manage.py scrape_data` 
+
+8. Then edit `CouncilTags/urls.py` to switch to localhost.
+
+```
+# url="https://backend.engage.town/api",
+url="http://localhost:8000/api",
+```
+
+9. Finally, start the server.
+
+`python manage.py runserver`
 
 You can go to `http://localhost:8000/swagger/` to look at the docs and interact with the API. 
 
 
 ## Continous Delivery
 
-We have setup a continous integration with Heroku. When you push to the `prod` branch on this repo, this will trigger a build on the server. This will also run the Django test suite. If the tests fail, the build will not go through. 
+We have setup continous integration and deployment with Heroku and CircleCI.
 
-## Django documentation
+When you push to the `prod` branch on this repo, this will trigger a build on the server and also run the Django test suite. If the tests fail, the build will not go through.
+
+
+## Django Documentation
+
 If you are new to using Django, you can read up more about it here:
 https://docs.djangoproject.com/en/2.0/
 
