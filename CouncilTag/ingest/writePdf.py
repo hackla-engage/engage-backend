@@ -6,7 +6,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
 from reportlab.pdfbase import pdfmetrics
-from CouncilTag.ingest.models import Message, Committee, EngageUserProfile, EngageUser
+from CouncilTag.ingest.models import Message, Committee, EngageUserProfile, EngageUser, Agenda
 from CouncilTag.api.utils import send_mail
 import io
 from datetime import datetime, date
@@ -43,7 +43,7 @@ def paragraphize_comments(comments, contents):
     return contents
 
 
-def writePdfForAgendaItems(agenda_items, committee):
+def writePdfForAgendaItems(agenda_items, committee, agenda):
     root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     static = 'PDF_Reports'
     full_path = os.path.join(root_dir, static)
@@ -165,6 +165,8 @@ def writePdfForAgendaItems(agenda_items, committee):
         send_mail({"user": committee, "subject": subject, "content": email_body, "attachment_file_path": attachment_file_path,
                    "attachment_type": attachment_type, "attachment_file_name": attachment_name})
 
+        agenda.processed = True
+        agenda.save()
         return True
     except:
         return False
