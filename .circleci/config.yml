@@ -38,7 +38,6 @@ jobs:
       - run: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
           command: |
-            ""
             pipenv run "python manage.py flush --noinput"
             pipenv run "python manage.py populate_tags"
             pipenv run "python manage.py migrate"
