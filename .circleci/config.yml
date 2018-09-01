@@ -17,6 +17,9 @@ jobs:
           POSTGRES_PASSWORD: something
     environment:
         TEST_REPORTS: /tmp/test-reports
+        POSTGRES_DB: counciltagtest
+        POSTGRES_USER: engagepsql
+        POSTGRES_PASSWORD: something
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
