@@ -13,12 +13,12 @@ jobs:
       - image: nimbustech/postgres-ssl:9.5
         environment:
           POSTGRES_DB: counciltagtest
-          POSTGRES_USER: engagepsql
+          POSTGRES_USER: circleci
           POSTGRES_PASSWORD: something
     environment:
         TEST_REPORTS: /tmp/test-reports
         POSTGRES_DB: counciltagtest
-        POSTGRES_USER: engagepsql
+        POSTGRES_USER: circleci
         POSTGRES_PASSWORD: something
     steps:
       - checkout
