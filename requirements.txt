@@ -1,3 +1,5 @@
+amqp==2.3.2
+anyjson==0.3.3
 appdirs==1.4.3
 astroid==1.5.3
 attrs==18.1.0
@@ -5,7 +7,9 @@ autopep8==1.3.2
 backports.functools-lru-cache==1.4
 bcrypt==3.1.4
 beautifulsoup4==4.6.0
+billiard==3.5.0.4
 bs4==0.0.1
+celery==4.2.1
 certifi==2017.7.27.1
 cffi==1.11.5
 chardet==3.0.4
@@ -18,6 +22,8 @@ defusedxml==0.5.0
 dj-database-url==0.5.0
 dj-static==0.0.6
 Django==2.0.7
+django-celery-beat==1.1.1
+django-celery-results==1.0.1
 django-cors-headers==2.1.0
 django-filter==1.1.0
 django-heroku==0.3.1
@@ -41,6 +47,7 @@ itypes==1.1.0
 Jinja2==2.10
 jsonpointer==1.14
 jsonschema==2.6.0
+kombu==4.2.1
 lazy-object-proxy==1.3.1
 lxml==4.1.1
 Markdown==2.6.11
@@ -60,6 +67,7 @@ python-http-client==3.0.0
 python3-openid==3.1.0
 pytz==2017.2
 PyYAML==3.13
+redis==2.10.6
 reportlab==3.4.0
 requests==2.12.1
 requests-oauthlib==0.8.0
@@ -79,5 +87,6 @@ toml==0.9.4
 uritemplate==3.0.0
 urllib3==1.22
 validate-email==1.3
+vine==1.1.4
 whitenoise==3.3.1
 wrapt==1.10.11

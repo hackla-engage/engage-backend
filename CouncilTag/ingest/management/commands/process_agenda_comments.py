@@ -27,8 +27,7 @@ class Command(BaseCommand):
             cutoff_offset_days = committee.cutoff_offset_days
             cutoff_hour = committee.cutoff_hour
             cutoff_minute = committee.cutoff_minute
-            lat = committee.location_lat
-            lng = committee.location_lng
+            location_tz = committee.location_tz
             time_delta = 1200  # 1200 seconds, 20m * 60s/m # 21600 is 6 hours
             upcoming_agendas = Agenda.objects.filter(processed=False)
             if (len(upcoming_agendas) == 0):
@@ -37,7 +36,7 @@ class Command(BaseCommand):
             for agenda in upcoming_agendas:
                 meeting_time = agenda.meeting_time
                 cutoff_datetime = getLocationBasedDate(
-                    meeting_time, cutoff_offset_days, cutoff_hour, cutoff_minute, lat, lng)
+                    meeting_time, cutoff_offset_days, cutoff_hour, cutoff_minute, location_tz)
                 cutoff_timestamp = int(cutoff_datetime.timestamp())
                 if (now_time_stamp - time_delta < cutoff_timestamp < now_time_stamp + time_delta):
                     agenda.processed = True
@@ -48,4 +47,4 @@ class Command(BaseCommand):
                         print(
                             "No upcoming agenda items on {meeting_time} for {committee.name}")
                         continue
-                    writePdfForAgendaItems(upcoming_agenda_items, committee)
+                    writePdfForAgendaItems(upcoming_agenda_items, committee, agenda)

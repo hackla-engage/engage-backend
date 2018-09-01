@@ -17,7 +17,7 @@ def verify_recaptcha(token):
     response = r.json()
     return response['success']
 
-def getLocationBasedDate(timestamp, cutoff_days_offset, cutoff_hours, cutoff_minutes, lat, lng):
+def getLocationBasedDate(timestamp, cutoff_days_offset, cutoff_hour, cutoff_minute, location_tz):
     """
     @timestamp a UTC timestamp
     @cutoff_dats_offset +/- integer days from now that should be checking date
@@ -26,19 +26,17 @@ def getLocationBasedDate(timestamp, cutoff_days_offset, cutoff_hours, cutoff_min
     @lat float latitude of location
     @lng float longitude of location
     """
-    gmaps = googlemaps.Client(key=os.environ.get("GOOGLETZAPIKEY"))
-    tz_obj = gmaps.timezone(location=f"{lat},{lng}", timestamp=timestamp)
-    tz_offset = tz_obj["dstOffset"] + tz_obj["rawOffset"]
-    dt = datetime.fromtimestamp(timestamp)
+    tz = pytz.timezone(location_tz)
+    dt = datetime.utcfromtimestamp(timestamp)
+    dt = dt.astimezone(tz)
     if cutoff_days_offset is not None:
         dt = dt + timedelta(days=cutoff_days_offset)
-    if cutoff_hours is not None:
-        dt = dt.replace(hour=cutoff_hours, minute=cutoff_minutes)
-    dt = dt + timedelta(seconds=tz_offset)
+    if cutoff_hour is not None:
+        dt = dt.replace(hour=cutoff_hour, minute=cutoff_minute)
     return dt
 
-def isCommentAllowed(timestamp, cutoff_days_offset, cutoff_hours, cutoff_minutes, lat, lng):
-    dt = getLocationBasedDate(timestamp, cutoff_days_offset, cutoff_hours, cutoff_minutes, lat, lng)
+def isCommentAllowed(timestamp, cutoff_days_offset, cutoff_hours, cutoff_minutes, location_tz):
+    dt = getLocationBasedDate(timestamp, cutoff_days_offset, cutoff_hours, cutoff_minutes, location_tz)
     now = datetime.now()
     if (now > dt):
         return False

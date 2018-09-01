@@ -188,6 +188,8 @@ def get_data(year):
         soup = BeautifulSoup(r.text, 'html.parser')
         agendas = dict()
         table = soup.find('table', {'class': 'agendaTable'})
+        if table is None:
+            return None
         rows = table.findAll('tr')
         for row in rows:
             cells = row.findChildren('td')

@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 import dj_database_url
-import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,10 +27,10 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 DEBUG = False
 if os.environ.get("CouncilTag") == 'local':
     DEBUG = True
-print(DEBUG)
+
 ALLOWED_HOSTS = ['localhost', 'https://engage-santa-monica.herokuapp.com',
                  'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1']
-APPEND_SLASH=True
+APPEND_SLASH = True
 # Application definition
 print("Opened settings")
 INSTALLED_APPS = [
@@ -46,8 +45,16 @@ INSTALLED_APPS = [
     'CouncilTag.api',
     'corsheaders',
     'drf_yasg',
-    'drf_openapi'
+    'drf_openapi',
+    'django_celery_beat',
+    'CouncilTag.apps.CouncilTagConfig',
+    'CouncilTag.celery'
 ]
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -74,7 +81,7 @@ SWAGGER_SETTINGS = {
         }
     },
     'USE_SESSION_AUTH': True,
-    
+
 }
 
 ROOT_URLCONF = 'CouncilTag.urls'
@@ -98,37 +105,23 @@ TEMPLATES = [
 WSGI_APPLICATION = 'CouncilTag.wsgi.application'
 
 # Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get("DB_NAME"),
-            'USER': os.environ.get("DB_USER"),
-            'PASSWORD': os.environ.get("DB_PASS"),
-            'HOST': 'localhost',
-            'TEST': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': os.environ.get("TEST_DB_NAME"),
-                'USER': os.environ.get("TEST_DB_USER"),
-                'PASSWORD': os.environ.get("TEST_DB_PASS"),
-                'HOST': 'localhost',
-            },
-        },
-    }
-else:
-    DATABASES = {}
-    DATABASES['default'] = dj_database_url.config(
-        conn_max_age=600, ssl_require=True)
-    DATABASES['default']['TEST'] = {
+DATABASES = {
+    'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get("TEST_DB_NAME"),
-        'USER': os.environ.get("TEST_DB_USER"),
-        'PASSWORD': os.environ.get("TEST_DB_PASS"),
+        'NAME': os.environ.get("DB_NAME"),
+        'USER': os.environ.get("DB_USER"),
+        'PASSWORD': os.environ.get("DB_PASS"),
         'HOST': 'localhost',
-    }
-print(os.environ.get('DATABASE_URL'))
+        'TEST': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get("POSTGRES_DB"),
+            'USER': os.environ.get("POSTGRES_USER"),
+            'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
+            'HOST': 'localhost',
+        },
+    },
+}
+print(DATABASES['default']['TEST'])
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
@@ -149,16 +142,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'America/Los_Angeles'
-
 USE_I18N = True
-
 USE_L10N = True
-
-USE_TZ = True
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
@@ -178,29 +165,4 @@ AUTHENTICATION_BACKENDS = ['CouncilTag.api.backends.EmailPasswordBackend']
 AUTH_USER_MODEL = 'ingest.EngageUser'
 
 CORS_URLS_REGEX = r'^/api/.*$'
-
-if DEBUG:
-    COUNCIL_CLERK_EMAIL = 'shariq.torres@gmail.com'
-else:
-    COUNCIL_CLERK_EMAIL = 'counciltag@gmail.com'
-
-# According to Heroku, this should be at the end of settings.py
-django_heroku.settings(locals())
-
-if os.environ.get("CouncilTag") == 'local':
-    # Display output of the email in the console
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = 'smtp.sendgrid.net'
-    EMAIL_HOST_USER = os.environ.get('USERNAME')
-    EMAIL_HOST_PASSWORD = os.environ.get('PASSWORD')
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = False
-    EMAIL_USE_TLS = False
-    EMAIL_USE_SSL = False
-    EMAIL_TIMEOUT = False
-    EMAIL_SSL_KEYFILE = False
-    EMAIL_SSL_CERTFILE = False
-
 SENDGRID_API_KEY = os.environ.get('SENDGRIDKEY')

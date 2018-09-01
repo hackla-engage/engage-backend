@@ -6,17 +6,20 @@ jobs:
       - image: circleci/python:3.6.4
         environment:
           PIPENV_VENV_IN_PROJECT: true
-          DATABASE_URL: postgresql://postgres@localhost/circle_test?sslmode=true
+          DATABASE_URL: postgresql://engagepsql:something@localhost/counciltagtest?sslmode=true
           CouncilTag: local
           DJANGO_SECRET_KEY: examplesecretkeydonotuseinprod
           SENDGRIDKEY: SG.-thisisnotarealkeylol
       - image: nimbustech/postgres-ssl:9.5
         environment:
-          TEST_DB_USER: postgres
-          TEST_DB_NAME: circle_test
-          TEST_DB_PASS:
+          POSTGRES_DB: counciltagtest
+          POSTGRES_USER: circleci
+          POSTGRES_PASSWORD: something
     environment:
         TEST_REPORTS: /tmp/test-reports
+        POSTGRES_DB: counciltagtest
+        POSTGRES_USER: circleci
+        POSTGRES_PASSWORD: something
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
@@ -34,11 +37,9 @@ jobs:
             - ".venv"
             - "/usr/local/bin"
             - "/usr/local/lib/python3.6/site-packages"
-       # Wait for DB
-      - run: dockerize -wait tcp://localhost:5432 -timeout 1m
-      - run:
-          command: |
-            pipenv run "python manage.py test"
+      # Wait for DB
+      - run: pipenv run "python manage.py flush --noinput"
+      - run: pipenv run "python manage.py test -k"
       - store_test_results:
           path: /tmp/test-results
       - store_artifacts:
