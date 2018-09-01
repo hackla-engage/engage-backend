@@ -6,7 +6,7 @@ class CouncilTagConfig(AppConfig):
     name = 'CouncilTag'
 
     def ready(self):
-        if (!CouncilTag.settings.DEBUG):
+        if (not CouncilTag.settings.DEBUG):
             from CouncilTag.ingest.models import Agenda, Committee
             from CouncilTag.api.utils import getLocationBasedDate
             from CouncilTag.celery import schedule_process_pdf
