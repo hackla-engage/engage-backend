@@ -21,6 +21,10 @@ jobs:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+      - run: sudo apt-get install -y postgresql-client
+
+      - run: createdb -h localhost -O $POSTGRES_USER 
+
       - restore_cache:
           key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
@@ -35,8 +39,6 @@ jobs:
             - "/usr/local/bin"
             - "/usr/local/lib/python3.6/site-packages"
       # Wait for DB
-      - run: pipenv run "python manage.py migrate" 
-      - run: pipenv run "python manage.py populate_tags"
       - run: pipenv run "python manage.py test"
       - store_test_results:
           path: /tmp/test-results
