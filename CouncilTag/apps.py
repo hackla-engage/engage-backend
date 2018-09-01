@@ -1,12 +1,12 @@
 from django.apps import AppConfig
 import json
-
+from CouncilTag.settings import DEBUG
 
 class CouncilTagConfig(AppConfig):
     name = 'CouncilTag'
 
     def ready(self):
-        if (not CouncilTag.settings.DEBUG):
+        if not DEBUG:
             from CouncilTag.ingest.models import Agenda, Committee
             from CouncilTag.api.utils import getLocationBasedDate
             from CouncilTag.celery import schedule_process_pdf
