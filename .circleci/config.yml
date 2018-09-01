@@ -39,7 +39,7 @@ jobs:
             - "/usr/local/lib/python3.6/site-packages"
       # Wait for DB
       - run: pipenv run "python manage.py flush --noinput"
-      - run: pipenv run "python manage.py test"
+      - run: pipenv run "python manage.py test -k"
       - store_test_results:
           path: /tmp/test-results
       - store_artifacts:
