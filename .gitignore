@@ -9,6 +9,8 @@ __pycache__/
 # generated PDFs
 *.pdf
 *.PDF
+*.tst 
+*.pid
 
 # Distribution / packaging
 .Python
