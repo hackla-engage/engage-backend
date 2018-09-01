@@ -36,12 +36,10 @@ jobs:
             - "/usr/local/lib/python3.6/site-packages"
       # Wait for DB
       - run: dockerize -wait tcp://localhost:5432 -timeout 1m
-      - run:
-          command: |
-            pipenv run "python manage.py flush --noinput"
-            pipenv run "python manage.py migrate"
-            pipenv run "python manage.py populate_tags"
-            pipenv run "python manage.py test"
+      - run: pipenv run "python manage.py flush --noinput"
+      - run: pipenv run "python manage.py migrate" 
+      - run: pipenv run "python manage.py populate_tags"
+      - run: pipenv run "python manage.py test"
       - store_test_results:
           path: /tmp/test-results
       - store_artifacts:
