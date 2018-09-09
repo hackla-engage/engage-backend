@@ -46,8 +46,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'drf_openapi',
     'django_celery_beat',
-    'CouncilTag.apps.CouncilTagConfig',
-    'CouncilTag.celery'
+    'CouncilTag.celery',
+    'CouncilTag.apps.CouncilTagConfig'
 ]
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'

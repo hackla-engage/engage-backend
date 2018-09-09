@@ -25,7 +25,7 @@ def setup_beats(sender, **kwargs):
     committees = Committee.objects.all()
     for committee in committees:
         sender.add_periodic_task(
-            crontab(minute=0, hour='*'),
+            crontab(minute=0, hour='*/2'),
             schedule_committee_processing.s(committee.name),
             name=committee.name,
         )
