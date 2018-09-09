@@ -25,7 +25,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-TEST = FALSE
+TEST = False
 if os.environ.get("CouncilTag") == 'debug':
     DEBUG = True
 if os.environ.get("CouncilTag") == 'test':
