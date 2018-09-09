@@ -29,7 +29,7 @@ def addMessage(request, format=None):
     agenda_item = AgendaItem.objects.get(pk=message_info['ag_item'])
     if agenda_item is None:
         return Response(data={"error": "Could not find agenda item matching:" + message_info['ag_item']}, status=404)
-    if not settings.DEBUG and not isCommentAllowed(agenda_item.meeting_time, committee.cutoff_offset_days, committee.cutoff_hour, committee.cutoff_minute, committee.location_tz):
+    if not settings.TEST and not isCommentAllowed(agenda_item.meeting_time, committee.cutoff_offset_days, committee.cutoff_hour, committee.cutoff_minute, committee.location_tz):
         return Response(status=401, data={"error": "Could not add comment about agenda item because past the cutoff time"})
     content = message_info['content']
     pro = message_info['pro']

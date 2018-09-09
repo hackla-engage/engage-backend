@@ -31,7 +31,7 @@ To setup the development environment:
  DJANGO_SECRET_KEY=someuniqueunpredictablevalue
  SENDGRIDKEY="SG.-some_long_string"
  RECAPTCHAKEY="some_string"
- CouncilTag=local
+ CouncilTag=debug
  ```
 
 7. If it's your first time setting up the dev environment, run the following commands. In this order, these commands will 1) create the SQL tables needed, 2) load our list of tags, 3) scrape live data from the City of Santa Monica.
