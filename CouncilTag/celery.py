@@ -25,7 +25,7 @@ def setup_beats(sender, **kwargs):
     committees = Committee.objects.all()
     for committee in committees:
         sender.add_periodic_task(
-            crontab(minute=0, hour=0),
+            crontab(minute=0, hour='*/2'),
             schedule_committee_processing.s(committee.name),
             name=committee.name,
         )
@@ -52,7 +52,7 @@ def schedule_process_pdf(committee_name, agenda_id):
 
 @app.task
 def schedule_committee_processing(committee_name, **args):
-    print("XXXX", committee_name, args)
+    print(f"Executing scraping for {committee_name}")
     from CouncilTag.ingest.utils import processAgendasForYears
     year = datetime.now().year
     processAgendasForYears([year], committee_name)

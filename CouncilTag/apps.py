@@ -1,16 +1,18 @@
 from django.apps import AppConfig
 import json
-from CouncilTag.settings import DEBUG
+from CouncilTag.settings import TEST
 
 class CouncilTagConfig(AppConfig):
     name = 'CouncilTag'
-
     def ready(self):
-        if not DEBUG:
+        if not TEST:
             from CouncilTag.ingest.models import Agenda, Committee
             from CouncilTag.api.utils import getLocationBasedDate
-            from CouncilTag.celery import schedule_process_pdf
+            from celery.schedules import crontab
+            from CouncilTag.celery import schedule_process_pdf, app
             print("SETTING UP CELERY ASYNC TASKS!")
+            app.conf.beat_schedule = {}
+            app.conf.timezone='UTC'
             committees = Committee.objects.all()
             for committee in committees:
                 agendas = Agenda.objects.filter(
@@ -20,3 +22,8 @@ class CouncilTagConfig(AppConfig):
                                             committee.cutoff_hour, committee.cutoff_minute, committee.location_tz)
                     schedule_process_pdf.apply_async(
                         (committee.name, agenda.meeting_id), eta=dt)
+                app.conf.beat_schedule[committee.name] = {
+                    'task': 'CouncilTag.celery.schedule_committee_processing',
+                    'schedule': crontab(hour='*/2', minute='0'),
+                    'args': (committee.name,)
+                }

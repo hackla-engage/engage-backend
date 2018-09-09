@@ -25,8 +25,10 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
-if os.environ.get("CouncilTag") == 'local':
+if os.environ.get("CouncilTag") == 'debug':
     DEBUG = True
+if os.environ.get("CouncilTag") == 'test':
+    TEST = True
 
 ALLOWED_HOSTS = ['localhost', 'engage-santa-monica.herokuapp.com', 'backend.engage.town', 'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1', 'sm.engage.town']
 APPEND_SLASH = True
@@ -46,8 +48,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'drf_openapi',
     'django_celery_beat',
-    'CouncilTag.apps.CouncilTagConfig',
-    'CouncilTag.celery'
+    'CouncilTag.celery',
+    'CouncilTag.apps.CouncilTagConfig'
 ]
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
