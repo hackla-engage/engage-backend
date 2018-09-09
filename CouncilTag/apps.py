@@ -24,6 +24,6 @@ class CouncilTagConfig(AppConfig):
                         (committee.name, agenda.meeting_id), eta=dt)
                 app.conf.beat_schedule[committee.name] = {
                     'task': 'CouncilTag.celery.schedule_committee_processing',
-                    'schedule': crontab(hour='*/2', minute='0'),
+                    'schedule': crontab(hour='*/2', minute='35'),
                     'args': (committee.name,)
                 }
