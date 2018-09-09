@@ -1,12 +1,12 @@
-from django.test import TestCase
-import json
-from CouncilTag.ingest.models import Agenda, Committee, Tag, AgendaItem, EngageUserProfile, Message
-import jwt
 from CouncilTag import settings
+from CouncilTag.ingest.models import Agenda, Committee, Tag, AgendaItem, EngageUserProfile, Message
 from CouncilTag.api.utils import send_message
-from datetime import datetime
+from django.test import TestCase
 from django.contrib.auth import get_user_model
 User = get_user_model()
+from datetime import datetime
+import json
+import jwt
 
 # Create your tests here.
 class TestAgendasEndpoint(TestCase):

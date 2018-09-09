@@ -1,12 +1,13 @@
+from CouncilTag import settings
+from sendgrid.helpers.mail import Email, Content, Mail, Attachment
+from datetime import datetime, timedelta
 import sendgrid
 import logging
 import requests
 import os
-from CouncilTag import settings
-from sendgrid.helpers.mail import Email, Content, Mail, Attachment
+import bcrypt
 import base64
 import pytz
-from datetime import datetime, timedelta
 import googlemaps
 log = logging.Logger(__name__)
 
@@ -17,14 +18,71 @@ def verify_recaptcha(token):
     response = r.json()
     return response['success']
 
+def array_of_ordereddict_to_list_of_names(tags_ordereddict_array):
+    """
+    Serializers have a funny organization that isn't helpful in making further queries
+    Here we take the list of ordered dictionaries (id: x, name: y) and pull out the name only
+    and put that in a names list to return
+    """
+    names = []
+    length = len(list(tags_ordereddict_array))
+    for i in range(length):
+        names.append(tags_ordereddict_array[i]["name"])
+    return names
+
+def check_auth_code(plain_code, hashed):
+    dec = bcrypt.hashpw(plain_code.encode('utf-8'),
+                        hashed.encode('utf-8')).decode('utf-8')
+    if dec == hashed:
+        return True
+    return False
+
+
+def calculateTallies(messages_qs):
+    pro = 0
+    con = 0
+    more_info = 0
+    home_owner = 0
+    business_owner = 0
+    resident = 0
+    works = 0
+    school = 0
+    child_school = 0
+    total = 0
+    for message in messages_qs:
+        if message.authcode != None:
+            continue
+        if message.pro == 0:
+            con += 1
+        elif message.pro == 1:
+            pro += 1
+        else:
+            more_info += 1
+        if message.home_owner:
+            home_owner += 1
+        if message.business_owner:
+            business_owner += 1
+        if message.resident:
+            resident += 1
+        if message.works:
+            works += 1
+        if message.school:
+            school += 1
+        if message.child_school:
+            child_school += 1
+        total += 1
+    return {"home_owner": home_owner, "business_owner": business_owner,
+            "resident": resident, "works": works, "school": school,
+            "child_school": child_school, "pro": pro, "con": con, "more_info": more_info, "total": total}
+
+
 def getLocationBasedDate(timestamp, cutoff_days_offset, cutoff_hour, cutoff_minute, location_tz):
     """
     @timestamp a UTC timestamp
     @cutoff_dats_offset +/- integer days from now that should be checking date
     @cutoff_hours integer hours for location that should be set
     @cutoff_minutes integer minutes for locaiton that should be set
-    @lat float latitude of location
-    @lng float longitude of location
+    @location_tz string timezone for location where meeting takes place
     """
     tz = pytz.timezone(location_tz)
     dt = datetime.utcfromtimestamp(timestamp)
