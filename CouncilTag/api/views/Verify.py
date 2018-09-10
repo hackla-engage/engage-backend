@@ -9,6 +9,8 @@ from CouncilTag.api.utils import verify_recaptcha, send_mail, isCommentAllowed, 
 from django.contrib.auth.models import AnonymousUser
 from CouncilTag import settings
 from datetime import datetime
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 class VerifyView(APIView):
     @swagger_auto_schema(request_body=VerifySerializer)
