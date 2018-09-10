@@ -95,7 +95,7 @@ def getLocationBasedDate(timestamp, cutoff_days_offset, cutoff_hour, cutoff_minu
 
 def isCommentAllowed(timestamp, cutoff_days_offset, cutoff_hours, cutoff_minutes, location_tz):
     dt = getLocationBasedDate(timestamp, cutoff_days_offset, cutoff_hours, cutoff_minutes, location_tz)
-    now = datetime.now()
+    now = datetime.now().astimezone(tz=pytz.timezone(location_tz))
     if (now > dt):
         return False
     return True
