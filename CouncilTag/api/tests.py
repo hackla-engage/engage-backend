@@ -115,6 +115,8 @@ class TestSendMessageEndpoint(TestCase):
     Add SES test
     '''
     def test_mail_util_func(self):
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        static = 'PDF_Reports'
         full_path = os.path.join(root_dir, static)
         attachment_file_path = str(full_path) + "/test_pdf_report.pdf" 
         print(attachment_file_path)
