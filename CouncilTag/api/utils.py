@@ -130,7 +130,7 @@ def send_mail(mail_message):
             msg.attach(part)
     response = ses_client.send_raw_email(
         Source="engage team <do-not-reply@engage.town>",
-        Destination=to_email,
+        Destinations=[to_email],
         RawMessage={'Data': msg.as_string()})
     if response['MessageId'] is not None:
         return True
