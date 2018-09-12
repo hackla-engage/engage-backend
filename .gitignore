@@ -7,8 +7,8 @@ __pycache__/
 *.so
 
 # generated PDFs
-*.pdf
-*.PDF
+M*.pdf
+M*.PDF
 *.tst 
 *.pid
 celerybeat-schedule.db

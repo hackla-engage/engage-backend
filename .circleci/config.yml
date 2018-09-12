@@ -8,8 +8,6 @@ jobs:
           PIPENV_VENV_IN_PROJECT: true
           DATABASE_URL: postgresql://engagepsql:something@localhost/counciltagtest?sslmode=true
           CouncilTag: test
-          DJANGO_SECRET_KEY: examplesecretkeydonotuseinprod
-          SENDGRIDKEY: SG.-thisisnotarealkeylol
       - image: nimbustech/postgres-ssl:9.5
         environment:
           POSTGRES_DB: counciltagtest

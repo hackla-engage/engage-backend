@@ -168,4 +168,3 @@ AUTHENTICATION_BACKENDS = ['CouncilTag.api.backends.EmailPasswordBackend']
 AUTH_USER_MODEL = 'ingest.EngageUser'
 
 CORS_URLS_REGEX = r'^/api/.*$'
-SENDGRID_API_KEY = os.environ.get('SENDGRIDKEY')
