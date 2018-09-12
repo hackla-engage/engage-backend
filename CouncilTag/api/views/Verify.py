@@ -5,12 +5,13 @@ from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 
-from CouncilTag.api.utils import verify_recaptcha, send_mail, isCommentAllowed, check_auth_code
+from CouncilTag.api.utils import verify_recaptcha, isCommentAllowed, check_auth_code
 from django.contrib.auth.models import AnonymousUser
 from CouncilTag import settings
 from datetime import datetime
 from django.contrib.auth import get_user_model
 User = get_user_model()
+
 
 class VerifyView(APIView):
     @swagger_auto_schema(request_body=VerifySerializer)
@@ -49,4 +50,3 @@ class VerifyView(APIView):
             profile.save()
             return Response(status=200, data={"success": True})
         return Response(status=500)
-

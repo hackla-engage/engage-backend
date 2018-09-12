@@ -12,8 +12,11 @@ import uuid
 import urllib
 import bcrypt
 import random
+import boto3
 
 '''Email message comments for either registered or non-registered users'''
+
+
 @api_view(["POST"])
 @swagger_auto_schema(request_body=AddMessageSerializer, responses={'404': "Either committee or ", '401': 'Recaptcha v2 was incorrect or', '400': 'Incorrect parameters', '201': 'OK, message added'})
 def addMessage(request, format=None):

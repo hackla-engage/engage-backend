@@ -18,6 +18,8 @@ class CouncilTagConfig(AppConfig):
                 agendas = Agenda.objects.filter(
                     committee=committee, processed=False)
                 for agenda in agendas:
+                    agenda.processed = True
+                    agenda.save()
                     dt = getLocationBasedDate(agenda.meeting_time, committee.cutoff_offset_days,
                                             committee.cutoff_hour, committee.cutoff_minute, committee.location_tz)
                     schedule_process_pdf.apply_async(
