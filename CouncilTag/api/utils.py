@@ -135,8 +135,8 @@ def send_mail(mail_message):
     if response['MessageId'] is not None:
         return True
     else:
-        log.error("Could not send an email from {} to {} about {}".format(from_email,
-                                                                          to_email, subject))
+        log.error("Could not send an email from {} to {} about {}".format("do-not-reply@engage.town",
+                                                                          to_email, mail_message['Subject']))
         log.error(response.body)
         log.error(response.status_code)
         return False
