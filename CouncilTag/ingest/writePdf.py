@@ -135,7 +135,6 @@ def writePdfForAgendaItems(agenda_items, committee, agenda):
         doc.build(contents)
         attachment_file_path = str(full_path) + "/Meeting_" + str(datetime.fromtimestamp(
             agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + ".pdf"
-        attachment_type = "application/pdf"
         attachment_name = "Agenda_Comments_Council_Meeting_" + \
             str(datetime.fromtimestamp(
                 agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + f".pdf"
@@ -163,7 +162,7 @@ def writePdfForAgendaItems(agenda_items, committee, agenda):
 
         subject = f"Council Meeting {datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%m/%d/%Y')} - Agenda Recommendations, Comment Submissions for {today.strftime('%m/%d/%Y')}"
         send_mail({"user": committee, "subject": subject, "content": email_body, "attachment_file_path": attachment_file_path,
-                   "attachment_type": attachment_type, "attachment_file_name": attachment_name})
+                   "attachment_file_name": attachment_name})
 
         agenda.processed = True
         agenda.save()
