@@ -7,6 +7,7 @@ User = get_user_model()
 from datetime import datetime
 import json
 import jwt
+import os
 
 # Create your tests here.
 class TestAgendasEndpoint(TestCase):
