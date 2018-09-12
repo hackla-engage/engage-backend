@@ -114,8 +114,7 @@ class TestSendMessageEndpoint(TestCase):
     Add SES test
     '''
     def test_mail_util_func(self):
-        send_mail({'user': {'email': 'engage@engage.town'}, 'subject': 'test', 'content': '<html><body>Testing</body></html>', 'attachment_file_path': '../PDF_Reports/Meeting_20180522.pdf', 'attachment_file_name': 'test_pdf_report.pdf'})
-        result = send_message(sent_message)
+        result = send_mail({'user': {'email': 'engage@engage.town'}, 'subject': 'test', 'content': '<html><body>Testing</body></html>', 'attachment_file_path': '../PDF_Reports/Meeting_20180522.pdf', 'attachment_file_name': 'test_pdf_report.pdf'})
         self.assertTrue(result)
 
     
