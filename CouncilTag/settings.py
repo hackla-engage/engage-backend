@@ -35,7 +35,6 @@ ALLOWED_HOSTS = ['localhost', 'engage-santa-monica.herokuapp.com', 'backend.enga
                  'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1', 'sm.engage.town']
 APPEND_SLASH = True
 # Application definition
-print("Opened settings")
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -86,7 +85,7 @@ SWAGGER_SETTINGS = {
     'USE_SESSION_AUTH': True,
 
 }
-
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 ROOT_URLCONF = 'CouncilTag.urls'
 
 TEMPLATES = [
@@ -163,7 +162,14 @@ STATICFILES_DIRS = (
 )
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = (
+    'localhost:8080',
+    'engage.town',
+    'backend.engage.town'
+)
 AUTHENTICATION_BACKENDS = ['CouncilTag.api.backends.EmailPasswordBackend']
 AUTH_USER_MODEL = 'ingest.EngageUser'
 

@@ -97,6 +97,8 @@ class Message(models.Model):
     works = models.BooleanField(default=False)
     school = models.BooleanField(default=False)
     child_school = models.BooleanField(default=False)
+    # Keep session key so if user authenticates one message it authenticates all messages
+    session_key = models.CharField(max_length=100, blank=True, null=True)
     # code challenge for user
     authcode = models.CharField(max_length=255, null=True)
     date = models.PositiveIntegerField(default=0)  # Unix timestamp

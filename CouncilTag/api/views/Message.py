@@ -20,6 +20,11 @@ import boto3
 @api_view(["POST"])
 @swagger_auto_schema(request_body=AddMessageSerializer, responses={'404': "Either committee or ", '401': 'Recaptcha v2 was incorrect or', '400': 'Incorrect parameters', '201': 'OK, message added'})
 def addMessage(request, format=None):
+    session_key = request.session.get('session_key', None)
+    if (session_key is None):
+        session_key = str(uuid.uuid1())
+        request.session['session_key'] = session_key
+        request.session.modified = True
     '''Add a new message to list to be sent to city council'''
     now = datetime.now()
     message_info = request.data
@@ -52,16 +57,6 @@ def addMessage(request, format=None):
     rand_begin = random.randint(0, 32 - CODE_LENGTH)
     authcode_hashed = None
     if (isinstance(request.user, AnonymousUser)):
-        if 'token' not in message_info:
-            return Response(status=400, data={"error": "Not logged in user must use recaptcha."})
-        verify_token = message_info['token']
-        result = verify_recaptcha(verify_token)
-        if not result:
-            return Response(status=401)
-        authcode = str(uuid.uuid1()).replace(
-            "-", "")[rand_begin:rand_begin + CODE_LENGTH].encode('utf-8')
-        authcode_hashed = bcrypt.hashpw(
-            authcode, bcrypt.gensalt()).decode('utf-8')
         if 'first_name' not in message_info or message_info['first_name'] is None or \
             'last_name' not in message_info or message_info['last_name'] is None or \
             'zipcode' not in message_info or message_info['zipcode'] is None or \
@@ -71,8 +66,21 @@ def addMessage(request, format=None):
             'resident' not in message_info or message_info['resident'] is None or \
             'works' not in message_info or message_info['works'] is None or \
             'school' not in message_info or message_info['school'] is None or \
-                'child_school' not in message_info or message_info['child_school'] is None:
+            'child_school' not in message_info or message_info['child_school'] is None or \
+                'token' not in message_info or message_info['token'] is None:
             return Response(status=400, data={"error": "Missing or incorrect body parameters"})
+        messages = Message.objects.filter(session_key=session_key)
+        authcode = str(uuid.uuid1()).replace(
+            "-", "")[rand_begin:rand_begin + CODE_LENGTH].encode('utf-8')
+        if len(messages) == 0:
+            verify_token = message_info['token']
+            result = verify_recaptcha(verify_token)
+            if not result:
+                return Response(status=401)
+            authcode_hashed = bcrypt.hashpw(
+                authcode, bcrypt.gensalt()).decode('utf-8')
+        else:
+            authcode_hashed = messages[0].authcode
         first_name = message_info['first_name']
         last_name = message_info['last_name']
         zipcode = message_info['zipcode']
@@ -83,6 +91,28 @@ def addMessage(request, format=None):
         works = message_info['works']
         school = message_info['school']
         child_school = message_info['child_school']
+        new_message = Message(agenda_item=agenda_item, user=user,
+                              first_name=first_name, last_name=last_name,
+                              zipcode=zipcode, email=email,
+                              committee=committee, content=content, pro=pro, authcode=authcode_hashed,
+                              date=now.timestamp(), sent=0, home_owner=home_owner, business_owner=business_owner,
+                              resident=resident, works=works, school=school, child_school=child_school, session_key=session_key)
+        new_message.save()
+        if len(messages) == 0:
+            query_parameters = urllib.parse.urlencode({
+                "code": authcode,
+                "email": email,
+                "type": "email",
+                "id": str(new_message.id)
+            })
+            query_string = 'https://sm.engage.town/#/emailConfirmation?' + query_parameters
+            content = '<h3>Thanks for voicing your opinion,</h3> Before we process your comments, please click <a href="' + \
+                query_string + '">here</a> to authenticate.<br/><br/>If you create and authenticate an account you will never have to authenticate for messages again.<br/><br/> Thank you for your interest in your local government!<br/><br/> If you are receiving this in error, please email: <a href="mailto:engage@engage.town">engage@engage.town</a>. '
+            response = send_mail(
+                {"user": {"email": email}, "subject": "Verify message regarding agenda item: " + agenda_item.agenda_item_id,
+                 "content": content})
+            if (not response):
+                return Response(status=500, data={'error': "Something happened sending you your confirmation email, please contact engage@engage.town"})
     else:
         user = request.user
         profile = EngageUserProfile.objects.get(user_id=request.user.id)
@@ -94,25 +124,12 @@ def addMessage(request, format=None):
         child_school = profile.child_school
         if profile.authcode != None:
             authcode_hashed = profile.authcode
-    new_message = Message(agenda_item=agenda_item, user=user,
-                          first_name=first_name, last_name=last_name,
-                          zipcode=zipcode, email=email,
-                          committee=committee, content=content, pro=pro, authcode=authcode_hashed,
-                          date=now.timestamp(), sent=0, home_owner=home_owner, business_owner=business_owner,
-                          resident=resident, works=works, school=school, child_school=child_school)
-    new_message.save()
-    if user is None:
-        query_parameters = urllib.parse.urlencode({
-            "code": authcode,
-            "email": email,
-            "type": "email",
-            "id": str(new_message.id)
-        })
-        query_string = 'https://sm.engage.town/#/emailConfirmation?' + query_parameters
-        content = '<h3>Thanks for voicing your opinion,</h3> Before we process your comment, please click <a href="' + \
-            query_string + '">here</a> to authenticate.<br/><br/>If you create and authenticate an account you will never have to authenticate for messages again.<br/><br/> Thank you for your interest in your local government!<br/><br/> If you are receiving this in error, please email: <a href="mailto:engage@engage.town">engage@engage.town</a>. '
-        send_mail(
-            {"user": {"email": email}, "subject": "Verify message regarding agenda item: " + agenda_item.agenda_item_id,
-             "content": content})
+        new_message = Message(agenda_item=agenda_item, user=user,
+                              first_name=first_name, last_name=last_name,
+                              zipcode=zipcode, email=email,
+                              committee=committee, content=content, pro=pro, authcode=authcode_hashed,
+                              date=now.timestamp(), sent=0, home_owner=home_owner, business_owner=business_owner,
+                              resident=resident, works=works, school=school, child_school=child_school, session_key=session_key)
+        new_message.save()
     # Default to unsent, will send on weekly basis all sent=0
-    return Response(status=201)
+    return Response(status=201, data={"success": True, "message": "Message added"})
