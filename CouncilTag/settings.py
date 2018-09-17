@@ -167,8 +167,7 @@ CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = (
     'localhost:8080',
-    'engage.town',
-    'backend.engage.town'
+    'sm.engage.town'
 )
 AUTHENTICATION_BACKENDS = ['CouncilTag.api.backends.EmailPasswordBackend']
 AUTH_USER_MODEL = 'ingest.EngageUser'
