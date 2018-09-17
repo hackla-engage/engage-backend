@@ -13,6 +13,9 @@ import urllib
 import bcrypt
 import random
 import boto3
+import logging
+log = logging.Logger(__name__)
+
 
 '''Email message comments for either registered or non-registered users'''
 
@@ -20,7 +23,7 @@ import boto3
 @api_view(["POST"])
 @swagger_auto_schema(request_body=AddMessageSerializer, responses={'404': "Either committee or ", '401': 'Recaptcha v2 was incorrect or', '400': 'Incorrect parameters', '201': 'OK, message added'})
 def addMessage(request, format=None):
-    print(request.data)
+    log.error(request.data)
     session_key = request.session.get('session_key', None)
     if (session_key is None):
         session_key = str(uuid.uuid1())
