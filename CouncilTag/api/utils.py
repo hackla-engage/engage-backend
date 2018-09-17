@@ -122,6 +122,7 @@ def send_mail(mail_message):
     msg['From'] = 'do-not-reply@engage.town'
     part = MIMEText(mail_message['content'], 'html')
     msg.attach(part)
+    print("XXXX", to_email)
     if "attachment_file_path" in mail_message:
         with open(mail_message["attachment_file_path"], 'rb') as f:
             part = MIMEApplication(f.read(), _subtype='pdf')
