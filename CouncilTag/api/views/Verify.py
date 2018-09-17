@@ -36,6 +36,10 @@ class VerifyView(APIView):
                 return Response(data={"error": "Authcodes do not match for email"}, status=404)
             message.authcode = None
             message.save()
+            other_messages = Message.objects.filter(session_key=message.session_key)
+            for other_message in other_messages:
+                other_message.authcode = None
+                other_message.save()
             return Response(status=200, data={"success": True})
         elif data['type'] == 'signup':
             if user is None:
