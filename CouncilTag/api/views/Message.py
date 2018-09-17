@@ -112,6 +112,7 @@ def addMessage(request, format=None):
                 {"user": {"email": email}, "subject": "Verify message regarding agenda item: " + agenda_item.agenda_item_id,
                  "content": content})
             if (not response):
+                new_message.delete()
                 return Response(status=500, data={'error': "Something happened sending you your confirmation email, please contact engage@engage.town"})
     else:
         user = request.user
