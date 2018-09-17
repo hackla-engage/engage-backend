@@ -122,7 +122,7 @@ def send_mail(mail_message):
     msg['From'] = 'do-not-reply@engage.town'
     part = MIMEText(mail_message['content'], 'html')
     msg.attach(part)
-    log.error("XXXX", to_email)
+    log.error(("XXXX", to_email))
     if "attachment_file_path" in mail_message:
         with open(mail_message["attachment_file_path"], 'rb') as f:
             part = MIMEApplication(f.read(), _subtype='pdf')
@@ -130,7 +130,7 @@ def send_mail(mail_message):
                             filename=mail_message['attachment_file_name'])
             msg.attach(part)
     try:
-        log.error("YYY", msg.as_string())
+        log.error(("YYY", msg.as_string()))
         response = ses_client.send_raw_email(
             Source="engage team <do-not-reply@engage.town>",
             Destinations=[to_email],
