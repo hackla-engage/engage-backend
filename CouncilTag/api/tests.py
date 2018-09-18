@@ -1,12 +1,13 @@
-from django.test import TestCase
-import json
-from CouncilTag.ingest.models import Agenda, Committee, Tag, AgendaItem, EngageUserProfile, Message
-import jwt
 from CouncilTag import settings
-from CouncilTag.api.utils import send_message
-from datetime import datetime
+from CouncilTag.ingest.models import Agenda, Committee, Tag, AgendaItem, EngageUserProfile, Message
+from CouncilTag.api.utils import send_mail
+from django.test import TestCase
 from django.contrib.auth import get_user_model
 User = get_user_model()
+from datetime import datetime
+import json
+import jwt
+import os
 
 # Create your tests here.
 class TestAgendasEndpoint(TestCase):
@@ -111,16 +112,15 @@ class TestSendMessageEndpoint(TestCase):
         self.assertEqual(0, sent_message.sent)
 
     '''
-    To Work in CircleCI, this test needs to
-    be decoupled from the Sendgrid API,
-    maybe by using a mock object
+    Add SES test
     '''
-    # def test_mail_util_func(self):
-    #     user = self.engage_user.user
-    #     sent_message = Message(sent=int(datetime.now().timestamp()), content="Hello world",
-    #         user=user, agenda_item=self.ag_item )
-    #     sent_message.save()
-    #     result = send_message(sent_message)
-    #     self.assertTrue(result)
+    def test_mail_util_func(self):
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        static = 'PDF_Reports'
+        full_path = os.path.join(root_dir, static)
+        attachment_file_path = str(full_path) + "/test_pdf_report.pdf" 
+        print(attachment_file_path)
+        result = send_mail({'user': {'email': 'engage@engage.town'}, 'subject': 'test', 'content': '<html><body>Testing</body></html>', 'attachment_file_path': attachment_file_path, 'attachment_file_name': 'test_pdf_report.pdf'})
+        self.assertTrue(result)
 
     

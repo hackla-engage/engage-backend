@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from django.core.exceptions import *
 from psycopg2.extras import NumericRange
 from CouncilTag.ingest.writePdf import writePdfForAgendaItems
+from CouncilTag.api.utils import getLocationBasedDate
+
 
 class Command(BaseCommand):
     help = '''
@@ -13,24 +15,36 @@ class Command(BaseCommand):
         '''
 
     def handle(self, *args, **options):
-        #now = datetime.utcnow()
-        now = datetime(datetime.now().year, datetime.now().month, datetime.now().day, datetime.now().hour, datetime.now().minute, datetime.now().second, datetime.now().microsecond)
+        now = datetime.now()
         # Find agenda between today and next 10 days.
-        now_plus_tenh = now + timedelta(hours=10) 
-        
         now_time_stamp = int(now.timestamp())
-        now_plus_tenh_time_stamp = int(now_plus_tenh.timestamp())
-
-        upcoming_agendas = Agenda.objects.filter(meeting_time__contained_by=NumericRange(
-            now_time_stamp, now_plus_tenh_time_stamp))
-
-        if (len(upcoming_agendas) == 0):
-            print(f"No upcoming agenda between {now.strftime('%m/%d/%Y')} and {now_plus_tenh.strftime('%m/%d/%Y')}")
+        committees = Committee.objects.all()
+        if len(committees) == 0:
+            print(f"No committees to check agendas for")
             return
-        upcoming_agenda = upcoming_agendas[0]
-        upcoming_agenda_items = AgendaItem.objects.filter(
-            agenda=upcoming_agenda)
-        if (len(upcoming_agenda_items) == 0):
-            print("No upcoming agenda items on agenda")
-            return
-        writePdfForAgendaItems(upcoming_agenda_items)
+        for committee in committees:
+            print(committee.name)
+            cutoff_offset_days = committee.cutoff_offset_days
+            cutoff_hour = committee.cutoff_hour
+            cutoff_minute = committee.cutoff_minute
+            location_tz = committee.location_tz
+            time_delta = 1200  # 1200 seconds, 20m * 60s/m # 21600 is 6 hours
+            upcoming_agendas = Agenda.objects.filter(processed=False)
+            if (len(upcoming_agendas) == 0):
+                # No agendas
+                return 
+            for agenda in upcoming_agendas:
+                meeting_time = agenda.meeting_time
+                cutoff_datetime = getLocationBasedDate(
+                    meeting_time, cutoff_offset_days, cutoff_hour, cutoff_minute, location_tz)
+                cutoff_timestamp = int(cutoff_datetime.timestamp())
+                if (now_time_stamp - time_delta < cutoff_timestamp < now_time_stamp + time_delta):
+                    agenda.processed = True
+                    agenda.save()
+                    upcoming_agenda_items = AgendaItem.objects.filter(
+                        agenda=agenda)
+                    if (len(upcoming_agenda_items) == 0):
+                        print(
+                            "No upcoming agenda items on {meeting_time} for {committee.name}")
+                        continue
+                    writePdfForAgendaItems(upcoming_agenda_items, committee, agenda)

@@ -1,14 +1,20 @@
-import sendgrid
+from CouncilTag import settings
+from datetime import datetime, timedelta
 import logging
 import requests
 import os
-from CouncilTag import settings
-from sendgrid.helpers.mail import Email, Content, Mail, Attachment
+import bcrypt
 import base64
 import pytz
-from datetime import datetime, timedelta
 import googlemaps
+import boto3
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
 log = logging.Logger(__name__)
+ses_client = boto3.client('ses', aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
+                          aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+                          region_name=os.environ["AWS_REGION"])
 
 
 def verify_recaptcha(token):
@@ -18,71 +24,123 @@ def verify_recaptcha(token):
     return response['success']
 
 
-def isCommentAllowed(timestamp, cutoff_days_offset, cutoff_hours, cutoff_minutes):
-    gmaps = googlemaps.Client(key=os.environ.get("GOOGLETZAPIKEY"))
-    tz_obj = gmaps.timezone(location="34.0195,-118.4912", timestamp=timestamp)
-    tz_offset = abs(tz_obj["dstOffset"] + tz_obj["rawOffset"])
+def array_of_ordereddict_to_list_of_names(tags_ordereddict_array):
+    """
+    Serializers have a funny organization that isn't helpful in making further queries
+    Here we take the list of ordered dictionaries (id: x, name: y) and pull out the name only
+    and put that in a names list to return
+    """
+    names = []
+    length = len(list(tags_ordereddict_array))
+    for i in range(length):
+        names.append(tags_ordereddict_array[i]["name"])
+    return names
+
+
+def check_auth_code(plain_code, hashed):
+    dec = bcrypt.hashpw(plain_code.encode('utf-8'),
+                        hashed.encode('utf-8')).decode('utf-8')
+    if dec == hashed:
+        return True
+    return False
+
+
+def calculateTallies(messages_qs):
+    pro = 0
+    con = 0
+    more_info = 0
+    home_owner = 0
+    business_owner = 0
+    resident = 0
+    works = 0
+    school = 0
+    child_school = 0
+    total = 0
+    for message in messages_qs:
+        if message.authcode != None:
+            continue
+        if message.pro == 0:
+            con += 1
+        elif message.pro == 1:
+            pro += 1
+        else:
+            more_info += 1
+        if message.home_owner:
+            home_owner += 1
+        if message.business_owner:
+            business_owner += 1
+        if message.resident:
+            resident += 1
+        if message.works:
+            works += 1
+        if message.school:
+            school += 1
+        if message.child_school:
+            child_school += 1
+        total += 1
+    return {"home_owner": home_owner, "business_owner": business_owner,
+            "resident": resident, "works": works, "school": school,
+            "child_school": child_school, "pro": pro, "con": con, "more_info": more_info, "total": total}
+
+
+def getLocationBasedDate(timestamp, cutoff_days_offset, cutoff_hour, cutoff_minute, location_tz):
+    """
+    @timestamp a UTC timestamp
+    @cutoff_dats_offset +/- integer days from now that should be checking date
+    @cutoff_hours integer hours for location that should be set
+    @cutoff_minutes integer minutes for locaiton that should be set
+    @location_tz string timezone for location where meeting takes place
+    """
+    tz = pytz.timezone(location_tz)
     dt = datetime.utcfromtimestamp(timestamp)
-    dt = dt + timedelta(days=cutoff_days_offset)
-    dt = dt.replace(hour=cutoff_hours, minute=cutoff_minutes)
-    dt = dt + timedelta(minutes = tz_offset)
-    now = datetime.now()
+    dt = dt.astimezone(tz)
+    if cutoff_days_offset is not None:
+        dt = dt + timedelta(days=cutoff_days_offset)
+    if cutoff_hour is not None:
+        dt = dt.replace(hour=cutoff_hour, minute=cutoff_minute)
+    return dt
+
+
+def isCommentAllowed(timestamp, cutoff_days_offset, cutoff_hours, cutoff_minutes, location_tz):
+    dt = getLocationBasedDate(
+        timestamp, cutoff_days_offset, cutoff_hours, cutoff_minutes, location_tz)
+    now = datetime.now().astimezone(tz=pytz.timezone(location_tz))
     if (now > dt):
-      return False
+        return False
     return True
 
 
 def send_mail(mail_message):
-    APIKEY = os.environ["SENDGRIDKEY"]
-    sg = sendgrid.SendGridAPIClient(apikey=APIKEY)
-    from_email = Email("do-not-reply@engage.town")
     if type(mail_message["user"]) is dict:
-        to_email = Email(mail_message["user"]["email"])
+        to_email = mail_message["user"]["email"]
     else:
-        to_email = Email(mail_message["user"].email)
-    subject = mail_message["subject"]
-    content = Content('text/html', (mail_message["content"]))
-    mail = Mail(from_email=from_email, subject=subject,
-                to_email=to_email, content=content)
-
+        to_email = mail_message["user"].email
+    multipart_content_subtype = 'mixed'
+    msg = MIMEMultipart(multipart_content_subtype)
+    msg['Subject'] = mail_message["subject"]
+    msg['To'] = to_email
+    msg['From'] = 'do-not-reply@engage.town'
+    part = MIMEText(mail_message['content'], 'html')
+    msg.attach(part)
+    log.error(("XXXX", to_email))
     if "attachment_file_path" in mail_message:
         with open(mail_message["attachment_file_path"], 'rb') as f:
-            data = f.read()
-            f.close()
-
-        encode = base64.b64encode(data).decode()
-        attachment = Attachment()
-        attachment.content = encode
-        attachment.type = mail_message["attachment_type"]
-        attachment.filename = mail_message["attachment_file_name"]
-        attachment.disposition = "attachment"
-        mail.add_attachment(attachment)
-
-    response = sg.client.mail.send.post(request_body=mail.get())
-    if response.status_code == 200 or response.status_code == 202:
-        return True
-    else:
-        log.error("Could not send an email from {} to {} about {}".format(from_email,
-                                                                          to_email, subject))
-        log.error(response.body)
-        log.error(response.status_code)
-        return False
-
-
-def send_message(message_record):
-    sg = sendgrid.SendGridAPIClient(apikey=settings.SENDGRID_API_KEY)
-    from_email = Email(message_record.user.email)
-    to_email = Email(settings.COUNCIL_CLERK_EMAIL)
-    subject = "Comment on {}".format(message_record.agenda_item.title)
-    content = Content('text/html', message_record.content)
-    mail = Mail(from_email=from_email, subject=subject,
-                to_email=to_email, content=content)
-    response = sg.client.mail.send.post(request_body=mail.get())
-    if response.status_code == 200 or response.status_code == 202:
-        return True
-    else:
-        log.error("Could not send an email from {} to {} about {}".format(from_email,
-                                                                          to_email, subject))
-        log.error(response.body)
-        log.error(response.status_code)
+            part = MIMEApplication(f.read(), _subtype='pdf')
+            part.add_header('Content-Disposition', 'attachment',
+                            filename=mail_message['attachment_file_name'])
+            msg.attach(part)
+    try:
+        log.error(("YYY", msg.as_string()))
+        response = ses_client.send_raw_email(
+            Source="engage team <do-not-reply@engage.town>",
+            Destinations=[to_email],
+            RawMessage={'Data': msg.as_string()})
+        if response['MessageId'] is not None:
+            return True
+        else:
+            log.error("Could not send an email from {} to {} about {}".format("do-not-reply@engage.town",
+                                                                            to_email, mail_message['Subject']))
+            return False
+    except:
+        log.error("Could not send email and threw error")
         return False

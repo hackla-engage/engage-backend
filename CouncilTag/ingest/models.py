@@ -23,12 +23,16 @@ class Committee(models.Model):
     cutoff_offset_days = models.IntegerField(default=0)
     cutoff_hour = models.PositiveIntegerField(default=11)
     cutoff_minute = models.PositiveIntegerField(default=59)
+    location_tz = models.CharField(null=False, max_length=255, default="America/Los_Angeles")
+    location_lat = models.FloatField(null=False, default=34.024212)
+    location_lng = models.FloatField(null=False, default=-118.496475)
 
 
 class Agenda(models.Model):
     meeting_time = models.PositiveIntegerField()  # Unix timestamp
     committee = models.ForeignKey(Committee, on_delete='CASCADE')
     meeting_id = models.CharField(max_length=20, null=True)  # Agenda ID
+    processed = models.BooleanField(default=False)
 
 
 class AgendaItem(models.Model):
@@ -93,6 +97,8 @@ class Message(models.Model):
     works = models.BooleanField(default=False)
     school = models.BooleanField(default=False)
     child_school = models.BooleanField(default=False)
+    # Keep session key so if user authenticates one message it authenticates all messages
+    session_key = models.CharField(max_length=100, blank=True, null=True)
     # code challenge for user
     authcode = models.CharField(max_length=255, null=True)
     date = models.PositiveIntegerField(default=0)  # Unix timestamp

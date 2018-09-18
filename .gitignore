@@ -6,6 +6,13 @@ __pycache__/
 # C extensions
 *.so
 
+# generated PDFs
+M*.pdf
+M*.PDF
+*.tst 
+*.pid
+celerybeat-schedule.db
+
 # Distribution / packaging
 .Python
 env/
