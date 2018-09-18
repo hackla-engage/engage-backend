@@ -2,6 +2,7 @@ from django.apps import AppConfig
 import json
 import logging
 from CouncilTag.settings import TEST
+import pytz
 log = logging.Logger(__name__)
 
 class CouncilTagConfig(AppConfig):
@@ -26,7 +27,7 @@ class CouncilTagConfig(AppConfig):
                                             committee.cutoff_hour, committee.cutoff_minute, committee.location_tz)
                     log.error(f"scheduling pdf processing for: {dt}")
                     schedule_process_pdf.apply_async(
-                        (committee.name, agenda.meeting_id), eta=dt)
+                        (committee.name, agenda.meeting_id), eta=dt.astimezone(pytz.timezone('UTC')))
                 app.conf.beat_schedule[committee.name] = {
                     'task': 'CouncilTag.celery.schedule_committee_processing',
                     'schedule': crontab(hour='*/2', minute='35'),
