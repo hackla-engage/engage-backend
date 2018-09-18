@@ -22,7 +22,6 @@ class VerifyView(APIView):
             return Response(data={"error": "Data object must contain code, email, id, and type"}, status=404)
         if data['type'] not in ["email", "signup"]:
             return Response(data={"error": "Data object's type must be signup or email"}, status=404)
-        user = User.objects.get(email=data["email"])
         if data['type'] == 'email':
             if 'id' not in data:
                 return Response(data={"error": "Data object must contain code, email, id, and type, for email message"}, status=404)
@@ -42,7 +41,8 @@ class VerifyView(APIView):
                 other_message.save()
             return Response(status=200, data={"success": True})
         elif data['type'] == 'signup':
-            if user is None:
+            user = User.objects.filter(email=data["email"])
+            if user is None or len(user) == 0:
                 return Response(data={"error": "User not found"}, status=404)
             profile = EngageUserProfile.objects.get(user=user)
             authcode = profile.authcode
