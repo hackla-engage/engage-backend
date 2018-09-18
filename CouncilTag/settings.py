@@ -165,9 +165,11 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 # CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = (
-    'localhost:8080',
-    'sm.engage.town'
+CORS_ORIGIN_REGEX_WHITELIST = (
+    r'^(https?://)?(.{2,})?engage\.town$',
+    r'(34.219.49.254)',
+    r'(localhost):?(8080)?'
+    r'(127.0.0.1):?(8080)?'
 )
 AUTHENTICATION_BACKENDS = ['CouncilTag.api.backends.EmailPasswordBackend']
 AUTH_USER_MODEL = 'ingest.EngageUser'
