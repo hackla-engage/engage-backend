@@ -1,6 +1,8 @@
 from django.apps import AppConfig
 import json
+import logging
 from CouncilTag.settings import TEST
+log = logging.Logger(__name__)
 
 class CouncilTagConfig(AppConfig):
     name = 'CouncilTag'
@@ -10,7 +12,7 @@ class CouncilTagConfig(AppConfig):
             from CouncilTag.api.utils import getLocationBasedDate
             from celery.schedules import crontab
             from CouncilTag.celery import schedule_process_pdf, app
-            print("SETTING UP CELERY ASYNC TASKS!")
+            log.info("SETTING UP CELERY ASYNC TASKS!")
             app.conf.beat_schedule = {}
             app.conf.timezone='UTC'
             committees = Committee.objects.all()
@@ -22,6 +24,7 @@ class CouncilTagConfig(AppConfig):
                     agenda.save()
                     dt = getLocationBasedDate(agenda.meeting_time, committee.cutoff_offset_days,
                                             committee.cutoff_hour, committee.cutoff_minute, committee.location_tz)
+                    log.error(f"scheduling pdf processing for: {dt}")
                     schedule_process_pdf.apply_async(
                         (committee.name, agenda.meeting_id), eta=dt)
                 app.conf.beat_schedule[committee.name] = {
