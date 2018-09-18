@@ -2,6 +2,8 @@ import os
 from celery import Celery, task
 from celery.schedules import crontab
 from datetime import datetime
+import logging
+log = logging.Logger(__name__)
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'CouncilTag.settings')
 
@@ -21,7 +23,7 @@ app.conf.timezone = 'UTC'
 @app.on_after_configure.connect
 def setup_beats(sender, **kwargs):
     from CouncilTag.ingest.models import Committee
-    print("SETTING UP BEATS!")
+    log.info("SETTING UP BEATS!")
     committees = Committee.objects.all()
     for committee in committees:
         sender.add_periodic_task(
@@ -37,7 +39,7 @@ def debug_task(self):
 
 @app.task
 def schedule_process_pdf(committee_name, agenda_id):
-    print(
+    log.error(
         f"Executing PDF process for {committee_name} and meeting: {agenda_id}")
     from CouncilTag.ingest.models import AgendaItem, Agenda, Committee
     from CouncilTag.ingest.writePdf import writePdfForAgendaItems
@@ -52,7 +54,7 @@ def schedule_process_pdf(committee_name, agenda_id):
 
 @app.task
 def schedule_committee_processing(committee_name, **args):
-    print(f"Executing scraping for {committee_name}")
+    log.error(f"Executing scraping for {committee_name}")
     from CouncilTag.ingest.utils import processAgendasForYears
     year = datetime.now().year
     processAgendasForYears([year], committee_name)
