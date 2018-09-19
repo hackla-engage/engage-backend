@@ -1,8 +1,10 @@
 import os
 from celery import Celery, task
 from celery.schedules import crontab
+from celery_once import QueueOnce
 from datetime import datetime
 import logging
+import functools
 log = logging.Logger(__name__)
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'CouncilTag.settings')
@@ -18,7 +20,13 @@ app.config_from_object('django.conf:settings', namespace="CELERY")
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
 app.conf.timezone = 'UTC'
-
+app.conf.ONCE = {
+  'backend': 'celery_once.backends.Redis',
+  'settings': {
+    'url': 'redis://localhost:6379/0',
+    'default_timeout': 60 * 60
+  }
+}
 
 @app.on_after_configure.connect
 def setup_beats(sender, **kwargs):
@@ -36,8 +44,7 @@ def setup_beats(sender, **kwargs):
 def debug_task(self):
     print('Request: {0!r}'.format(self.request))
 
-
-@app.task
+@app.task(base=QueueOnce, once=dict(keys=('agenda_id',)))
 def schedule_process_pdf(committee_name, agenda_id):
     log.error(
         f"Executing PDF process for {committee_name} and meeting: {agenda_id}")

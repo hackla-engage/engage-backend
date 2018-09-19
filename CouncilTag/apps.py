@@ -30,8 +30,11 @@ class CouncilTagConfig(AppConfig):
                                             committee.cutoff_hour, committee.cutoff_minute, committee.location_tz)
                     dt = dt + timedelta(minutes=5)
                     log.error(f"scheduling pdf processing for: {dt} for: {committee.name}")
-                    schedule_process_pdf.apply_async(
-                        (committee.name, agenda.meeting_id), eta=dt.astimezone(pytz.UTC))
+                    try :
+                        schedule_process_pdf.apply_async(
+                            (committee.name, agenda.meeting_id), eta=dt.astimezone(pytz.UTC))
+                    except:
+                        log.error(f'{committee.name} {agenda.meeting_id} already queued for pdf')
                 app.conf.beat_schedule[committee.name] = {
                     'task': 'CouncilTag.celery.schedule_committee_processing',
                     'schedule': crontab(hour='*/2', minute='35'),

@@ -57,6 +57,8 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+ONCE_REDIS_URL = 'redis://localhost:6379/0'
+ONCE_DEFAULT_TIMEOUT = 60 * 60  # remove lock after 1 hour in case it was stale
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
