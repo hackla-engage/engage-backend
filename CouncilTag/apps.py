@@ -15,6 +15,7 @@ class CouncilTagConfig(AppConfig):
             from celery.schedules import crontab
             from CouncilTag.celery import schedule_process_pdf, app
             from celery.task.control import inspect
+            app.control.purge()
             log.error("SETTING UP CELERY ASYNC TASKS!")
             app.conf.beat_schedule = {}
             app.conf.timezone='UTC'
