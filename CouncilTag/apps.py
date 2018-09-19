@@ -3,6 +3,7 @@ import json
 import logging
 from CouncilTag.settings import TEST
 import pytz
+from datetime import datetime, timedelta
 log = logging.Logger(__name__)
 
 class CouncilTagConfig(AppConfig):
@@ -13,7 +14,7 @@ class CouncilTagConfig(AppConfig):
             from CouncilTag.api.utils import getLocationBasedDate
             from celery.schedules import crontab
             from CouncilTag.celery import schedule_process_pdf, app
-            log.info("SETTING UP CELERY ASYNC TASKS!")
+            log.error("SETTING UP CELERY ASYNC TASKS!")
             app.conf.beat_schedule = {}
             app.conf.timezone='UTC'
             committees = Committee.objects.all()
@@ -21,13 +22,12 @@ class CouncilTagConfig(AppConfig):
                 agendas = Agenda.objects.filter(
                     committee=committee, processed=False)
                 for agenda in agendas:
-                    agenda.processed = True
-                    agenda.save()
                     dt = getLocationBasedDate(agenda.meeting_time, committee.cutoff_offset_days,
                                             committee.cutoff_hour, committee.cutoff_minute, committee.location_tz)
-                    log.error(f"scheduling pdf processing for: {dt}")
+                    dt = dt + timedelta(minutes=5)
+                    log.error(f"scheduling pdf processing for: {dt} for: {committee.name}")
                     schedule_process_pdf.apply_async(
-                        (committee.name, agenda.meeting_id), eta=dt.astimezone(pytz.timezone('UTC')))
+                        (committee.name, agenda.meeting_id), eta=dt.astimezone(pytz.UTC))
                 app.conf.beat_schedule[committee.name] = {
                     'task': 'CouncilTag.celery.schedule_committee_processing',
                     'schedule': crontab(hour='*/2', minute='35'),

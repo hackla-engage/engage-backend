@@ -92,8 +92,8 @@ def getLocationBasedDate(timestamp, cutoff_days_offset, cutoff_hour, cutoff_minu
     @location_tz string timezone for location where meeting takes place
     """
     tz = pytz.timezone(location_tz)
-    dt = datetime.utcfromtimestamp(timestamp)
-    dt = dt.astimezone(tz)
+    dt = datetime.fromtimestamp(timestamp, tz=tz)
+    log.error(dt)
     if cutoff_days_offset is not None:
         dt = dt + timedelta(days=cutoff_days_offset)
     if cutoff_hour is not None:
