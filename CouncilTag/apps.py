@@ -14,6 +14,7 @@ class CouncilTagConfig(AppConfig):
             from CouncilTag.api.utils import getLocationBasedDate
             from celery.schedules import crontab
             from CouncilTag.celery import schedule_process_pdf, app
+            from celery.task.control import inspect
             log.error("SETTING UP CELERY ASYNC TASKS!")
             app.conf.beat_schedule = {}
             app.conf.timezone='UTC'
@@ -26,6 +27,8 @@ class CouncilTagConfig(AppConfig):
                                             committee.cutoff_hour, committee.cutoff_minute, committee.location_tz)
                     dt = dt + timedelta(minutes=5)
                     log.error(f"scheduling pdf processing for: {dt} for: {committee.name}")
+                    i = inspect()
+                    log.error(i.scheduled())
                     schedule_process_pdf.apply_async(
                         (committee.name, agenda.meeting_id), eta=dt.astimezone(pytz.UTC))
                 app.conf.beat_schedule[committee.name] = {
@@ -33,3 +36,4 @@ class CouncilTagConfig(AppConfig):
                     'schedule': crontab(hour='*/2', minute='35'),
                     'args': (committee.name,)
                 }
+                
