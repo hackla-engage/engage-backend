@@ -32,7 +32,7 @@ class CouncilTagConfig(AppConfig):
                                             committee.cutoff_hour, committee.cutoff_minute, committee.location_tz)
                     dt = dt + timedelta(minutes=5)
                     log.error(f"scheduling pdf processing for: {dt} for: {committee.name}")
-                    dt_utc = datetime.fromtimestamp(dt.timestamp(), tz=pytz.timezone('UTC')) + timedelta(hours = 1, minutes=)
+                    dt_utc = datetime.fromtimestamp(dt.timestamp(), tz=pytz.timezone('UTC'))
                     exists = r.get(f"{committee.name}-{agenda.meeting_time}")
                     log.error(exists)
                     if exists is None:
