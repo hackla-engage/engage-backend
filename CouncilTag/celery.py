@@ -47,7 +47,7 @@ def debug_task(self):
     print('Request: {0!r}'.format(self.request))
 
 
-@task(base=QueueOnce, once={'keys': ['agenda_id']})
+@app.task()
 def schedule_process_pdf(committee_name, agenda_id):
     log.error(
         f"Executing PDF process for {committee_name} and meeting: {agenda_id}")

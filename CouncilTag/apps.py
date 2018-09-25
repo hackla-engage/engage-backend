@@ -14,8 +14,9 @@ class CouncilTagConfig(AppConfig):
             from CouncilTag.api.utils import getLocationBasedDate
             from celery.schedules import crontab
             from CouncilTag.celery import schedule_process_pdf, app
+            from celery.task.control import inspect
             log.error("SETTING UP CELERY ASYNC TASKS!")
-            i = app.control.inspect()
+            i = inspect()
             log.error(i.scheduled())
             app.conf.beat_schedule = {}
             app.conf.timezone='UTC'
@@ -32,6 +33,7 @@ class CouncilTagConfig(AppConfig):
                     try :
                         schedule_process_pdf.apply_async(
                             (committee.name, agenda.meeting_id), eta=dt_utc)
+                        log.error(f"scheduled pdf processing")
                     except:
                         log.error(f'{committee.name} {agenda.meeting_id} already queued for pdf')
                 app.conf.beat_schedule[committee.name] = {
