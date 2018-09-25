@@ -30,9 +30,10 @@ class CouncilTagConfig(AppConfig):
                                             committee.cutoff_hour, committee.cutoff_minute, committee.location_tz)
                     dt = dt + timedelta(minutes=5)
                     log.error(f"scheduling pdf processing for: {dt} for: {committee.name}")
+                    dt_utc = datetime.fromtimestamp(dt.timestamp(), tz=pytz.timezone('UTC'))
                     try :
                         schedule_process_pdf.apply_async(
-                            (committee.name, agenda.meeting_id), eta=dt.astimezone(pytz.UTC))
+                            (committee.name, agenda.meeting_id), eta=dt_utc)
                     except:
                         log.error(f'{committee.name} {agenda.meeting_id} already queued for pdf')
                 app.conf.beat_schedule[committee.name] = {

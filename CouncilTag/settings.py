@@ -31,8 +31,8 @@ if os.environ.get("CouncilTag") == 'debug':
 if os.environ.get("CouncilTag") == 'test':
     TEST = True
 
-ALLOWED_HOSTS = ['localhost', 'engage-santa-monica.herokuapp.com', 'backend.engage.town',
-                 'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1', 'sm.engage.town']
+# ALLOWED_HOSTS = ['localhost', 'engage-santa-monica.herokuapp.com', 'backend.engage.town',
+#                  'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1', 'sm.engage.town']
 APPEND_SLASH = True
 # Application definition
 INSTALLED_APPS = [
@@ -169,9 +169,9 @@ CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_REGEX_WHITELIST = (
     r'^(https?://)?(.{2,})?engage\.town$',
-    r'(34.219.49.254)',
-    r'(localhost):?(8080)?'
-    r'(127.0.0.1):?(8080)?'
+    r'^(34.219.49.254)(:443)?$',
+    r'^(localhost):?(8080)?$'
+    r'^(127.0.0.1):?(8080)?$'
 )
 AUTHENTICATION_BACKENDS = ['CouncilTag.api.backends.EmailPasswordBackend']
 AUTH_USER_MODEL = 'ingest.EngageUser'
