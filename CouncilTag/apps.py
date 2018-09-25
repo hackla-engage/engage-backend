@@ -4,6 +4,9 @@ import logging
 from CouncilTag.settings import TEST
 import pytz
 from datetime import datetime, timedelta
+import redis
+r = redis.StrictRedis(host='localhost', port=6379, db=1)
+
 log = logging.Logger(__name__)
 
 class CouncilTagConfig(AppConfig):
@@ -29,12 +32,15 @@ class CouncilTagConfig(AppConfig):
                                             committee.cutoff_hour, committee.cutoff_minute, committee.location_tz)
                     dt = dt + timedelta(minutes=5)
                     log.error(f"scheduling pdf processing for: {dt} for: {committee.name}")
-                    dt_utc = datetime.fromtimestamp(dt.timestamp(), tz=pytz.timezone('UTC'))
-                    try :
+                    dt_utc = datetime.fromtimestamp(dt.timestamp(), tz=pytz.timezone('UTC')) + timedelta(hours = 1, minutes=)
+                    exists = r.get(f"{committee.name}-{agenda.meeting_time}")
+                    log.error(exists)
+                    if exists is None:
+                        r.set(f"{committee.name}-{agenda.meeting_time}", True, ex=3*60)
                         schedule_process_pdf.apply_async(
                             (committee.name, agenda.meeting_id), eta=dt_utc)
                         log.error(f"scheduled pdf processing")
-                    except:
+                    else:
                         log.error(f'{committee.name} {agenda.meeting_id} already queued for pdf')
                 app.conf.beat_schedule[committee.name] = {
                     'task': 'CouncilTag.celery.schedule_committee_processing',

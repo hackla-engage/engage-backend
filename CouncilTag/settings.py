@@ -31,8 +31,8 @@ if os.environ.get("CouncilTag") == 'debug':
 if os.environ.get("CouncilTag") == 'test':
     TEST = True
 
-# ALLOWED_HOSTS = ['localhost', 'engage-santa-monica.herokuapp.com', 'backend.engage.town',
-#                  'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1', 'sm.engage.town']
+ALLOWED_HOSTS = ['localhost', 'engage-santa-monica.herokuapp.com', 'backend.engage.town',
+                 'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1', 'sm.engage.town']
 APPEND_SLASH = True
 # Application definition
 INSTALLED_APPS = [
