@@ -57,6 +57,8 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+ONCE_REDIS_URL = 'redis://localhost:6379/0'
+ONCE_DEFAULT_TIMEOUT = 60 * 60  # remove lock after 1 hour in case it was stale
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -165,9 +167,11 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 # CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_WHITELIST = (
-    'localhost:8080',
-    'sm.engage.town'
+CORS_ORIGIN_REGEX_WHITELIST = (
+    r'^(https?://)?(.{2,})?engage\.town$',
+    r'(34.219.49.254)',
+    r'(localhost):?(8080)?'
+    r'(127.0.0.1):?(8080)?'
 )
 AUTHENTICATION_BACKENDS = ['CouncilTag.api.backends.EmailPasswordBackend']
 AUTH_USER_MODEL = 'ingest.EngageUser'

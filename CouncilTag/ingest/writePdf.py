@@ -8,6 +8,8 @@ from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
 from reportlab.pdfbase import pdfmetrics
 from CouncilTag.ingest.models import Message, Committee, EngageUserProfile, EngageUser, Agenda
 from CouncilTag.api.utils import send_mail
+import logging
+log = logging.Logger(__name__)
 import io
 from datetime import datetime, date
 import os
@@ -44,16 +46,17 @@ def paragraphize_comments(comments, contents):
 
 
 def writePdfForAgendaItems(agenda_items, committee, agenda):
+    log.info(f"Starting writePdfForAgendaItems for {committee} and {agenda}")
     root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     static = 'PDF_Reports'
     full_path = os.path.join(root_dir, static)
     today = datetime.today()
-
     if not os.path.exists(full_path):
         os.mkdir(full_path)
-
+    file_path = str(full_path) + "/Meeting_" + str(datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + ".pdf"
+    log.info(file_path)
     try:
-        doc = SimpleDocTemplate(str(full_path) + "/Meeting_" + str(datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + ".pdf",
+        doc = SimpleDocTemplate(file_path,
                                 pagesize=letter,
                                 rightMargin=72, leftMargin=72,
                                 topMargin=72, bottomMargin=18)
@@ -105,7 +108,8 @@ def writePdfForAgendaItems(agenda_items, committee, agenda):
             need_info_comments_on_agenda_item = Message.objects.filter(
                 agenda_item=upcoming_agenda_item, pro=2
             )
-            contents.append(Paragraph("Comments agreeing with the recommendations:", ps_pro))
+            contents.append(
+                Paragraph("Comments agreeing with the recommendations:", ps_pro))
             contents.append(Spacer(1, 0.2 * inch))
             if len(pro_comments_on_agenda_item) > 0:
                 paragraphize_comments(pro_comments_on_agenda_item, contents)
@@ -113,7 +117,8 @@ def writePdfForAgendaItems(agenda_items, committee, agenda):
                 contents.append(
                     Paragraph("No comments agreeing with recommendations on this item.", ps_no_comments))
             contents.append(Spacer(1, 0.5 * inch))
-            contents.append(Paragraph("Comments disagreeing with the recommendations:", ps_con))
+            contents.append(
+                Paragraph("Comments disagreeing with the recommendations:", ps_con))
             contents.append(Spacer(1, 0.2 * inch))
             if len(con_comments_on_agenda_item) > 0:
                 paragraphize_comments(con_comments_on_agenda_item, contents)
@@ -133,8 +138,8 @@ def writePdfForAgendaItems(agenda_items, committee, agenda):
             contents.append(Spacer(1, 0.5 * inch))
             contents.append(PageBreak())
         doc.build(contents)
-        attachment_file_path = str(full_path) + "/Meeting_" + str(datetime.fromtimestamp(
-            agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + ".pdf"
+        attachment_file_path = file_path
+        log.info(f"attachment_file_path")
         attachment_name = "Agenda_Comments_Council_Meeting_" + \
             str(datetime.fromtimestamp(
                 agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + f".pdf"
