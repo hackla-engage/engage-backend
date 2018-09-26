@@ -111,7 +111,7 @@ def addMessage(request, format=None):
             })
             query_string = 'https://sm.engage.town/#/emailConfirmation?' + query_parameters
             content = '<h3>Thanks for voicing your opinion,</h3> Before we process your comments, please click <a href="' + \
-                query_string + '">here</a> to authenticate.<br/><br/>If you create and authenticate an account you will never have to authenticate for messages again.<br/><br/> Thank you for your interest in your local government!<br/><br/> If you are receiving this in error, please email: <a href="mailto:engage@engage.town">engage@engage.town</a>. '
+                query_string + '">here</a> to authenticate.<br/><br/> Thank you for your interest in your local government!<br/><br/> If you are receiving this in error, please email: <a href="mailto:engage@engage.town">engage@engage.town</a>. '
             response = send_mail(
                 {"user": {"email": email}, "subject": "Verify message regarding agenda item: " + agenda_item.agenda_item_id,
                  "content": content})
