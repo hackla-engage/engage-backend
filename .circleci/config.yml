@@ -7,7 +7,6 @@ jobs:
         environment:
           PIPENV_VENV_IN_PROJECT: true
           DATABASE_URL: postgresql://circleci:something@localhost/counciltagtest?sslmode=true
-          SECRET_KEY: fakekey
           CouncilTag: test
       - image: nimbustech/postgres-ssl:9.5
         environment:
