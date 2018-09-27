@@ -170,7 +170,7 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_REGEX_WHITELIST = (
     r'^(https?://)?(.{2,})?engage\.town$',
     r'^(34.219.49.254)(:443)?$',
-    r'^(localhost):?(8080)?$'
+    r'^(localhost):?(8080)?$',
     r'^(127.0.0.1):?(8080)?$'
 )
 AUTHENTICATION_BACKENDS = ['CouncilTag.api.backends.EmailPasswordBackend']
