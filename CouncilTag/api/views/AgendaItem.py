@@ -7,7 +7,7 @@ from drf_yasg.utils import swagger_auto_schema, no_body
 from rest_framework.decorators import api_view
 
 @api_view(['GET'])
-def get_agenda_item(request, agenda_item_id, tz_offset):
+def get_agenda_item(request, agenda_item_id):
     '''
     Returns JSON serialized agenda item
     '''
@@ -19,7 +19,7 @@ def get_agenda_item(request, agenda_item_id, tz_offset):
 
 
 @api_view(['GET'])
-def get_agenda_item_detail(request, agenda_item_id, tz_offset):
+def get_agenda_item_detail(request, agenda_item_id):
     '''
     Returns a detail object for an agenda item, including agree/disagree/no_position tallies
     '''
