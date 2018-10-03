@@ -56,6 +56,13 @@ MarkupSafe = "==1.0"
 PyJWT = "==1.5.3"
 PyMySQL = "==0.7.11"
 python_http_client = "==3.0.0"
+celery = "*"
+drf-yasg = "*"
+drf-openapi = "*"
+django-celery-beat = "*"
+bcrypt = "*"
+googlemaps = "*"
+"boto3" = "*"
 
 [dev-packages]
 
