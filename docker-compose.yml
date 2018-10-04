@@ -10,7 +10,6 @@ services:
       - DB_NAME=postgres
       - DB_USER=postgres
       - HOST=db
-      - DATABASE_URL=postgres://postgres:@db:5432/postgres
       - REDIS_URL=redis://redis:6379
     build: .
     command: python /engage_backend_service/manage.py runserver 0.0.0.0:8000
