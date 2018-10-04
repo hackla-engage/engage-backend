@@ -31,7 +31,6 @@ DB_NAME=counciltag
 DB_USER=REPLACEME
 DB_PASSWORD=REPLACEME
 HOST=localhost
-REDIS_HOST=localhost
 DJANGO_SECRET_KEY=someuniqueunpredictablevalue
 SENDGRIDKEY="SG.-some_long_string"
 RECAPTCHAKEY="some_string"
@@ -94,10 +93,17 @@ You can go to `http://localhost:8000/swagger/` to look at the docs and interact 
 ## To deploy Docker container onto Heroku
 
 1. Follow instructions on https://devcenter.heroku.com/articles/container-registry-and-runtime and build the Docker image via: `heroku container:push web`
-2. After image is built and deployed to Heroku, provision Postgres database addon via: `heroku addons:create heroku-postgresql:hobby-dev`
-3. Run migrations on the new database via: `heroku run python manage.py migrate`
-4. Run `heroku run python manage.py populate_tags` and `heroku run python manage.py scrape_data --years 2018` to further populate the database.
-5. Run `heroku open` to open the browser and test the app.
+2. Then release the image to your app: `heroku container:release web`
+3. After image is built and deployed to Heroku, provision Postgres database addon via: `heroku addons:create heroku-postgresql:hobby-dev`
+4. Then provision Redis addon via: `heroku addons:create heroku-redis:hobby-dev`
+5. Run migrations on the new database via: `heroku run python manage.py migrate`
+6. Run `heroku run python manage.py populate_tags` and `heroku run python manage.py scrape_data --years 2018` to further populate the database.
+7. Add the following heroku environment variables:
+  - `CouncilTag` to `test`
+  - `DEBUG` to `True`
+  - `DJANGO_SECRET_KEY` to your generated or secure key
+  - `ALLOWED_HOST` to your created heroku app url (i.e. `engage-backend.herokuapp.com`)
+8. Run `heroku open` to open the browser and test the app.
 
 ## Continous Delivery
 

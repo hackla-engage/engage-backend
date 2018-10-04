@@ -23,7 +23,7 @@ app.conf.timezone = 'UTC'
 app.conf.ONCE = {
     'backend': 'celery_once.backends.Redis',
     'settings': {
-        'url': 'redis://' + os.environ.get("REDIS_HOST") + ':6379/0',
+        'url': f"{os.environ.get('REDIS_URL')}/0",
         'default_timeout': 60 * 60
     }
 }

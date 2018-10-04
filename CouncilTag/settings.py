@@ -24,7 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True if os.environ.get("DEBUG") == 'True' else False
 TEST = False
 if os.environ.get("CouncilTag") == 'debug':
     DEBUG = True
@@ -33,6 +33,8 @@ if os.environ.get("CouncilTag") == 'test':
 
 ALLOWED_HOSTS = ['localhost', 'engage-santa-monica.herokuapp.com', 'backend.engage.town',
                  'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1', 'sm.engage.town']
+if os.environ.get("ALLOWED_HOST"):
+    ALLOWED_HOSTS.append(os.environ.get("ALLOWED_HOST"))
 APPEND_SLASH = True
 # Application definition
 INSTALLED_APPS = [
@@ -52,12 +54,13 @@ INSTALLED_APPS = [
     'CouncilTag.celery',
     'CouncilTag.apps.CouncilTagConfig'
 ]
-CELERY_BROKER_URL = 'redis://' + os.environ.get("REDIS_HOST") + ':6379'
-CELERY_RESULT_BACKEND = 'redis://' + os.environ.get("REDIS_HOST") + ':6379'
+REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-ONCE_REDIS_URL = 'redis://' + os.environ.get("REDIS_HOST") + ':6379/0'
+ONCE_REDIS_URL = f'{REDIS_URL}/0'
 ONCE_DEFAULT_TIMEOUT = 60 * 60  # remove lock after 1 hour in case it was stale
 
 MIDDLEWARE = [
@@ -115,15 +118,20 @@ DATABASES = {
         'NAME': os.environ.get("DB_NAME"),
         'USER': os.environ.get("DB_USER"),
         'PASSWORD': os.environ.get("DB_PASS"),
-        'HOST': os.environ.get("HOST"),
-        'TEST': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.environ.get("POSTGRES_DB"),
-            'USER': os.environ.get("POSTGRES_USER"),
-            'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
-            'HOST': 'localhost',
-        },
-    },
+        'HOST': os.environ.get("HOST")
+    }
+}
+
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if DATABASE_URL:
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600)
+
+DATABASES['default']['TEST'] = {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': os.environ.get("POSTGRES_DB"),
+    'USER': os.environ.get("POSTGRES_USER"),
+    'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
+    'HOST': 'localhost'
 }
 print(DATABASES['default']['TEST'])
 # Password validation
