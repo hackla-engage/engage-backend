@@ -24,22 +24,28 @@ bash:
 
 .PHONY: shell
 shell:
-	docker-compose run --rm ${DJANGO_CONTAINER} python manage.py shell --settings=CouncilTag.docker_settings
+	docker-compose run --rm ${DJANGO_CONTAINER} python manage.py shell
 
 dbshell:
-	docker-compose run --rm ${DJANGO_CONTAINER} python manage.py dbshell --settings=CouncilTag.docker_settings
+	docker-compose run --rm ${DJANGO_CONTAINER} python manage.py dbshell
 
 createsuperuser:
-	docker-compose run --rm ${DJANGO_CONTAINER} python manage.py createsuperuser --settings=CouncilTag.docker_settings
+	docker-compose run --rm ${DJANGO_CONTAINER} python manage.py createsuperuser
+
+test:
+	docker-compose run --rm ${DJANGO_CONTAINER} python manage.py test -k
 
 .PHONY: migrate
 migrate:
-	docker-compose run --rm ${DJANGO_CONTAINER} python manage.py migrate --settings=CouncilTag.docker_settings
+	docker-compose run --rm ${DJANGO_CONTAINER} python manage.py migrate
 
 populate_tags:
-	docker-compose run --rm ${DJANGO_CONTAINER} python manage.py populate_tags --settings=CouncilTag.docker_settings
+	docker-compose run --rm ${DJANGO_CONTAINER} python manage.py populate_tags
+
+process_comments:
+	docker-compose run --rm ${DJANGO_CONTAINER} python manage.py process_agenda_comments
 
 scrape_data:
-	docker-compose run --rm ${DJANGO_CONTAINER} python manage.py scrape_data --settings=CouncilTag.docker_settings
+	docker-compose run --rm ${DJANGO_CONTAINER} python manage.py scrape_data --years 2018
 
 setup: build migrate

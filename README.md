@@ -1,4 +1,3 @@
-
 # CouncilTag
 
 - Live Website: https://sm.engage.town
@@ -8,6 +7,7 @@
 - Local API Documentation http://localhost:8000/swagger/
 
 ## Dev Setup
+
 To setup the development environment:
 
 1. Clone this repo
@@ -22,19 +22,24 @@ To setup the development environment:
 
 5. Create a database user, give the user a password and grant the user permissions for `counciltag`.
 
-6. Add the following environmental variables for the project. You'll need database info, django secret key and 'CouncilTag' to run the project in DEBUG mode. 
+6. Setup Redis and execute `redis-server`
 
- ```
- DB_NAME=counciltag
- DB_USER=REPLACEME
- DB_PASSWORD=REPLACEME
- DJANGO_SECRET_KEY=someuniqueunpredictablevalue
- SENDGRIDKEY="SG.-some_long_string"
- RECAPTCHAKEY="some_string"
- CouncilTag=debug
- ```
+7. Add the following environmental variables for the project. You'll need database info, django secret key and 'CouncilTag' to run the project in DEBUG mode.
+
+```
+DB_NAME=counciltag
+DB_USER=REPLACEME
+DB_PASSWORD=REPLACEME
+HOST=localhost
+REDIS_HOST=localhost
+DJANGO_SECRET_KEY=someuniqueunpredictablevalue
+SENDGRIDKEY="SG.-some_long_string"
+RECAPTCHAKEY="some_string"
+CouncilTag=debug
+```
 
 7. To run tests on the package set these environment variables:
+
 ```
 POSTGRES_USER=<Some user with DB create rights or who owns $POSTGRES_DB>
 POSTGRES_PASSWORD=<Password for $DB_TEST_USER>
@@ -46,15 +51,16 @@ SENDGRIDKEY=SG.-thisisnotarealkeylol
 ```
 
 8. Then, run `python manage.py test -k`
-* -k keeps the existing database and is not necessary if your user is granted create rights on the system
+
+- -k keeps the existing database and is not necessary if your user is granted create rights on the system
 
 9. If it's your first time setting up the dev environment, run the following commands. In this order, these commands will 1) create the SQL tables needed, 2) load our list of tags, 3) scrape live data from the City of Santa Monica.
 
-`python manage.py migrate` 
+`python manage.py migrate`
 
-`python manage.py populate_tags` 
+`python manage.py populate_tags`
 
-`python manage.py scrape_data` 
+`python manage.py scrape_data`
 
 10. Then edit `CouncilTags/urls.py` to switch to localhost.
 
@@ -75,13 +81,13 @@ url="http://localhost:8000/api",
 
 `python manage.py runserver`
 
-You can go to `http://localhost:8000/swagger/` to look at the docs and interact with the API. 
+You can go to `http://localhost:8000/swagger/` to look at the docs and interact with the API.
 
 ## To run locally on Docker
 
 1. Run `docker build .` to build Docker image
 2. Run `make setup` to build Docker services
-3. Run `make migrate` migrate postgres database
+3. Run `make migrate` to run postgres database migrations
 4. Run `make populate_tags` and `make scrape_data` to further populate the database in the Docker container.
 5. Run `make run` to run server
 
@@ -89,9 +95,9 @@ You can go to `http://localhost:8000/swagger/` to look at the docs and interact 
 
 1. Follow instructions on https://devcenter.heroku.com/articles/container-registry-and-runtime and build the Docker image via: `heroku container:push web`
 2. After image is built and deployed to Heroku, provision Postgres database addon via: `heroku addons:create heroku-postgresql:hobby-dev`
-4. Run migrations on the new database via: `heroku run python manage.py migrate`
-5. Run `heroku run python manage.py populate_tags` and `heroku run python manage.py scrape_data` to further populate the database.
-6. Run `heroku open` to open the browser and test the app.
+3. Run migrations on the new database via: `heroku run python manage.py migrate`
+4. Run `heroku run python manage.py populate_tags` and `heroku run python manage.py scrape_data --years 2018` to further populate the database.
+5. Run `heroku open` to open the browser and test the app.
 
 ## Continous Delivery
 
@@ -99,9 +105,7 @@ We have setup continous integration and deployment on CircleCI.
 
 When you push to the `master` branch on this repo, this will trigger a build on the server and also run the Django test suite. If the tests fail, the build will not go through.
 
-
 ## Django Documentation
 
 If you are new to using Django, you can read up more about it here:
 https://docs.djangoproject.com/en/2.0/
-
