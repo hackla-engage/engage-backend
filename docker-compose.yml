@@ -3,23 +3,25 @@ version: "3"
 services:
   web:
     environment:
-      - CouncilTag=debug
+      - CouncilTag=test
+      - DEBUG=True
       - DJANGO_SECRET_KEY=examplesecretkeydonotuseinprod
       - RECAPTCHAKEY=some_string
       - DB_NAME=postgres
       - DB_USER=postgres
       - HOST=db
-      - REDIS_HOST=redis
+      - DATABASE_URL=postgres://postgres:@db:5432/postgres
+      - REDIS_URL=redis://redis:6379
     build: .
-    command: python /code/manage.py runserver 0.0.0.0:8000
+    command: python /engage_backend_service/manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/code
+      - .:/engage_backend_service
     ports:
       - "8000:8000"
     depends_on:
       - db
       - redis
   db:
-    image: postgres
+    image: postgres:10.5
   redis:
-    image: redis
+    image: redis:4.0.0
