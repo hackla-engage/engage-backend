@@ -85,10 +85,10 @@ You can go to `http://localhost:8000/swagger/` to look at the docs and interact 
 ## To run locally on Docker
 
 1. Run `docker build .` to build Docker image
-2. Run `make setup` to build Docker services
-3. Run `make migrate` to run postgres database migrations
-4. Run `make populate_tags` and `make scrape_data` to further populate the database in the Docker container.
-5. Run `make run` to run server
+2. Run `make migrate` to run postgres database migrations (OR run `make setup` to build, then migrate)
+3. Run `make populate_tags` and `make scrape_data` to further populate the database in the Docker container.
+4. Run `make run` to run server
+5. Open browser window to `http://localhost:8000/swagger/`
 
 ## To deploy Docker container onto Heroku
 
