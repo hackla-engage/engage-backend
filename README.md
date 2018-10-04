@@ -10,6 +10,14 @@
 
 To setup the development environment:
 
+0. Install redis [https://redis.io/download](https://redis.io/download)
+
+ * Compiling is very slow due to the testing suite.
+
+   * if you use MacOS, use ```brew install redis``` 
+   
+   * if ubuntu, use guide from [digital ocean](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04)
+ 
 1. Clone this repo
 
 2. Setup a virtualenv and install all Python packages.
