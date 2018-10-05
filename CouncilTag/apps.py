@@ -1,11 +1,12 @@
+import os
 from django.apps import AppConfig
 import json
 import logging
-from CouncilTag.settings import TEST
+from CouncilTag.settings import REDIS_URL, TEST
 import pytz
 from datetime import datetime, timedelta
 import redis
-r = redis.StrictRedis(host='localhost', port=6379, db=1)
+r = redis.from_url(REDIS_URL, db=1)
 
 log = logging.Logger(__name__)
 
