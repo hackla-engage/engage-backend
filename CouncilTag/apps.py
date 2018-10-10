@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 import json
 import logging
-from CouncilTag.settings import TEST
+from CouncilTag.settings import TEST, CELERY, DEBUG
 import pytz
 from datetime import datetime, timedelta
 import redis
@@ -12,7 +12,7 @@ log = logging.Logger(__name__)
 class CouncilTagConfig(AppConfig):
     name = 'CouncilTag'
     def ready(self):
-        if not TEST:
+        if DEBUG:
             from CouncilTag.ingest.models import Agenda, Committee
             from CouncilTag.api.utils import getLocationBasedDate
             from celery.schedules import crontab
