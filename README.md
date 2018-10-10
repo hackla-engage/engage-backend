@@ -12,6 +12,8 @@ To setup the development environment:
 
 0. Install redis [https://redis.io/download](https://redis.io/download)
 
+ * Make sure you use version 4.0.0
+
  * Compiling is very slow due to the testing suite.
 
    * if you use MacOS, use ```brew install redis``` 
@@ -20,17 +22,25 @@ To setup the development environment:
  
 1. Clone this repo
 
-2. Setup a virtualenv and install all Python packages.
+2. Set up a virtualenv and install all Python packages.
+
+`pip install virtualenv`
+
+`virtualenv env -p /path/to/python3.6`
+
+`source env/bin/activate`
 
 `pip install -r requirements.txt`
 
 3. Setup Postgres and PgAdmin for your platform if needed. PgAdmin is a useful GUI database manager.
+ 
+ * Make sure you are using postgres from major vrsion 10, not 11
 
 4. Create the `counciltag` database if it does not exist.
 
 5. Create a database user, give the user a password and grant the user permissions for `counciltag`.
 
-6. Add the following environmental variables for the project. You'll need database info, django secret key and 'CouncilTag' to run the project in DEBUG mode. 
+6. Add the following environment variables for the project. You'll need database info, django secret key and 'CouncilTag' to run the project in DEBUG mode. 
 
  ```
  DB_NAME=counciltag
@@ -45,7 +55,7 @@ To setup the development environment:
 7. To run tests on the package set these environment variables:
 ```
 POSTGRES_USER=<Some user with DB create rights or who owns $POSTGRES_DB>
-POSTGRES_PASSWORD=<Password for $DB_TEST_USER>
+POSTGRES_PASSWORD=<Password for $POSTGRES_USER>
 POSTGRES_DB=<Some DB that already exists or that you have create rights for>
 DATABASE_URL=postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB?sslmode=true
 CouncilTag=test

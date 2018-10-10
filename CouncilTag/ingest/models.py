@@ -38,7 +38,7 @@ class Agenda(models.Model):
 class AgendaItem(models.Model):
     title = models.TextField()
     department = models.CharField(max_length=250)
-    body = ArrayField(models.TextField(blank=True), default=list())
+    body = ArrayField(models.TextField(blank=True), default=list)
     sponsors = models.CharField(max_length=250, null=True)
     agenda = models.ForeignKey(
         Agenda, related_name="items", on_delete='CASCADE')
@@ -52,7 +52,7 @@ class AgendaItem(models.Model):
 class AgendaRecommendation(models.Model):
     agenda_item = models.ForeignKey(
         AgendaItem, related_name="recommendations", on_delete='CASCADE')
-    recommendation = ArrayField(models.TextField(), default=list())
+    recommendation = ArrayField(models.TextField(), default=list)
 
 
 class CommitteeMember(models.Model):
