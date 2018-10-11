@@ -26,11 +26,15 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True if os.environ.get("DEBUG") == 'True' else False
 TEST = False
+CELERY = False
+
 if os.environ.get("CouncilTag") == 'debug':
     DEBUG = True
 if os.environ.get("CouncilTag") == 'test':
     TEST = True
-
+if os.environ.get("CouncilTag") == 'celery':
+    CELERY = True
+print(DEBUG)
 ALLOWED_HOSTS = ['localhost', 'engage-santa-monica.herokuapp.com', 'backend.engage.town',
                  'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1', 'sm.engage.town']
 if os.environ.get("ALLOWED_HOST"):
@@ -52,7 +56,7 @@ INSTALLED_APPS = [
     'drf_openapi',
     'django_celery_beat',
     'CouncilTag.celery',
-    'CouncilTag.apps.CouncilTagConfig'
+    'CouncilTag.apps.CouncilTagConfig',
 ]
 REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
 CELERY_BROKER_URL = REDIS_URL
@@ -133,7 +137,6 @@ DATABASES['default']['TEST'] = {
     'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
     'HOST': 'localhost'
 }
-print(DATABASES['default']['TEST'])
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
@@ -162,11 +165,9 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATIC_URL = '/static/'
-
-# Extra places for collectstatic to find static files.
+ # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
     os.path.join(PROJECT_ROOT, 'static'),
 )
