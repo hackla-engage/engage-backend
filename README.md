@@ -46,7 +46,6 @@ To setup the development environment:
 DB_NAME=counciltag
 DB_USER=REPLACEME
 DB_PASSWORD=REPLACEME
-HOST=localhost
 DJANGO_SECRET_KEY=someuniqueunpredictablevalue
 SENDGRIDKEY="SG.-some_long_string"
 RECAPTCHAKEY="some_string"
