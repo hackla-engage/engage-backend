@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 import dj_database_url
+import redis
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -63,6 +64,10 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 ONCE_REDIS_URL = 'redis://localhost:6379/0'
 ONCE_DEFAULT_TIMEOUT = 60 * 60  # remove lock after 1 hour in case it was stale
+TIME_ZONE='UTC'
+USE_TZ=True
+r = redis.StrictRedis(host='localhost', port=6379, db=1)
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
