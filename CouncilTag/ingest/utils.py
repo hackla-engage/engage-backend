@@ -2,7 +2,10 @@ from CouncilTag.ingest.models import Committee, Agenda, AgendaItem, AgendaRecomm
 from CouncilTag.ingest.tagging import RandomTagEngine
 from django.core.exceptions import ObjectDoesNotExist
 from CouncilTag.ingest.data import get_data
-
+from celery.schedules import crontab
+from CouncilTag.celery import schedule_process_pdf, app
+from datetime import datetime, timedelta
+from CouncilTag.settings import r
 
 def save_agendaitem(agenda_item, new_agenda, meeting_time):
     agendaitem = AgendaItem.objects.filter(
@@ -47,10 +50,26 @@ def processAgendasForYears(years, committee_name):
             if len(agenda) > 0:
                 found_agenda = Agenda.objects.filter(
                     meeting_time=time).first()
+                print(found_agenda)
                 if found_agenda is None:
                     found_agenda = Agenda(meeting_time=time)
                     found_agenda.committee = committee
                     found_agenda.meeting_id = agenda[0]['MeetingID']
+                    dt = getLocationBasedDate(agenda.meeting_time, committee.cutoff_offset_days,
+                        committee.cutoff_hour, committee.cutoff_minute, committee.location_tz)
+                    dt = dt + timedelta(minutes=5)
+                    log.error(f"scheduling pdf processing for: {dt} for: {committee.name}")
+                    dt_utc = datetime.fromtimestamp(dt.timestamp(), tz=pytz.timezone('UTC'))
+                    exists = r.get(f"{committee.name}-{agenda.meeting_time}")
+                    log.error(exists)
+                    if exists is None:
+                        r.set(f"{committee.name}-{agenda.meeting_time}", True, ex=3*60)
+                        schedule_process_pdf.apply_async(
+                            (committee.name, agenda.meeting_id), eta=dt_utc)
+                        log.error(f"scheduled pdf processing")
+                    else:
+                        log.error(f'{committee.name} {agenda.meeting_id} already queued for pdf in utils')
+
                 for ag_item in agenda:
                     save_agendaitem(ag_item, found_agenda, time)
                 found_agenda.save()
