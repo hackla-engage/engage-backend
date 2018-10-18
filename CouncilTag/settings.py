@@ -63,10 +63,18 @@ CELERY_RESULT_BACKEND = f"redis://{os.environ.get('REDIS_HOSTNAME')}:6379"
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+<<<<<<< HEAD
 TIME_ZONE = 'UTC'
 USE_TZ = True
 r = redis.StrictRedis(
     host=f"{os.environ.get('REDIS_HOSTNAME')}", port=6379, db=1)
+=======
+ONCE_REDIS_URL = 'redis://localhost:6379/0'
+ONCE_DEFAULT_TIMEOUT = 60 * 60  # remove lock after 1 hour in case it was stale
+TIME_ZONE='UTC'
+USE_TZ=True
+r = redis.StrictRedis(host='localhost', port=6379, db=1)
+>>>>>>> fa8a77110d1368ed8b005e74f3e9a472f2c9d1ae
 
 
 MIDDLEWARE = [
