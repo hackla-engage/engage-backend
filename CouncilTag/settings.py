@@ -57,16 +57,16 @@ INSTALLED_APPS = [
     'CouncilTag.celery',
     'CouncilTag.apps.CouncilTagConfig',
 ]
-CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+
+CELERY_BROKER_URL = f"redis://{os.environ.get('REDIS_HOSTNAME')}:6379"
+CELERY_RESULT_BACKEND = f"redis://{os.environ.get('REDIS_HOSTNAME')}:6379"
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-ONCE_REDIS_URL = 'redis://localhost:6379/0'
-ONCE_DEFAULT_TIMEOUT = 60 * 60  # remove lock after 1 hour in case it was stale
-TIME_ZONE='UTC'
-USE_TZ=True
-r = redis.StrictRedis(host='localhost', port=6379, db=1)
+TIME_ZONE = 'UTC'
+USE_TZ = True
+r = redis.StrictRedis(
+    host=f"{os.environ.get('REDIS_HOSTNAME')}", port=6379, db=1)
 
 
 MIDDLEWARE = [
@@ -121,16 +121,16 @@ WSGI_APPLICATION = 'CouncilTag.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get("DB_NAME"),
-        'USER': os.environ.get("DB_USER"),
-        'PASSWORD': os.environ.get("DB_PASS"),
-        'HOST': 'localhost',
+        'NAME': os.environ.get("POSTGRES_DB"),
+        'USER': os.environ.get("POSTGRES_USER"),
+        'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
+        'HOST': os.environ.get("POSTGRES_HOSTNAME"),
         'TEST': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': os.environ.get("POSTGRES_DB"),
             'USER': os.environ.get("POSTGRES_USER"),
             'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
-            'HOST': 'localhost',
+            'HOST': os.environ.get("POSTGRES_HOSTNAME"),
         },
     },
 }
@@ -164,7 +164,7 @@ USE_TZ = False
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATIC_URL = '/static/'
- # Extra places for collectstatic to find static files.
+# Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
     os.path.join(PROJECT_ROOT, 'static'),
 )
