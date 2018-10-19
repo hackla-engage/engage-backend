@@ -6,7 +6,6 @@ WORKDIR /engage_backend_service/
 
 RUN apt-get update && apt-get -y install postgresql
 RUN pip install pipenv
-RUN pip install pipenv
 RUN pipenv install --system
 
 # Expose is NOT supported by Heroku

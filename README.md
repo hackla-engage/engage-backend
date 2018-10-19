@@ -43,13 +43,15 @@ To setup the development environment:
 6. Add the following environment variables for the project. You'll need database info, django secret key and 'CouncilTag' to run the project in DEBUG mode. 
 
  ```
- DB_NAME=counciltag
- DB_USER=REPLACEME
- DB_PASSWORD=REPLACEME
+ POSTGRES_DB=counciltag
+ POSTGRES_USER=REPLACEME
+ POSTGRES_PASSWORD=REPLACEME
  DJANGO_SECRET_KEY=someuniqueunpredictablevalue
  SENDGRIDKEY="SG.-some_long_string"
  RECAPTCHAKEY="some_string"
  CouncilTag=debug
+ REDIS_HOSTNAME=localhost
+ POSTGRES_HOSTNAME=localhost
  ```
 
 7. To run tests on the package set these environment variables:
@@ -61,6 +63,8 @@ DATABASE_URL=postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_
 CouncilTag=test
 DJANGO_SECRET_KEY=examplesecretkeydonotuseinprod
 SENDGRIDKEY=SG.-thisisnotarealkeylol
+REDIS_HOSTNAME=localhost
+POSTGRES_HOSTNAME=localhost
 ```
 
 8. Then, run `python manage.py test -k`
@@ -94,6 +98,18 @@ url="http://localhost:8000/api",
 `python manage.py runserver`
 
 You can go to `http://localhost:8000/swagger/` to look at the docs and interact with the API. 
+
+14. Alternatively use Docker
+
+* We have included a docker-compose.yml so that you can edit this repository and run the backend without having to configure all the requirements. To build the combined images required for the repository run:
+`docker-compose build`
+
+* If you are testing the frontend against the docker backend then you should uncomment line 8 from `runservices.sh` to download agendas for 2018 (You can add, change, or remove years on that line. Years should be separated by a comma. Be patient, web scraping from the Santa Monica site is incredibly slow.)
+
+* Once built, you can run the repository's configuration with
+`docker-compose up`
+
+* Navigate to https://localhost:8000/swagger/ to test
 
 
 ## Continous Delivery
