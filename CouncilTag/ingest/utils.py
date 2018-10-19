@@ -6,6 +6,10 @@ from celery.schedules import crontab
 from CouncilTag.celery import schedule_process_pdf, app
 from datetime import datetime, timedelta
 from CouncilTag.settings import r
+from CouncilTag.api.utils import getLocationBasedDate
+import logging
+import pytz
+log = logging.Logger(__name__)
 
 def save_agendaitem(agenda_item, new_agenda, meeting_time):
     agendaitem = AgendaItem.objects.filter(
@@ -55,21 +59,20 @@ def processAgendasForYears(years, committee_name):
                     found_agenda = Agenda(meeting_time=time)
                     found_agenda.committee = committee
                     found_agenda.meeting_id = agenda[0]['MeetingID']
-                    dt = getLocationBasedDate(agenda.meeting_time, committee.cutoff_offset_days,
+                    dt = getLocationBasedDate(found_agenda.meeting_time, committee.cutoff_offset_days,
                         committee.cutoff_hour, committee.cutoff_minute, committee.location_tz)
                     dt = dt + timedelta(minutes=5)
                     log.error(f"scheduling pdf processing for: {dt} for: {committee.name}")
                     dt_utc = datetime.fromtimestamp(dt.timestamp(), tz=pytz.timezone('UTC'))
-                    exists = r.get(f"{committee.name}-{agenda.meeting_time}")
-                    log.error(exists)
+                    exists = r.get(f"{committee.name}-{found_agenda.meeting_time}")
+                    found_agenda.save()
                     if exists is None:
-                        r.set(f"{committee.name}-{agenda.meeting_time}", True, ex=3*60)
+                        r.set(f"{committee.name}-{found_agenda.meeting_time}", True, ex=3*60)
                         schedule_process_pdf.apply_async(
-                            (committee.name, agenda.meeting_id), eta=dt_utc)
+                            (committee.name, found_agenda.meeting_id), eta=dt_utc)
                         log.error(f"scheduled pdf processing")
                     else:
-                        log.error(f'{committee.name} {agenda.meeting_id} already queued for pdf in utils')
-
+                        log.error(f'{committee.name} {found_agenda.meeting_id} already queued for pdf in utils')
                 for ag_item in agenda:
                     save_agendaitem(ag_item, found_agenda, time)
                 found_agenda.save()
