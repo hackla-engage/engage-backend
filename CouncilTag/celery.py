@@ -21,12 +21,13 @@ app.config_from_object('django.conf:settings', namespace="CELERY")
 app.autodiscover_tasks()
 app.conf.timezone = 'UTC'
 app.conf.ONCE = {
-  'backend': 'celery_once.backends.Redis',
-  'settings': {
-    'url': 'redis://localhost:6379/0',
-    'default_timeout': 60 * 60
-  }
+    'backend': 'celery_once.backends.Redis',
+    'settings': {
+        'url': 'redis://localhost:6379/0',
+        'default_timeout': 60 * 60
+    }
 }
+
 
 @app.on_after_configure.connect
 def setup_beats(sender, **kwargs):
@@ -40,11 +41,13 @@ def setup_beats(sender, **kwargs):
             name=committee.name,
         )
 
+
 @app.task(bind=True)
 def debug_task(self):
     print('Request: {0!r}'.format(self.request))
 
-@app.task(base=QueueOnce, once=dict(keys=('agenda_id',)))
+
+@app.task()
 def schedule_process_pdf(committee_name, agenda_id):
     log.error(
         f"Executing PDF process for {committee_name} and meeting: {agenda_id}")

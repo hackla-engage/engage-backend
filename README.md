@@ -10,39 +10,61 @@
 ## Dev Setup
 To setup the development environment:
 
+0. Install redis [https://redis.io/download](https://redis.io/download)
+
+ * Make sure you use version 4.0.0
+
+ * Compiling is very slow due to the testing suite.
+
+   * if you use MacOS, use ```brew install redis``` 
+   
+   * if ubuntu, use guide from [digital ocean](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04)
+ 
 1. Clone this repo
 
-2. Setup a virtualenv and install all Python packages.
+2. Set up a virtualenv and install all Python packages.
+
+`pip install virtualenv`
+
+`virtualenv env -p /path/to/python3.6`
+
+`source env/bin/activate`
 
 `pip install -r requirements.txt`
 
 3. Setup Postgres and PgAdmin for your platform if needed. PgAdmin is a useful GUI database manager.
+ 
+ * Make sure you are using postgres from major vrsion 10, not 11
 
 4. Create the `counciltag` database if it does not exist.
 
 5. Create a database user, give the user a password and grant the user permissions for `counciltag`.
 
-6. Add the following environmental variables for the project. You'll need database info, django secret key and 'CouncilTag' to run the project in DEBUG mode. 
+6. Add the following environment variables for the project. You'll need database info, django secret key and 'CouncilTag' to run the project in DEBUG mode. 
 
  ```
- DB_NAME=counciltag
- DB_USER=REPLACEME
- DB_PASSWORD=REPLACEME
+ POSTGRES_DB=counciltag
+ POSTGRES_USER=REPLACEME
+ POSTGRES_PASSWORD=REPLACEME
  DJANGO_SECRET_KEY=someuniqueunpredictablevalue
  SENDGRIDKEY="SG.-some_long_string"
  RECAPTCHAKEY="some_string"
  CouncilTag=debug
+ REDIS_HOSTNAME=localhost
+ POSTGRES_HOSTNAME=localhost
  ```
 
 7. To run tests on the package set these environment variables:
 ```
 POSTGRES_USER=<Some user with DB create rights or who owns $POSTGRES_DB>
-POSTGRES_PASSWORD=<Password for $DB_TEST_USER>
+POSTGRES_PASSWORD=<Password for $POSTGRES_USER>
 POSTGRES_DB=<Some DB that already exists or that you have create rights for>
 DATABASE_URL=postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB?sslmode=true
 CouncilTag=test
 DJANGO_SECRET_KEY=examplesecretkeydonotuseinprod
 SENDGRIDKEY=SG.-thisisnotarealkeylol
+REDIS_HOSTNAME=localhost
+POSTGRES_HOSTNAME=localhost
 ```
 
 8. Then, run `python manage.py test -k`
@@ -76,6 +98,18 @@ url="http://localhost:8000/api",
 `python manage.py runserver`
 
 You can go to `http://localhost:8000/swagger/` to look at the docs and interact with the API. 
+
+14. Alternatively use Docker
+
+* We have included a docker-compose.yml so that you can edit this repository and run the backend without having to configure all the requirements. To build the combined images required for the repository run:
+`docker-compose build`
+
+* If you are testing the frontend against the docker backend then you should uncomment line 8 from `runservices.sh` to download agendas for 2018 (You can add, change, or remove years on that line. Years should be separated by a comma. Be patient, web scraping from the Santa Monica site is incredibly slow.)
+
+* Once built, you can run the repository's configuration with
+`docker-compose up`
+
+* Navigate to https://localhost:8000/swagger/ to test
 
 
 ## Continous Delivery
