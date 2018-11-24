@@ -39,6 +39,10 @@ def save_agendaitem(agenda_item, new_agenda, meeting_time):
 
 
 def processAgendasForYears(years, committee_name):
+    if not years:
+        now = datetime.now()
+        years = [now.year] 
+
     try:
         committee = Committee.objects.get(name=committee_name)
     except ObjectDoesNotExist:
