@@ -963,7 +963,7 @@
                 "sha256:3f3f27a9d0f9092935efc78054ef324eb9f8166718270aefe036dfa1e4f68e1e"
             ],
             "index": "pypi",
-            "version": "==2.20.1"
+            "version": "==2.12.1"
         },
         "requests-oauthlib": {
             "hashes": [
