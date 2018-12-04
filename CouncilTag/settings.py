@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 import dj_database_url
+import redis
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,11 +27,15 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 TEST = False
+CELERY = False
+
 if os.environ.get("CouncilTag") == 'debug':
     DEBUG = True
 if os.environ.get("CouncilTag") == 'test':
     TEST = True
-
+if os.environ.get("CouncilTag") == 'celery':
+    CELERY = True
+print(DEBUG)
 ALLOWED_HOSTS = ['localhost', 'engage-santa-monica.herokuapp.com', 'backend.engage.town',
                  'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1', 'sm.engage.town']
 APPEND_SLASH = True
@@ -50,15 +55,19 @@ INSTALLED_APPS = [
     'drf_openapi',
     'django_celery_beat',
     'CouncilTag.celery',
-    'CouncilTag.apps.CouncilTagConfig'
+    'CouncilTag.apps.CouncilTagConfig',
 ]
-CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+
+CELERY_BROKER_URL = f"redis://{os.environ.get('REDIS_HOSTNAME')}:6379"
+CELERY_RESULT_BACKEND = f"redis://{os.environ.get('REDIS_HOSTNAME')}:6379"
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-ONCE_REDIS_URL = 'redis://localhost:6379/0'
-ONCE_DEFAULT_TIMEOUT = 60 * 60  # remove lock after 1 hour in case it was stale
+TIME_ZONE = 'UTC'
+USE_TZ = True
+r = redis.StrictRedis(
+    host=f"{os.environ.get('REDIS_HOSTNAME')}", port=6379, db=1)
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -112,20 +121,19 @@ WSGI_APPLICATION = 'CouncilTag.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get("DB_NAME"),
-        'USER': os.environ.get("DB_USER"),
-        'PASSWORD': os.environ.get("DB_PASS"),
-        'HOST': 'localhost',
+        'NAME': os.environ.get("POSTGRES_DB"),
+        'USER': os.environ.get("POSTGRES_USER"),
+        'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
+        'HOST': os.environ.get("POSTGRES_HOSTNAME"),
         'TEST': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': os.environ.get("POSTGRES_DB"),
             'USER': os.environ.get("POSTGRES_USER"),
             'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
-            'HOST': 'localhost',
+            'HOST': os.environ.get("POSTGRES_HOSTNAME"),
         },
     },
 }
-print(DATABASES['default']['TEST'])
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
@@ -154,10 +162,8 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATIC_URL = '/static/'
-
 # Extra places for collectstatic to find static files.
 STATICFILES_DIRS = (
     os.path.join(PROJECT_ROOT, 'static'),
