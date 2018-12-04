@@ -53,7 +53,8 @@ def writePdfForAgendaItems(agenda_items, committee, agenda):
     today = datetime.today()
     if not os.path.exists(full_path):
         os.mkdir(full_path)
-    file_path = str(full_path) + "/Meeting_" + str(datetime.fromtimestamp(agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + ".pdf"
+    file_path = str(full_path) + "/Meeting_" + str(datetime.fromtimestamp(
+        agenda_items[0].agenda.meeting_time).strftime('%Y%m%d')) + ".pdf"
     log.info(file_path)
     try:
         doc = SimpleDocTemplate(file_path,
@@ -70,8 +71,6 @@ def writePdfForAgendaItems(agenda_items, committee, agenda):
             'pro', fontSize=10, backColor='#27ae60', textColor="#FFFFFF", spaceBefore=7, borderPadding=(5, 5, 5, 5))
         ps_con = ParagraphStyle(
             'con', fontSize=10, backColor='#c0392b', textColor='#FFFFFF', spaceBefore=7, borderPadding=(5, 5, 5, 5))
-        ps_need_info = ParagraphStyle(
-            'need_info', fontSize=10, backColor='#000000', textColor='#FFFFFF', spaceBefore=7, borderPadding=(5, 5, 5, 5))
         ps_need_info = ParagraphStyle(
             'need_info', fontSize=10, backColor='#000000', textColor='#FFFFFF', spaceBefore=7, borderPadding=(5, 5, 5, 5))
         ps_no_comments = ParagraphStyle(
@@ -108,33 +107,40 @@ def writePdfForAgendaItems(agenda_items, committee, agenda):
             need_info_comments_on_agenda_item = Message.objects.filter(
                 agenda_item=upcoming_agenda_item, pro=2
             )
-            contents.append(
-                Paragraph("Comments agreeing with the recommendations:", ps_pro))
-            contents.append(Spacer(1, 0.2 * inch))
-            if len(pro_comments_on_agenda_item) > 0:
-                paragraphize_comments(pro_comments_on_agenda_item, contents)
+            if pro_comments_on_agenda_item or con_comments_on_agenda_item or need_info_comments_on_agenda_item:
+                contents.append(
+                    Paragraph("Comments agreeing with the recommendations:", ps_pro))
+                contents.append(Spacer(1, 0.2 * inch))
+                if len(pro_comments_on_agenda_item) > 0:
+                    paragraphize_comments(
+                        pro_comments_on_agenda_item, contents)
+                else:
+                    contents.append(
+                        Paragraph("No comments agreeing with recommendations on this item.", ps_no_comments))
+                contents.append(Spacer(1, 0.5 * inch))
+                contents.append(
+                    Paragraph("Comments disagreeing with the recommendations:", ps_con))
+                contents.append(Spacer(1, 0.2 * inch))
+                if len(con_comments_on_agenda_item) > 0:
+                    paragraphize_comments(
+                        con_comments_on_agenda_item, contents)
+                else:
+                    contents.append(
+                        Paragraph("No comments disagreeing with recommendations on this item.", ps_no_comments))
+                contents.append(Spacer(1, 0.5 * inch))
+                contents.append(
+                    Paragraph("Need more information comments", ps_need_info))
+                contents.append(Spacer(1, 0.2 * inch))
+                if len(need_info_comments_on_agenda_item) > 0:
+                    paragraphize_comments(
+                        need_info_comments_on_agenda_item, contents)
+                else:
+                    contents.append(
+                        Paragraph("No needs more information comments on this item.", ps_no_comments))
+            # exclude section without comments
             else:
                 contents.append(
-                    Paragraph("No comments agreeing with recommendations on this item.", ps_no_comments))
-            contents.append(Spacer(1, 0.5 * inch))
-            contents.append(
-                Paragraph("Comments disagreeing with the recommendations:", ps_con))
-            contents.append(Spacer(1, 0.2 * inch))
-            if len(con_comments_on_agenda_item) > 0:
-                paragraphize_comments(con_comments_on_agenda_item, contents)
-            else:
-                contents.append(
-                    Paragraph("No comments disagreeing with recommendations on this item.", ps_no_comments))
-            contents.append(Spacer(1, 0.5 * inch))
-            contents.append(
-                Paragraph("Need more information comments", ps_need_info))
-            contents.append(Spacer(1, 0.2 * inch))
-            if len(need_info_comments_on_agenda_item) > 0:
-                paragraphize_comments(
-                    need_info_comments_on_agenda_item, contents)
-            else:
-                contents.append(
-                    Paragraph("No needs more information comments on this item.", ps_no_comments))
+                    Paragraph("No comments agreeing or disagreeing with this agenda item were recorded.", ps_no_comments))
             contents.append(Spacer(1, 0.5 * inch))
             contents.append(PageBreak())
         doc.build(contents)
