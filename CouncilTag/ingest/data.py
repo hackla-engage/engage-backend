@@ -176,7 +176,7 @@ def get_data(year):
         soupget = BeautifulSoup(rget.text, 'html.parser')
         form = soupget.find('form', {'name': 'aspnetForm'})
         formInputs = form.findChildren('input')
-        payload = {}
+        payload = dict()
         for input in formInputs:
             if input.get('name') in [
                 "EktronClientManager",

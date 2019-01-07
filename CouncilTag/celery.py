@@ -53,15 +53,19 @@ def schedule_process_pdf(committee_name, agenda_id):
         f"Executing PDF process for {committee_name} and meeting: {agenda_id}")
     from CouncilTag.ingest.models import AgendaItem, Agenda, Committee
     from CouncilTag.ingest.writePdf import writePdfForAgendaItems
-    agenda = Agenda.objects.get(meeting_id=agenda_id, processed=False)
-    agenda.processed = True
-    agenda.save()
-    committee = Committee.objects.get(name=committee_name)
-    upcoming_agenda_items = AgendaItem.objects.filter(agenda=agenda)
-    if len(upcoming_agenda_items) == 0:
+    try:
+        agenda = Agenda.objects.get(meeting_id=agenda_id, processed=False)
+        agenda.processed = True
+        agenda.save()
+        committee = Committee.objects.get(name=committee_name)
+        upcoming_agenda_items = AgendaItem.objects.filter(agenda=agenda)
+        if len(upcoming_agenda_items) == 0:
+            return
+        writePdfForAgendaItems(upcoming_agenda_items, committee, agenda)
+    except:
+        log.error(f'Attempted to process agenda {agenda_id} but it failed to find the item that was still unprocessed')
+    finally:
         return
-    writePdfForAgendaItems(upcoming_agenda_items, committee, agenda)
-    return
 
 
 @app.task
