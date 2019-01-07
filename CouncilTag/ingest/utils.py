@@ -14,7 +14,7 @@ log = logging.Logger(__name__)
 def save_agendaitem(agenda_item, new_agenda, meeting_time):
     agendaitem = AgendaItem.objects.filter(
         agenda_item_id=agenda_item['ID'])
-    if len(agendaitem) == 0:
+    if not agendaitem:
         random_tagger = RandomTagEngine()
         new_agenda_item = AgendaItem()
         new_agenda_item.department = agenda_item['Department']
@@ -47,7 +47,7 @@ def processAgendasForYears(years, committee_name):
         committee.save()
     for year in years:
         agenda_values = get_data(year=year)
-        if agenda_values is None:
+        if not agenda_values:
             print(f"No agendas/items for {year}")
             continue
         for time, agenda in agenda_values.items():
@@ -55,7 +55,7 @@ def processAgendasForYears(years, committee_name):
                 found_agenda = Agenda.objects.filter(
                     meeting_time=time).first()
                 print(found_agenda)
-                if found_agenda is None:
+                if not found_agenda:
                     found_agenda = Agenda(meeting_time=time)
                     found_agenda.committee = committee
                     found_agenda.meeting_id = agenda[0]['MeetingID']

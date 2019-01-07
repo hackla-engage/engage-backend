@@ -76,7 +76,7 @@ def addMessage(request, format=None):
         messages = Message.objects.filter(session_key=session_key)
         authcode = str(uuid.uuid1()).replace(
             "-", "")[rand_begin:rand_begin + CODE_LENGTH].encode('utf-8')
-        if len(messages) == 0:
+        if not messages:
             verify_token = message_info['token']
             result = verify_recaptcha(verify_token)
             if not result:

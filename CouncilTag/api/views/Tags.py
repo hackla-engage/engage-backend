@@ -27,7 +27,7 @@ class UserTagView(LoginRequiredMixin, APIView):
         '''
         Add new tags (array of tag names) to user's profile
         '''
-        if len(request.data["tags"]) == 0:
+        if not request.data["tags"]:
             return Response({"error": "tags were not included"}, status=400)
         user = EngageUserProfile.objects.get(user=request.user)
         for tag in request.data["tags"]:
@@ -50,7 +50,7 @@ class UserTagView(LoginRequiredMixin, APIView):
         '''
         Delete array of existing tags from user
         '''
-        if len(request.data["tags"]) == 0:
+        if not request.data["tags"]:
             return Response({"error": "tags were not included"}, status=400)
         user = EngageUserProfile.objects.get(user=request.user)
         for tag in request.data["tags"]:

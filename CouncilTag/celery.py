@@ -60,7 +60,7 @@ def schedule_process_pdf(committee_name, agenda_id):
         agenda.save()
         committee = Committee.objects.get(name=committee_name)
         upcoming_agenda_items = AgendaItem.objects.filter(agenda=agenda)
-        if upcoming_agenda_items is None:
+        if not upcoming_agenda_items:
             return
         writePdfForAgendaItems(upcoming_agenda_items, committee, agenda)
     except ObjectDoesNotExist as exc:

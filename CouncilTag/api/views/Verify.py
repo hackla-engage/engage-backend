@@ -42,7 +42,7 @@ class VerifyView(APIView):
             return Response(status=200, data={"success": True})
         elif data['type'] == 'signup':
             user = User.objects.filter(email=data["email"])
-            if user is None or len(user) == 0:
+            if not user:
                 return Response(data={"error": "User not found"}, status=404)
             profile = EngageUserProfile.objects.get(user=user)
             authcode = profile.authcode
