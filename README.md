@@ -119,8 +119,4 @@ We have setup continous integration and deployment on CircleCI.
 When you push to the `master` branch on this repo, this will trigger a build on the server and also run the Django test suite. If the tests fail, the build will not go through.
 
 
-## Django Documentation
-
-If you are new to using Django, you can read up more about it here:
-https://docs.djangoproject.com/en/2.0/
-
+## 

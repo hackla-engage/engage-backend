@@ -16,7 +16,7 @@ services:
       - AWS_REGION=us-east-1
     build: .
     # command: pipenv run "python /engage_backend_service/manage.py runserver 0.0.0.0:8000"
-    command: ./runservices.sh
+    entrypoint: ./runservices.sh
     volumes:
       - .:/engage_backend_service
     ports:
