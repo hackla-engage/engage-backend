@@ -16,13 +16,13 @@ class CouncilTagConfig(AppConfig):
             from CouncilTag.ingest.models import Agenda, Committee
             from CouncilTag.api.utils import getLocationBasedDate
             from celery.schedules import crontab
-            from CouncilTag.celery import schedule_process_pdf, app
+            from CouncilTag.celery import schedule_process_pdf, APP
             from celery.task.control import inspect
             log.error("SETTING UP CELERY ASYNC TASKS!")
             i = inspect()
             log.error(i.scheduled())
-            app.conf.beat_schedule = {}
-            app.conf.timezone = 'UTC'
+            APP.conf.beat_schedule = {}
+            APP.conf.timezone = 'UTC'
             committees = Committee.objects.all()
             for committee in committees:
                 agendas = Agenda.objects.filter(
@@ -45,7 +45,7 @@ class CouncilTagConfig(AppConfig):
                     else:
                         log.error(
                             f'{committee.name} {agenda.meeting_id} already queued for pdf')
-                app.conf.beat_schedule[committee.name] = {
+                APP.conf.beat_schedule[committee.name] = {
                     'task': 'CouncilTag.celery.schedule_committee_processing',
                     'schedule': crontab(hour='*', minute='*/30'),
                     'args': (committee.name,)

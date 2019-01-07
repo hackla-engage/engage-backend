@@ -3,7 +3,7 @@ from CouncilTag.ingest.tagging import RandomTagEngine
 from django.core.exceptions import ObjectDoesNotExist
 from CouncilTag.ingest.data import get_data
 from celery.schedules import crontab
-from CouncilTag.celery import schedule_process_pdf, app
+from CouncilTag.celery import schedule_process_pdf
 from datetime import datetime, timedelta
 from CouncilTag.settings import r
 from CouncilTag.api.utils import getLocationBasedDate
