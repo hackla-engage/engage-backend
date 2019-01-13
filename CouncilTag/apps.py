@@ -38,7 +38,7 @@ class CouncilTagConfig(AppConfig):
                     exists = r.get(f"{committee.name}-{agenda.meeting_time}")
                     if exists is None:
                         r.set(f"{committee.name}-{agenda.meeting_time}",
-                              True, ex=3 * 60)
+                              "true", ex=3 * 60)
                         schedule_process_pdf.apply_async(
                             (committee.name, agenda.meeting_id), eta=dt_utc)
                         log.error(f"scheduled pdf processing")

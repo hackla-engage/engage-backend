@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from drf_openapi.entities import VersionedSerializers
 from CouncilTag.ingest.models import Agenda, AgendaItem, Tag, AgendaRecommendation, Committee, Message
 
 

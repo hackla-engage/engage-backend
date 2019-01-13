@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     'CouncilTag.api',
     'corsheaders',
     'drf_yasg',
-    'drf_openapi',
     'django_celery_beat',
     'CouncilTag.celery',
     'CouncilTag.apps.CouncilTagConfig',
