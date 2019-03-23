@@ -5,6 +5,7 @@ import datetime
 import pytz
 from CouncilTag.ingest.models import AgendaItem
 from calendar import timegm
+from CouncilTag import settings
 
 local_tz = pytz.timezone("America/Los_Angeles")
 city_council_agendas_url = "https://www.smgov.net/departments/clerk/agendas.aspx"
@@ -52,6 +53,9 @@ def process_information_section(body):
 
 
 def process_actions_section(body):
+    """
+    body here is recommendations body included in the divItemDiscussion div
+    """
     actions = []
     paragraphs = body.find_all('p')
     list_actions = body.find('ol')
@@ -65,9 +69,10 @@ def process_actions_section(body):
                 actions.append(unicodedata.normalize("NFKD", next.get_text()))
             next = next.next_sibling
     else:
-        paragraphs = paragraphs[1:]
         for paragraph in paragraphs:
-            actions.append(unicodedata.normalize("NFKD", paragraph.get_text()))
+            if settings.DEBUG:
+                print(paragraph)
+            actions.append(unicodedata.normalize("NFKD", paragraph.get_text()).replace("Recommended Action", ""))
     if len(actions) > 0 and actions[0] == 'Staff recommends that the City Council:':
         actions = actions[1:]
     return actions
