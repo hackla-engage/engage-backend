@@ -5,19 +5,6 @@ import requests
 import json
 from os import getenv
 
-
-# =========================================
-# Load .env file. Can be deleted if
-# loaded somewhere ealse in the application.
-# Otherwise remove this comment
-
-from dotenv import load_dotenv
-from pathlib import Path
-path = Path(Path(__file__).parents[3], '.env')
-load_dotenv(dotenv_path=path)
-
-# =========================================
-
 REGION = getenv('MAILCHIMP_REGION')
 KEY = getenv('MAILCHIMP_KEY')
 USER = getenv('MAILCHIMP_USER')
