@@ -8,6 +8,7 @@ from .views.UserFeed import UserFeed
 from .views.Auth import SignupView, login_user, update_profile
 from .views.Message import addMessage
 from .views.Verify import VerifyView
+from .views.MailChimp import mailChimpSub
 
 urlpatterns = [
     url(r'^agendas/$', AgendaView.as_view()),
@@ -22,7 +23,8 @@ urlpatterns = [
     url(r'^tag/(?P<tag_name>[a-zA-Z _]+)/agenda/items/$', get_agendaitem_by_tag),
     url(r'^user/tags/$', UserTagView().as_view()),
     url(r'^add/message/$', addMessage),
-    url(r'^verify/$', VerifyView.as_view())
+    url(r'^verify/$', VerifyView.as_view()),
+    url(r'^mailchimp/$', mailChimpSub),
 
 ]
 
