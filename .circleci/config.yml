@@ -70,7 +70,7 @@ workflows:
  version: 2
  check-compose:
    jobs:
-     - test:
+     - test
  build-and-deploy:
    jobs:
      - build
