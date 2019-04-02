@@ -12,7 +12,7 @@ class CouncilTagConfig(AppConfig):
     name = 'CouncilTag'
 
     def ready(self):
-        if DEBUG:
+        if CELERY:
             from CouncilTag.ingest.models import Agenda, Committee
             from CouncilTag.api.utils import getLocationBasedDate
             from celery.schedules import crontab
