@@ -71,7 +71,6 @@ PyJWT==1.7.1
 pylint==2.2.2
 pylint-django==2.0.5
 pylint-plugin-utils==0.4
-PyMySQL==0.9.3
 pyparsing==2.3.0
 PyPDF2==1.26.0
 python-crontab==2.3.6
