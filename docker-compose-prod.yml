@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  backend:
+    env_file:
+      - ../engconfig/engconfig.env
+    build: .
+    # command: pipenv run "python /engage_backend_service/manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/engage_backend_service
+    working_dir: /engage_backend_service
+    entrypoint: ./runservices.sh
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+  redis:
+    image: redis:4.0.0
