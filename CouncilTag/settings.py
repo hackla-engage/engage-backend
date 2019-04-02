@@ -25,16 +25,22 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-TEST = False
-CELERY = False
-
-if os.environ.get("CouncilTag") == 'debug':
-    DEBUG = True
-if os.environ.get("CouncilTag") == 'test':
-    TEST = True
 if os.environ.get("CouncilTag") == 'celery':
+    TEST = False
     CELERY = True
+    DEBUG = False
+elif os.environ.get("CouncilTag") == 'debug':
+    TEST = False
+    DEBUG = True
+    CELERY = True
+elif os.environ.get("CouncilTag") == 'test':
+    TEST = True
+    DEBUG = False
+    CELERY = False
+else:
+    TEST = False
+    DEBUG = False
+    CELERY = False
 print(DEBUG)
 ALLOWED_HOSTS = ['localhost', 'engage-santa-monica.herokuapp.com', 'backend.engage.town',
                  'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1', 'sm.engage.town']

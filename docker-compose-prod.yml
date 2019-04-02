@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  backend:
+    
+    environment:
+      - CouncilTag=debug
+      - DJANGO_SECRET_KEY=examplesecretkeydonotuseinprod
+      - RECAPTCHAKEY=some_string
+      - POSTGRES_USER=engageuser
+      - POSTGRES_PASSWORD=engageuserpassword
+      - POSTGRES_DB=counciltag
+      - POSTGRES_HOSTNAME=postgres
+      - REDIS_HOSTNAME=redis
+      - AWS_ACCESS_KEY_ID=AKIAJHGBRQ5ZX6IUSX4A
+      - AWS_SECRET_ACCESS_KEY=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
+      - AWS_REGION=us-east-1
+    build: .
+    # command: pipenv run "python /engage_backend_service/manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/engage_backend_service
+    working_dir: /engage_backend_service
+    entrypoint: ./runservices.sh
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+  postgres:
+    image: postgres:10.5
+    environment:
+      - POSTGRES_USER=engageuser
+      - POSTGRES_PASSWORD=engageuserpassword
+      - POSTGRES_DB=counciltag
+    ports:
+      - "${DB_PORT:-5432}:5432"
+  redis:
+    image: redis:4.0.0
