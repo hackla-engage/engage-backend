@@ -1,5 +1,18 @@
 version: 2
 jobs:
+  test:
+    working_directory: ~/CouncilTag-Django
+    machine: true
+    steps:
+      - checkout
+      - run: docker-compose build
+      - run: docker-compse up
+      - run:
+          name: install dockerize
+          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.3.0
+      - run: dockerize -wait http://0.0.0.0:8000/ -timeout 8m
   build:
     working_directory: ~/CouncilTag-Django
     docker:
@@ -55,6 +68,9 @@ jobs:
                 ssh -f $SSH_USER@$SSH_HOST "./deploy.sh"
 workflows:
  version: 2
+ check-compose:
+   jobs:
+     - test:
  build-and-deploy:
    jobs:
      - build
