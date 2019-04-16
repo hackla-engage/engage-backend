@@ -38,18 +38,18 @@ class TestTagsEndpoint(TestCase):
         self.assertGreaterEqual(len(seed_tags), len(response.json()))
 
 class TestLoginEndpoint(TestCase):
-    
-    
+
+
     def test_user_creation(self):
-        user_to_test_against = User.objects.create_user("test", email="test@test.com", password='test')       
+        user_to_test_against = User.objects.create_user("test", email="test@test.com", password='test')
         jwt_token = jwt.encode({'email':user_to_test_against.email}, settings.SECRET_KEY)
         response = self.client.post("/api/login.json", {'email':'test@test.com', 'password': 'test'})
         token = response.json()['token']
         #have to decode the jwt_token since it will be a byte-object and not string
         self.assertEqual(jwt_token.decode('utf-8'), token)
-    
+
     def test_user_wrong_info(self):
-        user_to_test_against = User.objects.create_user("test", email="test@test.com", password='test')       
+        user_to_test_against = User.objects.create_user("test", email="test@test.com", password='test')
         response = self.client.post("/api/login.json", {'email':'test@test.com', 'password': 'testing'})
         self.assertEqual(404, response.status_code)
 
@@ -115,12 +115,13 @@ class TestSendMessageEndpoint(TestCase):
     Add SES test
     '''
     def test_mail_util_func(self):
+        if os.environ.get("ENGAGE_BACKEND_NO_MAIL") == 'TRUE':
+            # Early Exit for CI runners without valid MAIL API KEY
+            return
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         static = 'PDF_Reports'
         full_path = os.path.join(root_dir, static)
-        attachment_file_path = str(full_path) + "/test_pdf_report.pdf" 
+        attachment_file_path = str(full_path) + "/test_pdf_report.pdf"
         print(attachment_file_path)
         result = send_mail({'user': {'email': 'engage@engage.town'}, 'subject': 'test', 'content': '<html><body>Testing</body></html>', 'attachment_file_path': attachment_file_path, 'attachment_file_name': 'test_pdf_report.pdf'})
         self.assertTrue(result)
-
-    
