@@ -39,8 +39,8 @@ class CouncilTagConfig(AppConfig):
                     if exists is None:
                         r.set(f"{committee.name}-{agenda.meeting_time}",
                               "true", ex=3 * 60)
-                        print("XXXX:", dt_utc, datetime.utcnow())
-                        if dt_utc > datetime.utcnow():
+                        print("XXXX:", dt_utc, datetime.now(tz=pytz.timezone('UTC')))
+                        if dt_utc > datetime.now(tz=pytz.timezone('UTC')):
                             schedule_process_pdf.apply_async(
                                 (committee.name, agenda.meeting_id), eta=dt_utc)
                             log.error(f"scheduled pdf processing")
