@@ -1,6 +1,5 @@
 import os
 import logging
-import functools
 from datetime import datetime
 from celery import Celery
 from celery.schedules import crontab
@@ -59,7 +58,11 @@ def schedule_process_pdf(committee_name, agenda_id):
         agenda.processed = True
         agenda.save()
         committee = Committee.objects.get(name=committee_name)
-        upcoming_agenda_items = AgendaItem.objects.filter(agenda=agenda)
+
+        # Sort agenda items by ascending id, an acceptable proxy for the time
+        # the agend item created, which mirrors order originally presented
+        upcoming_agenda_items = (AgendaItem.objects.filter(agenda=agenda)
+                                 .order_by('id'))
         if not upcoming_agenda_items:
             return
         writePdfForAgendaItems(upcoming_agenda_items, committee, agenda)
