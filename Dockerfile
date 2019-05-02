@@ -1,12 +1,20 @@
-FROM python:3.6.5
-ENV PYTHONUNBUFFERED 1
+FROM python:3.6.5-alpine3.7
 
-RUN apt-get update && apt-get -y install postgresql
-RUN pip install pipenv
+WORKDIR "/srv/engage-backend"
 
-# Expose is NOT supported by Heroku
-# EXPOSE 8000
+ENV PYTHONUNBUFFERED=1
 
-# Run the image as a non-root user
+# | build-base     | GCC tools |
+# | postgresql-dev | psycopg2  |
+# | libffi-dev     | bcrypt    |
+# | libxslt-dev    | lxml      |
+# | jpeg-dev       | Pillow    |
+RUN apk add --no-cache build-base postgresql-dev libffi-dev libxslt-dev \
+                       jpeg-dev \
+    && pip install --upgrade pip \
+    && pip install pipenv
 
-CMD pip --version
+EXPOSE 8000
+VOLUME ["/srv/engage-backend"]
+
+CMD ["sh", "/srv/engage-backend/runservices.sh"]
