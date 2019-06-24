@@ -24,9 +24,7 @@ from html_codec import HTMLCodec
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from CouncilTag.ingest.models import Committee, Agenda, AgendaItem
-from CouncilTag.api.utils import getLocationBasedDate
 from datetime import datetime, timedelta
-from CouncilTag.celery import schedule_process_pdf, debug_task
 
 schema_view = get_schema_view(
     openapi.Info(

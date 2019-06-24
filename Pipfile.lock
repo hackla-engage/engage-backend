@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b883c4c901e8cc63d3ff3051648f808f8223a2ba3aaee4e9d86003339f28ad20"
+            "sha256": "01ec843100ec25deb4ae180260e25714e1a95d5e0edb866786379e6a568943e4"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -394,6 +394,14 @@
             ],
             "index": "pypi",
             "version": "==1.12.1"
+        },
+        "engage-scraper": {
+            "hashes": [
+                "sha256:47c4f3dbe7fdbcd2f02fe3685ed1d92b80d31f90474498eda0495e1af29a5f35",
+                "sha256:aa77d172802ad63828b9eca0986693aab5b526ba979a48b4461012ef22487475"
+            ],
+            "index": "pypi",
+            "version": "==0.0.3"
         },
         "enum34": {
             "hashes": [
@@ -1078,6 +1086,12 @@
             ],
             "index": "pypi",
             "version": "==1.7"
+        },
+        "sqlalchemy": {
+            "hashes": [
+                "sha256:c30925d60af95443458ebd7525daf791f55762b106049ae71e18f8dd58084c2f"
+            ],
+            "version": "==1.3.5"
         },
         "static3": {
             "hashes": [

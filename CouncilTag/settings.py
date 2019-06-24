@@ -58,16 +58,9 @@ INSTALLED_APPS = [
     'CouncilTag.api',
     'corsheaders',
     'drf_yasg',
-    'django_celery_beat',
-    'CouncilTag.celery',
     'CouncilTag.apps.CouncilTagConfig',
 ]
 
-CELERY_BROKER_URL = f"redis://{os.environ.get('REDIS_HOSTNAME')}:6379"
-CELERY_RESULT_BACKEND = f"redis://{os.environ.get('REDIS_HOSTNAME')}:6379"
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
 TIME_ZONE = 'UTC'
 USE_TZ = True
 r = redis.StrictRedis(

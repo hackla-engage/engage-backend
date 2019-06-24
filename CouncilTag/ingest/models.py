@@ -1,11 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
-
-
-
-# Create your models here.
-
+from datetime import datetime
 
 class Tag(models.Model):
     name = models.CharField(max_length=100)
@@ -25,9 +21,12 @@ class Committee(models.Model):
     cutoff_offset_days = models.IntegerField(default=0)
     cutoff_hour = models.PositiveIntegerField(default=11)
     cutoff_minute = models.PositiveIntegerField(default=59)
-    location_tz = models.CharField(null=False, max_length=255, default="America/Los_Angeles")
-    location_lat = models.FloatField(null=False, default=34.024212)
-    location_lng = models.FloatField(null=False, default=-118.496475)
+    location_tz = models.CharField(
+        null=False, max_length=255, default="America/Los_Angeles")
+    base_agenda_location = models.CharField(max_length=255,
+        null=False, default="http://santamonicacityca.iqm2.com/Citizens/Detail_Meeting.aspx?ID=")
+    agendas_table_location = models.CharField(max_length=255,
+        null=False, default="https://www.smgov.net/departments/clerk/agendas.aspx")
 
 
 class Agenda(models.Model):
@@ -35,7 +34,9 @@ class Agenda(models.Model):
     committee = models.ForeignKey(Committee, on_delete='CASCADE')
     meeting_id = models.CharField(max_length=20, null=True)  # Agenda ID
     processed = models.BooleanField(default=False)
-
+    cutoff_time = models.PositiveIntegerField(default=datetime.now().timestamp())
+    pdf_time = models.PositiveIntegerField(default=datetime.now().timestamp())
+    pdf_location = models.CharField(max_length=255, null=True)
 
 class AgendaItem(models.Model):
     title = models.TextField()

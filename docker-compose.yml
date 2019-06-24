@@ -19,10 +19,13 @@ services:
     volumes:
       - .:/engage_backend_service
     working_dir: /engage_backend_service
-    entrypoint: ./runservices.sh
+    entrypoint: scripts/rundev.sh
     ports:
       - "8000:8000"
     depends_on:
+      - postgres
+      - redis
+    links: 
       - postgres
       - redis
   postgres:

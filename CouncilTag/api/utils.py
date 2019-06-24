@@ -83,32 +83,11 @@ def calculateTallies(messages_qs):
             "child_school": child_school, "pro": pro, "con": con, "more_info": more_info, "total": total}
 
 
-def getLocationBasedDate(timestamp, cutoff_days_offset, cutoff_hour, cutoff_minute, location_tz):
-    """
-    @timestamp a UTC timestamp
-    @cutoff_dats_offset +/- integer days from now that should be checking date
-    @cutoff_hours integer hours for location that should be set
-    @cutoff_minutes integer minutes for locaiton that should be set
-    @location_tz string timezone for location where meeting takes place
-    """
-    tz = pytz.timezone(location_tz)
-    dt = datetime.fromtimestamp(timestamp, tz=tz)
-    log.error(dt)
-    if cutoff_days_offset is not None:
-        dt = dt + timedelta(days=cutoff_days_offset)
-    if cutoff_hour is not None:
-        dt = dt.replace(hour=cutoff_hour, minute=cutoff_minute)
-    return dt
-
-
-def isCommentAllowed(timestamp, cutoff_days_offset, cutoff_hours, cutoff_minutes, location_tz):
-    dt = getLocationBasedDate(
-        timestamp, cutoff_days_offset, cutoff_hours, cutoff_minutes, location_tz)
-    now = datetime.now().astimezone(tz=pytz.timezone(location_tz))
-    if (now > dt):
+def isCommentAllowed(timestamp):
+    dt = datetime.now().timestamp()
+    if dt > timestamp:
         return False
     return True
-
 
 def send_mail(mail_message):
     if type(mail_message["user"]) is dict:
@@ -122,7 +101,6 @@ def send_mail(mail_message):
     msg['From'] = 'do-not-reply@engage.town'
     part = MIMEText(mail_message['content'], 'html')
     msg.attach(part)
-    log.error(("XXXX", to_email))
     if "attachment_file_path" in mail_message:
         with open(mail_message["attachment_file_path"], 'rb') as f:
             part = MIMEApplication(f.read(), _subtype='pdf')
