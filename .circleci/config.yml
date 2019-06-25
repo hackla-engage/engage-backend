@@ -51,7 +51,7 @@ jobs:
       - run: pipenv --version
       - run: ls
       - run: pwd
-      - run: pipenv run "python --version"
+      - run: pipenv run python --version
       - run: pipenv run "python manage.py test -k"
       - store_test_results:
           path: /tmp/test-results
