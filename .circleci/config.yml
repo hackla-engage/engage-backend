@@ -39,7 +39,7 @@ jobs:
           key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           command: |
-            pipenv install --system --deploy
+            pipenv install
             mkdir -p ${TEST_REPORTS}
       - save_cache:
           key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
@@ -48,10 +48,6 @@ jobs:
             - "/usr/local/bin"
             - "/usr/local/lib/python3.6/site-packages"
       # Wait for DB
-      - run: pipenv --version
-      - run: ls
-      - run: pwd
-      - run: pipenv run python --version
       - run: pipenv run python manage.py test -k
       - store_test_results:
           path: /tmp/test-results
