@@ -2,7 +2,6 @@
 pipenv run pip install --upgrade pip
 pipenv install 
 export CouncilTag=test
-
 pipenv run python manage.py makemigrations
 pipenv run python manage.py migrate
 pipenv run python manage.py populate_tags
