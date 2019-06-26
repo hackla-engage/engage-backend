@@ -5,4 +5,8 @@ python manage.py makemigrations
 python manage.py migrate
 export ENGAGE_DATABASE=False
 python manage.py collectstatic --no-input
-python manage.py runserver 0.0.0.0:8000
+if [ -d "tmp" ]; then
+    rm -rf tmp
+fi
+mkdir tmp
+python manage.py test -k > tmp/tests-results 2>&1

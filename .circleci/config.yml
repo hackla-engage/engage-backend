@@ -1,58 +1,24 @@
 version: 2
 jobs:
   test:
-    working_directory: ~/CouncilTag-Django
-    machine: true
+    working_directory: ~/engage_backend_service
+    machine: 
+      enabled: true
     steps:
       - checkout
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker-compose build
-      - run: docker-compose up -d
-      - run:
-          name: install dockerize
-          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-          environment:
-            DOCKERIZE_VERSION: v0.6.1
-      - run: dockerize -wait http://localhost:8000/swagger/ -timeout 20m
-  build:
-    working_directory: ~/CouncilTag-Django
-    docker:
-      - image: circleci/python:3.6.8
-        environment:
-          PIPENV_VENV_IN_PROJECT: true
-          DATABASE_URL: postgresql://circleci:something@localhost/counciltagtest?sslmode=true
-          CouncilTag: test
-      - image: nimbustech/postgres-ssl:9.5
-        environment:
-          POSTGRES_DB: counciltagtest
-          POSTGRES_USER: circleci
-          POSTGRES_PASSWORD: something
-    environment:
-        TEST_REPORTS: /tmp/test-reports
-        POSTGRES_DB: counciltagtest
-        POSTGRES_USER: circleci
-        POSTGRES_PASSWORD: something
-    steps:
-      - checkout
-      - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
-      - restore_cache:
-          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
-      - run:
+      # Not using -d since will exit after completion
+      # Have to figure out how to shut down redis from entrypoint script
+      - run: 
+          name: Check test and upload if succeeded
           command: |
-            pipenv install
-            mkdir -p ${TEST_REPORTS}
-      - save_cache:
-          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
-          paths:
-            - ".venv"
-            - "/usr/local/bin"
-            - "/usr/local/lib/python3.6/site-packages"
-      # Wait for DB
-      - run: pipenv run python manage.py test -k
+              docker-compose -f docker-compose-test.yml up --abort-on-container-exit --exit-code-from backend
+              if [ $? -eq 0 ]; then; docker push hack4laengage/engage_backend_service; else; return 1; fi
       - store_test_results:
-          path: /tmp/test-results
+          path: ~/engage_backend_service/tmp/test-results
       - store_artifacts:
-          path: /tmp/test-results
+          path: ~/engage_backend_service/tmp/test-results
           destination: tr1
   deploy:
     machine:
@@ -67,15 +33,12 @@ jobs:
                 ssh -f $SSH_USER@$SSH_HOST "./deploy.sh"
 workflows:
  version: 2
- check-compose:
-   jobs:
-     - test
  build-and-deploy:
    jobs:
-     - build
+     - test
      - deploy:
          requires:
-           - build
+           - test
          filters:
            branches:
              only: master
