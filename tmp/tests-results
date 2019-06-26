@@ -1,0 +1,11 @@
+True
+Using existing test database for alias 'default'...
+System check identified no issues (0 silenced).
+....<html><body><h3>Welcome to the Engage platform for Santa Monica,</h3> Please click <a href="https://engage-santa-monica.herokuapp.com/#/emailConfirmation?code=49bb4e98&email=test%40test.com&type=signup&id=">here</a> to authenticate.<br/><br/>Thank you for your interest in your local government!<br/><br/> If you are receiving this in error, please email: <a href="mailto:engage@engage.town">engage@engage.town</a>.</body></html>
+...{'token': 'faketoken123', 'committee': 'test', 'pro': 4, 'content': 'I support that', 'ag_item': 33}
+..
+----------------------------------------------------------------------
+Ran 9 tests in 6.528s
+
+OK
+Preserving test database for alias 'default'...

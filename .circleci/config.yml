@@ -13,8 +13,7 @@ jobs:
       - run: 
           name: Check test and upload if succeeded
           command: |
-              docker-compose -f docker-compose-test.yml up --abort-on-container-exit --exit-code-from backend
-              if [ $? -eq 0 ]; then; docker push hack4laengage/engage_backend_service; else; return 1; fi
+              scripts/test_and_upload.sh
       - store_test_results:
           path: ~/engage_backend_service/tmp/test-results
       - store_artifacts:
