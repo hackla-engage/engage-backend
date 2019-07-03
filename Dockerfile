@@ -1,6 +1,7 @@
-FROM python:3.6-alpine
+FROM python:3.7-stretch
 # A side effect of using alpine is you must build psycopg2 from source
-RUN apk update && apk add curl postgresql-dev postgresql-contrib build-base python3-dev musl-dev netcat-openbsd jpeg-dev zlib-dev autoconf automake g++ make
+RUN apt-get update && apt-get install -y build-essential curl postgresql-contrib netcat
+
 ENV LIBRARY_PATH=/lib:/usr/lib
 RUN pip install pipenv
 COPY . /engage_backend_service
