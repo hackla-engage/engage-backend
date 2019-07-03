@@ -1,8 +1,7 @@
-FROM python:3.6.8
-ENV PYTHONUNBUFFERED 1
-RUN wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | apt-key add -
-RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
-RUN apt-get update && apt-get install -y build-essential curl postgresql postgresql-contrib netcat
+FROM python:3.7.3-alpine
+# A side effect of using alpine is you must build psycopg2 from source
+RUN apk update && apk add curl postgresql-dev postgresql-contrib build-base python3-dev musl-dev netcat-openbsd jpeg-dev zlib-dev 
+ENV LIBRARY_PATH=/lib:/usr/lib
 RUN pip install pipenv
 COPY . /engage_backend_service
 WORKDIR /engage_backend_service

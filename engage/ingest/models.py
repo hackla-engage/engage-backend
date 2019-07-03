@@ -50,7 +50,9 @@ class AgendaItem(models.Model):
         max_length=20, null=True
     )  # Agenda Item ID from server
     tags = models.ManyToManyField(Tag)
-
+    
+    class Meta:
+        ordering = ('agenda_item_id', )
 
 class AgendaRecommendation(models.Model):
     agenda_item = models.ForeignKey(

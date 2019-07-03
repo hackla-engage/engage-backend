@@ -38,4 +38,4 @@ services:
     ports:
       - "${DB_PORT:-5432}:5432"
   redis:
-    image: redis:5.0.5-alpine
+    image: redis:5-alpine

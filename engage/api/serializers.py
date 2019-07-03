@@ -19,7 +19,6 @@ class AgendaRecommendationSerializer(serializers.ModelSerializer):
         model = AgendaRecommendation
         fields = '__all__'
 
-
 class AgendaItemSerializer(serializers.ModelSerializer):
     recommendations = AgendaRecommendationSerializer(many=True, read_only=True)
 

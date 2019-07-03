@@ -9,6 +9,7 @@ from .views.Auth import SignupView, login_user, update_profile
 from .views.Message import addMessage
 from .views.Verify import VerifyView
 from .views.MailChimp import mailChimpSub
+from .views.PDF import getPDFLocation
 
 urlpatterns = [
     url(r'^agendas/$', AgendaView.as_view()),
@@ -25,6 +26,7 @@ urlpatterns = [
     url(r'^add/message/$', addMessage),
     url(r'^verify/$', VerifyView.as_view()),
     url(r'^mailchimp/$', mailChimpSub),
+    url(r'^getPDFLocation/(?P<meeting_id>[0-9]+)/$', getPDFLocation),
 
 ]
 
