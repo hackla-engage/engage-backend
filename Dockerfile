@@ -1,12 +1,9 @@
-FROM python:3.6.5
-ENV PYTHONUNBUFFERED 1
+FROM python:3.7-stretch
+# A side effect of using alpine is you must build psycopg2 from source
+RUN apt-get update && apt-get install -y build-essential curl postgresql-contrib netcat
 
-RUN apt-get update && apt-get -y install postgresql
+ENV LIBRARY_PATH=/lib:/usr/lib
 RUN pip install pipenv
-
-# Expose is NOT supported by Heroku
-# EXPOSE 8000
-
-# Run the image as a non-root user
-
-CMD pip --version
+COPY . /engage_backend_service
+WORKDIR /engage_backend_service
+RUN pipenv install --system --deploy

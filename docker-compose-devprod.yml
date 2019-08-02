@@ -4,14 +4,17 @@ services:
   backend:
     env_file:
       - ../engconfig/engconfig.env
+    build: .
     image: hack4laengage/engage_backend_service:latest
+    volumes:
+      - .:/engage_backend_service
     working_dir: /engage_backend_service
-    entrypoint: ./scripts/runprod.sh
+    entrypoint: /engage_backend_service/scripts/rundev.sh
     ports:
       - "8000:8000"
     depends_on:
       - redis
-    links:
+    links: 
       - redis
   redis:
-    image: redis:5.0.5-alpine
+    image: redis:5-alpine

@@ -1,46 +1,23 @@
 version: 2
 jobs:
-  build:
-    working_directory: ~/CouncilTag-Django
-    docker:
-      - image: circleci/python:3.6.4
-        environment:
-          PIPENV_VENV_IN_PROJECT: true
-          DATABASE_URL: postgresql://circleci:something@localhost/counciltagtest?sslmode=true
-          CouncilTag: test
-      - image: nimbustech/postgres-ssl:9.5
-        environment:
-          POSTGRES_DB: counciltagtest
-          POSTGRES_USER: circleci
-          POSTGRES_PASSWORD: something
-    environment:
-        TEST_REPORTS: /tmp/test-reports
-        POSTGRES_DB: counciltagtest
-        POSTGRES_USER: circleci
-        POSTGRES_PASSWORD: something
+  test:
+    working_directory: ~/engage_backend_service
+    machine: 
+      enabled: true
     steps:
       - checkout
-      - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
-      - restore_cache:
-          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
-      - run:
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run: docker-compose build
+      # Not using -d since will exit after completion
+      # Have to figure out how to shut down redis from entrypoint script
+      - run: 
+          name: Check test and upload if succeeded
           command: |
-            sudo pip install pipenv
-            pipenv run "pip install -r requirements.txt"
-            mkdir -p ${TEST_REPORTS}
-      - save_cache:
-          key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
-          paths:
-            - ".venv"
-            - "/usr/local/bin"
-            - "/usr/local/lib/python3.6/site-packages"
-      # Wait for DB
-      - run: pipenv run "python manage.py test -k"
+              scripts/test_and_upload.sh
       - store_test_results:
-          path: /tmp/test-results
+          path: ~/engage_backend_service/tmp/test-results
       - store_artifacts:
-          path: /tmp/test-results
+          path: ~/engage_backend_service/tmp/test-results
           destination: tr1
   deploy:
     machine:
@@ -52,15 +29,15 @@ jobs:
       - run:
             name: Deploy over SSH
             command: |
-                ssh -f $SSH_USER@$SSH_HOST "./deploy.sh"
+                ssh -f $SSH_USER@$SSH_HOST "./deploy-docker.sh"
 workflows:
  version: 2
  build-and-deploy:
    jobs:
-     - build
+     - test
      - deploy:
          requires:
-           - build
+           - test
          filters:
            branches:
              only: master
