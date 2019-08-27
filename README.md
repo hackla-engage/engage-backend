@@ -27,7 +27,7 @@ To setup the development environment:
 `pip install virtualenv`
 
 `virtualenv env -p /path/to/python3.6`
-  * if you don't know your path to python, run which python3 and use the path returned
+  * if you don't know your path to python, run `which python3` and use the path returned
 
 `source env/bin/activate`
 
