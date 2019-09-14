@@ -16,10 +16,10 @@ To setup the development environment:
 
  * Compiling is very slow due to the testing suite.
 
-   * if you use MacOS, use ```brew install redis``` 
-   
+   * if you use MacOS, use ```brew install redis```
+
    * if ubuntu, use guide from [digital ocean](https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-redis-on-ubuntu-16-04)
- 
+
 1. Clone this repo
 
 2. Set up a virtualenv and install all Python packages.
@@ -27,20 +27,21 @@ To setup the development environment:
 `pip install virtualenv`
 
 `virtualenv env -p /path/to/python3.6`
+  * if you don't know your path to python, run `which python3` and use the path returned
 
 `source env/bin/activate`
 
-`pip install -r requirements.txt`
+`pipenv install`
 
 3. Setup Postgres and PgAdmin for your platform if needed. PgAdmin is a useful GUI database manager.
- 
+
  * Make sure you are using postgres from major vrsion 10, not 11
 
 4. Create the `counciltag` database if it does not exist.
 
 5. Create a database user, give the user a password and grant the user permissions for `counciltag`.
 
-6. Add the following environment variables for the project. You'll need database info, django secret key and 'CouncilTag' to run the project in DEBUG mode. 
+6. Add the following environment variables for the project. You'll need database info, django secret key and 'CouncilTag' to run the project in DEBUG mode.
 
  ```
  POSTGRES_DB=counciltag
@@ -72,11 +73,11 @@ POSTGRES_HOSTNAME=localhost
 
 9. If it's your first time setting up the dev environment, run the following commands. In this order, these commands will 1) create the SQL tables needed, 2) load our list of tags, 3) scrape live data from the City of Santa Monica.
 
-`python manage.py migrate` 
+`python manage.py migrate`
 
-`python manage.py populate_tags` 
+`python manage.py populate_tags`
 
-`python manage.py scrape_data` 
+`python manage.py scrape_data`
 
 10. Then edit `CouncilTags/urls.py` to switch to localhost.
 
@@ -97,7 +98,7 @@ url="http://localhost:8000/api",
 
 `python manage.py runserver`
 
-You can go to `http://localhost:8000/swagger/` to look at the docs and interact with the API. 
+You can go to `http://localhost:8000/swagger/` to look at the docs and interact with the API.
 
 14. Alternatively use Docker
 
@@ -119,4 +120,4 @@ We have setup continous integration and deployment on CircleCI.
 When you push to the `master` branch on this repo, this will trigger a build on the server and also run the Django test suite. If the tests fail, the build will not go through.
 
 
-## 
+##
