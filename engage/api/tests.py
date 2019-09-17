@@ -115,7 +115,7 @@ class TestSendMessageEndpoint(TestCase):
     Add SES test
     '''
     def test_mail_util_func(self):
-        if os.environ.get("ENGAGE_BACKEND_NO_MAIL") == 'TRUE':
+        if os.environ.get("ENGAGE_TEST") == 'True':
             # Early Exit for CI runners without valid MAIL API KEY
             return
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))

@@ -11,6 +11,8 @@ services:
       - POSTGRES_PASSWORD=engageuserpassword
       - POSTGRES_DB=counciltag
       - POSTGRES_HOSTNAME=postgres
+      - POSTGRES_PORT=5432
+      - REDIS_PORT=6379
       - REDIS_HOSTNAME=redis
       - AWS_ACCESS_KEY_ID=AKIAJHGBRQ5ZX6IUSX4A
       - AWS_SECRET_ACCESS_KEY=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

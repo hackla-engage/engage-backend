@@ -12,7 +12,6 @@ import uuid
 import urllib
 import bcrypt
 import random
-import boto3
 import logging
 log = logging.Logger(__name__)
 
@@ -113,12 +112,13 @@ def addMessage(request, format=None):
             query_string = 'https://sm.engage.town/#/emailConfirmation?' + query_parameters
             content = '<h3>Thanks for voicing your opinion,</h3> Before we process your comments, please click <a href="' + \
                 query_string + '">here</a> to authenticate.<br/><br/> Thank you for your interest in your local government!<br/><br/> If you are receiving this in error, please email: <a href="mailto:engage@engage.town">engage@engage.town</a>. '
-            response = send_mail(
-                {"user": {"email": email}, "subject": "Verify message regarding agenda item: " + agenda_item.agenda_item_id,
-                 "content": content})
-            if (not response):
-                new_message.delete()
-                return Response(status=500, data={'error': "Something happened sending you your confirmation email, please contact engage@engage.town"})
+            if not settings.TEST:
+                response = send_mail(
+                    {"user": {"email": email}, "subject": "Verify message regarding agenda item: " + agenda_item.agenda_item_id,
+                    "content": content})
+                if (not response):
+                    new_message.delete()
+                    return Response(status=500, data={'error': "Something happened sending you your confirmation email, please contact engage@engage.town"})
     else:
         user = request.user
         profile = EngageUserProfile.objects.get(user_id=request.user.id)
