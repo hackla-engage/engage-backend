@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 pip install -r requirements.txt
 export ENGAGE_DATABASE=True
 python manage.py makemigrations
