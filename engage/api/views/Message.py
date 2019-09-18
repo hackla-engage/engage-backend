@@ -22,7 +22,6 @@ log = logging.Logger(__name__)
 @api_view(["POST"])
 @swagger_auto_schema(request_body=AddMessageSerializer, responses={'404': "Either committee or ", '401': 'Recaptcha v2 was incorrect or', '400': 'Incorrect parameters', '201': 'OK, message added'})
 def addMessage(request, format=None):
-    log.error(request.data)
     session_key = request.session.get('session_key', None)
     if (session_key is None):
         session_key = str(uuid.uuid1())
@@ -79,7 +78,7 @@ def addMessage(request, format=None):
         if not messages:
             verify_token = message_info['token']
             result = verify_recaptcha(verify_token)
-            if not result:
+            if not result and not settings.TEST:
                 return Response(status=401)
             authcode_hashed = bcrypt.hashpw(
                 authcode, bcrypt.gensalt()).decode('utf-8')
