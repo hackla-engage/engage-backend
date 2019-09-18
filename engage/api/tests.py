@@ -23,7 +23,8 @@ class TestAgendasEndpoint(TestCase):
     def test_db(self):
         committee = Committee(name="test")
         committee.save()
-        Agenda(meeting_time=393939393, committee=committee).save()
+        Agenda(meeting_time=393939393, committee=committee, cutoff_time=datetime.now(
+        ).time(), pdf_time=datetime.now().time()).save()
         response = self.client.get("/api/agendas.json")
         self.assertEqual(200, response.status_code)
         result_dict = response.json()
@@ -102,7 +103,8 @@ class TestSendMessageEndpoint(TestCase):
         self.engage_user.save()
         committee = Committee(name="test")
         committee.save()
-        self.agenda = Agenda(meeting_time=393939393, committee=committee)
+        self.agenda = Agenda(meeting_time=393939393, committee=committee,
+                             cutoff_time=datetime.now().time(), pdf_time=datetime.now().time())
         self.agenda.save()
         self.ag_item = AgendaItem(
             title="test", department="test", agenda=self.agenda)
