@@ -112,7 +112,7 @@ class TestSendMessageEndpoint(TestCase):
             "works": False,
             "school": False,
             "child_school": False,
-            "ag_item": self.ag_item.pk}), content_type="application/json")
+            "ag_item": self.ag_item.agenda_item_id}), content_type="application/json")
         log.error(response.json())
         self.assertEqual(201, response.status_code)
         self.assertEqual(1, len(Message.objects.all()))
