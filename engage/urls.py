@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+import os
 import coreapi
 import coreschema
 from django.contrib import admin
@@ -25,7 +26,12 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from engage.ingest.models import Committee, Agenda, AgendaItem
 from datetime import datetime, timedelta
-
+from engage import settings
+if settings.TEST:
+    url = "http://localhost:8000/api"
+else:
+    url="https://backend.engage.town/api"
+    
 schema_view = get_schema_view(
     openapi.Info(
         title="Engage API Documentation",
@@ -35,9 +41,7 @@ schema_view = get_schema_view(
         contact=openapi.Contact(email="engage@engage.town"),
         license=openapi.License(name="Apache License v2.0"),
     ),
-    url="https://backend.engage.town/api",
-    # url="http://localhost:8000/api",
-
+    url=url,
     validators=['flex', 'ssv'],
     public=True,
     permission_classes=(permissions.AllowAny,),
