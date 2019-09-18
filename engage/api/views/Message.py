@@ -23,7 +23,7 @@ log = logging.Logger(__name__)
 @swagger_auto_schema(request_body=AddMessageSerializer, responses={'404': "Either committee or ", '401': 'Recaptcha v2 was incorrect or', '400': 'Incorrect parameters', '201': 'OK, message added'})
 def addMessage(request, format=None):
     session_key = request.session.get('session_key', None)
-    if (session_key is None):
+    if session_key is None:
         session_key = str(uuid.uuid1())
         request.session['session_key'] = session_key
         request.session.modified = True
@@ -36,8 +36,12 @@ def addMessage(request, format=None):
         name__contains=message_info['committee'])
     if committee is None:
         return Response(data={"error": "Could not find committee matching:" + message_info['committee']}, status=404)
-    agenda_item = AgendaItem.objects.get(pk=message_info['ag_item'])
+    if settings.DEBUG:
+        log.error("Agenda item: {}".format(message_info['ag_item']))
+    agenda_item = AgendaItem.objects.get(agenda_item_id=message_info['ag_item'])
     agenda = Agenda.objects.get(pk=agenda_item.agenda_id)
+    if settings.DEBUG:
+        log.error("Agenda item: {}, agenda: {}".format(agenda_item, agenda))
     if agenda_item is None:
         return Response(data={"error": "Could not find agenda item matching:" + message_info['ag_item']}, status=404)
     if not settings.TEST and not isCommentAllowed(agenda.cutoff_time):
@@ -72,14 +76,17 @@ def addMessage(request, format=None):
             'child_school' not in message_info or message_info['child_school'] is None or \
                 'token' not in message_info or message_info['token'] is None:
             return Response(status=400, data={"error": "Missing or incorrect body parameters"})
+        if settings.DEBUG:
+            log.error("Passed tests in addMessage")
         messages = Message.objects.filter(session_key=session_key)
         authcode = str(uuid.uuid1()).replace(
             "-", "")[rand_begin:rand_begin + CODE_LENGTH].encode('utf-8')
         if not messages:
             verify_token = message_info['token']
-            result = verify_recaptcha(verify_token)
-            if not result and not settings.TEST:
-                return Response(status=401)
+            if not settings.TEST:
+                result = verify_recaptcha(verify_token)
+                if not result and not settings.TEST:
+                    return Response(status=401)
             authcode_hashed = bcrypt.hashpw(
                 authcode, bcrypt.gensalt()).decode('utf-8')
         else:
@@ -114,7 +121,7 @@ def addMessage(request, format=None):
             if not settings.TEST:
                 response = send_mail(
                     {"user": {"email": email}, "subject": "Verify message regarding agenda item: " + agenda_item.agenda_item_id,
-                    "content": content})
+                     "content": content})
                 if (not response):
                     new_message.delete()
                     return Response(status=500, data={'error': "Something happened sending you your confirmation email, please contact engage@engage.town"})
