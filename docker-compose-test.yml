@@ -10,6 +10,7 @@ services:
       - POSTGRES_USER=engageuser
       - POSTGRES_PASSWORD=engageuserpassword
       - POSTGRES_DB=counciltag
+      - POSTGRES_PORT=5432
       - POSTGRES_HOSTNAME=postgres
       - REDIS_HOSTNAME=redis
       - REDIS_PORT=6379
@@ -22,7 +23,7 @@ services:
     volumes:
       - .:/engage_backend_service
     working_dir: /engage_backend_service
-    entrypoint: scripts/runtest.sh
+    entrypoint: ["sh", "/engage_backend_service/scripts/runtest.sh"]
     ports:
       - "8000:8000"
     depends_on:
