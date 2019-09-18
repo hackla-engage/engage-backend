@@ -1,3 +1,4 @@
+asn1crypto==0.24.0
 attrs==19.1.0
 autopep8==1.4.3
 bcrypt==3.1.7
@@ -8,6 +9,7 @@ cffi==1.12.3
 chardet==3.0.4
 coreapi==2.3.3
 coreschema==0.0.4
+cryptography==2.7
 Django==2.2.5
 django-cors-headers==3.1.0
 django-timezone-field==3.0
@@ -21,10 +23,13 @@ itypes==1.1.0
 Jinja2==2.10.1
 jmespath==0.9.4
 jsonschema==3.0.2
+jwt==0.6.1
 MarkupSafe==1.1.1
+packaging==19.1
 psycopg2-binary==2.8.3
 pycodestyle==2.5.0
 pycparser==2.19
+pyparsing==2.4.2
 pyrsistent==0.15.4
 python-dateutil==2.8.0
 pytz==2019.2

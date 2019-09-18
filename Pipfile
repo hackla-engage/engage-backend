@@ -15,7 +15,7 @@ cffi = "*"
 django-cors-headers = "*"
 django-timezone-field = "*"
 djangorestframework = "*"
-drf-yasg = "*"
+drf-yasg = {extras = ["validation"],version = "*"}
 gunicorn = ">=19.9.0"
 psycopg2-binary = "*"
 pytz = "*"
@@ -24,6 +24,8 @@ swagger-spec-validator = "*"
 urllib3 = "*"
 whitenoise = ">=4.1.2"
 Django = ">=2.2.4"
+packaging = "*"
+jwt = "*"
 
 [requires]
 python_version = "3.7"

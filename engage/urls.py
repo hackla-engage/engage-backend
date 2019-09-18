@@ -14,14 +14,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 import os
-import coreapi
-import coreschema
 from django.contrib import admin
-from django.conf.urls import url, include
+from django.urls import path, re_path
+from django.conf.urls import include
 from rest_framework.documentation import include_docs_urls
 from rest_framework import permissions
-from openapi_codec import OpenAPICodec
-from html_codec import HTMLCodec
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from engage.ingest.models import Committee, Agenda, AgendaItem
@@ -31,7 +28,7 @@ if settings.TEST:
     url = "http://localhost:8000/api"
 else:
     url="https://backend.engage.town/api"
-    
+
 schema_view = get_schema_view(
     openapi.Info(
         title="Engage API Documentation",
@@ -48,12 +45,11 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^api/', include('engage.api.urls')),
-    url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(
+    re_path(r'api/', include('engage.api.urls')),
+    re_path(r'swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(
         cache_timeout=None), name='schema-json'),
-    url(r'^swagger/$', schema_view.with_ui('swagger',
+    re_path(r'^swagger/$', schema_view.with_ui('swagger',
                                            cache_timeout=None), name='schema-swagger-ui'),
-    url(r'^redoc/$', schema_view.with_ui('redoc',
+    re_path(r'^redoc/$', schema_view.with_ui('redoc',
                                          cache_timeout=None), name='schema-redoc'),
 ]

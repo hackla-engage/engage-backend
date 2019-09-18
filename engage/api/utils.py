@@ -6,7 +6,6 @@ import os
 import bcrypt
 import base64
 import pytz
-import googlemaps
 import boto3
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText

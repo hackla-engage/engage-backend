@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
 from datetime import datetime
+from django.utils import timezone
 
 class Tag(models.Model):
     name = models.CharField(max_length=100)
@@ -34,8 +35,8 @@ class Agenda(models.Model):
     committee = models.ForeignKey(Committee, on_delete='CASCADE')
     meeting_id = models.CharField(max_length=20, null=True)  # Agenda ID
     processed = models.BooleanField(default=False)
-    cutoff_time = models.PositiveIntegerField(default=datetime.now().timestamp())
-    pdf_time = models.PositiveIntegerField(default=datetime.now().timestamp())
+    cutoff_time = models.PositiveIntegerField()
+    pdf_time = models.PositiveIntegerField()
     pdf_location = models.CharField(max_length=255, null=True)
 
 class AgendaItem(models.Model):
