@@ -13,8 +13,11 @@ from email.mime.application import MIMEApplication
 log = logging.Logger(__name__)
 if not settings.TEST:
     ses_client = boto3.client('ses', aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
-                            aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
-                            region_name=os.environ["AWS_REGION"])
+                              aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+                              region_name=os.environ["AWS_REGION"])
+    if settings.DEBUG:
+        log.error("{}\n {}\n  {}".format(os.getenv("AWS_ACCESS_KEY_ID"),
+                                        os.getenv("AWS_SECRET_ACCESS_KEY"), os.getenv("AWS_REGION")))
 
 
 def verify_recaptcha(token):
@@ -89,6 +92,7 @@ def isCommentAllowed(timestamp):
         return False
     return True
 
+
 def send_mail(mail_message):
     if type(mail_message["user"]) is dict:
         to_email = mail_message["user"]["email"]
@@ -108,7 +112,8 @@ def send_mail(mail_message):
                             filename=mail_message['attachment_file_name'])
             msg.attach(part)
     try:
-        log.error(("YYY", msg.as_string()))
+        if settings.DEBUG:
+            log.error(("YYY", msg.as_string()))
         if not settings.TEST:
             response = ses_client.send_raw_email(
                 Source="engage team <do-not-reply@engage.town>",
@@ -118,10 +123,11 @@ def send_mail(mail_message):
                 return True
             else:
                 log.error("Could not send an email from {} to {} about {}".format("do-not-reply@engage.town",
-                                                                                to_email, mail_message['Subject']))
+                                                                                  to_email, mail_message['Subject']))
                 return False
         else:
             return True
-    except:
+    except Exception as exc:
         log.error("Could not send email and threw error")
+        log.error(exc)
         return False
