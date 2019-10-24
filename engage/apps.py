@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 import json
 import logging
-from engage.settings import TEST, DEBUG, r
+from engage import settings
 import pytz
 from datetime import datetime, timedelta
 

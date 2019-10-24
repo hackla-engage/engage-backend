@@ -10,26 +10,25 @@ services:
       - POSTGRES_USER=engageuser
       - POSTGRES_PASSWORD=engageuserpassword
       - POSTGRES_DB=counciltag
+      - POSTGRES_PORT=5432
       - POSTGRES_HOSTNAME=postgres
       - REDIS_HOSTNAME=redis
+      - REDIS_PORT=6379
       - AWS_ACCESS_KEY_ID=AKIAJHGBRQ5ZX6IUSX4A
       - AWS_SECRET_ACCESS_KEY=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
       - AWS_REGION=us-east-1
-      - ENGAGE_BACKEND_NO_MAIL=TRUE
     build: .
     image: hack4laengage/engage_backend_service:latest
     volumes:
       - .:/engage_backend_service
     working_dir: /engage_backend_service
-    entrypoint: scripts/runtest.sh
+    entrypoint: ["sh", "/engage_backend_service/scripts/runtest.sh"]
     ports:
       - "8000:8000"
     depends_on:
       - postgres
-      - redis
     links: 
       - postgres
-      - redis
   postgres:
     image: postgres:11-alpine
     environment:
@@ -38,5 +37,3 @@ services:
       - POSTGRES_DB=counciltag
     ports:
       - "${DB_PORT:-5432}:5432"
-  redis:
-    image: redis:5.0.5-alpine
