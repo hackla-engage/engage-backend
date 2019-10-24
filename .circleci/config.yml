@@ -6,12 +6,8 @@ jobs:
       enabled: true
     steps:
       - checkout
-      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - run: docker-compose build
-      # Not using -d since will exit after completion
-      # Have to figure out how to shut down redis from entrypoint script
       - run:
-          name: Check test and upload if succeeded
+          name: Check test, no uploading
           command: |
             scripts/test.sh
       - store_test_results:
