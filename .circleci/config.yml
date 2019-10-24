@@ -27,7 +27,7 @@ jobs:
       - run:
           name: Check test and upload if succeeded
           command: |
-            scripts/test_and_deploy.sh
+            scripts/test_and_upload.sh
       - store_test_results:
           path: ~/engage_backend_service/tmp/test-results
       - store_artifacts:
