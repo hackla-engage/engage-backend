@@ -128,3 +128,5 @@ staticfiles/
 
 tmp/
 *tmp/
+
+*migrations/0*py
