@@ -1,4 +1,4 @@
-FROM python:3.7-alpine
+FROM python:3.8-alpine
 # A side effect of using alpine is you must build psycopg2 from source
 RUN pip install --upgrade pip
 RUN apk update && apk add alpine-sdk postgresql-dev netcat-openbsd jpeg-dev libffi-dev zlib-dev 
