@@ -24,10 +24,8 @@ from drf_yasg import openapi
 from engage.ingest.models import Committee, Agenda, AgendaItem
 from datetime import datetime, timedelta
 from engage import settings
-if settings.TEST:
-    url = "http://localhost:8000/api"
-else:
-    url="https://backend.engage.town/api"
+
+url = os.getenv('ENGAGE_SWAGGER_URL', "http://localhost:8000/api")
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -49,7 +47,7 @@ urlpatterns = [
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(
         cache_timeout=None), name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger',
-                                           cache_timeout=None), name='schema-swagger-ui'),
+                                               cache_timeout=None), name='schema-swagger-ui'),
     re_path(r'^redoc/$', schema_view.with_ui('redoc',
-                                         cache_timeout=None), name='schema-redoc'),
+                                             cache_timeout=None), name='schema-redoc'),
 ]
