@@ -11,8 +11,6 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
-import dj_database_url
-import redis
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,13 +27,14 @@ DEBUG = os.getenv("ENGAGE_DEBUG", "False") == "True"
 DATABASE_OPERATION = os.getenv("ENGAGE_DATABASE", "False") == "True" 
 TEST = os.getenv("ENGAGE_TEST", "False") == "True"
 
-print(DEBUG)
 ALLOWED_HOSTS = ['localhost', 'engage-santa-monica.herokuapp.com', 'backend.engage.town',
                  'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1', 'sm.engage.town']
+
 APPEND_SLASH = True
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'django.contrib.sites',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -51,14 +50,11 @@ INSTALLED_APPS = [
 
 TIME_ZONE = 'UTC'
 USE_TZ = True
-r = redis.StrictRedis(
-    host="{}".format(os.environ.get('REDIS_HOSTNAME')), port=6379, db=1)
 
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -67,22 +63,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
-    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.SessionAuthentication'],
-}
-SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'name': 'Authentication',
-            'type': 'apiKey',
-            'in': 'header',
-        }
-    },
-    'USE_SESSION_AUTH': True,
-
-}
-SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 ROOT_URLCONF = 'engage.urls'
 
 TEMPLATES = [
@@ -100,23 +80,42 @@ TEMPLATES = [
         },
     },
 ]
-
 WSGI_APPLICATION = 'engage.wsgi.application'
+
+REST_FRAMEWORK = {
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
+    'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.SessionAuthentication'],
+}
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'name': 'Authentication',
+            'type': 'apiKey',
+            'in': 'header',
+        }
+    },
+    'USE_SESSION_AUTH': True,
+
+}
+
+
 
 # Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
+        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': os.environ.get("POSTGRES_DB"),
         'USER': os.environ.get("POSTGRES_USER"),
         'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
-        'HOST': os.environ.get("POSTGRES_HOSTNAME"),
+        'HOST': os.environ.get("POSTGRES_HOST"),
         'TEST': {
             'ENGINE': 'django.db.backends.postgresql',
+            # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME': os.environ.get("POSTGRES_DB"),
             'USER': os.environ.get("POSTGRES_USER"),
             'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
-            'HOST': os.environ.get("POSTGRES_HOSTNAME"),
+            'HOST': os.environ.get("POSTGRES_HOST"),
         },
     },
 }
@@ -145,16 +144,12 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = False
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
-STATIC_URL = '/static/'
-# Extra places for collectstatic to find static files.
-STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, 'static'),
-)
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_URL = '/staticfiles/'
+STATIC_ROOT = os.path.join(PROJECT_ROOT, "/staticfiles")
 
 # CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_ALLOW_ALL = False

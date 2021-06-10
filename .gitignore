@@ -121,3 +121,11 @@ node_modules/
 # migrations?
 migrations/0*.py
 nohup.*
+
+staticfiles/
+*staticfiles/*
+
+tmp/
+*tmp/
+
+*migrations/0*py

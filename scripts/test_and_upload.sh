@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 docker-compose -f docker-compose-test.yml up --abort-on-container-exit --exit-code-from backend
 if [ $? -eq 0 ]; then
     echo Succeeded building and testing

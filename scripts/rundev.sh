@@ -1,5 +1,4 @@
-#!/bin/bash
-pipenv install --system --deploy
+#!/bin/sh
 export ENGAGE_DATABASE=True
 python manage.py makemigrations
 python manage.py migrate
