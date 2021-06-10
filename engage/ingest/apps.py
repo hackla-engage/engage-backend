@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
-class InjestConfig(AppConfig):
-    name = 'injest'
+class IngestConfig(AppConfig):
+    name = 'engage.ingest'
     def ready(self):
         print("HELLO")

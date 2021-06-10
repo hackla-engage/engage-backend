@@ -32,7 +32,7 @@ class Committee(models.Model):
 
 class Agenda(models.Model):
     meeting_time = models.PositiveIntegerField()  # Unix timestamp
-    committee = models.ForeignKey(Committee, on_delete='CASCADE')
+    committee = models.ForeignKey(Committee, on_delete=models.CASCADE)
     meeting_id = models.CharField(max_length=20, null=True)  # Agenda ID
     processed = models.BooleanField(default=False)
     cutoff_time = models.PositiveIntegerField()
@@ -45,7 +45,7 @@ class AgendaItem(models.Model):
     body = ArrayField(models.TextField(blank=True), default=list)
     sponsors = models.CharField(max_length=250, null=True)
     agenda = models.ForeignKey(
-        Agenda, related_name="items", on_delete='CASCADE')
+        Agenda, related_name="items", on_delete=models.CASCADE)
     meeting_time = models.PositiveIntegerField(default=0)  # Unix timestamp
     agenda_item_id = models.CharField(
         max_length=20, null=True
@@ -57,7 +57,7 @@ class AgendaItem(models.Model):
 
 class AgendaRecommendation(models.Model):
     agenda_item = models.ForeignKey(
-        AgendaItem, related_name="recommendations", on_delete='CASCADE')
+        AgendaItem, related_name="recommendations", on_delete=models.CASCADE)
     recommendation = ArrayField(models.TextField(), default=list)
 
 
@@ -66,7 +66,7 @@ class CommitteeMember(models.Model):
     lastname = models.CharField(max_length=250)
     email = models.EmailField()
     committee = models.ForeignKey(
-        Committee, related_name="members", on_delete='CASCADE')
+        Committee, related_name="members", on_delete=models.CASCADE)
 
 
 class EngageUserProfile(models.Model):
@@ -89,10 +89,12 @@ class Message(models.Model):
     messges. Messages will then be grouped by item and separated by pro and con and
     have summaries produced which gauge their sentiment
     """
-    user = models.ForeignKey(EngageUser, null=True, on_delete='CASCADE')
-    agenda_item = models.ForeignKey(AgendaItem, null=True, on_delete='CASCADE')
+    user = models.ForeignKey(EngageUser, null=True, on_delete=models.CASCADE)
+    agenda_item = models.ForeignKey(
+        AgendaItem, null=True, on_delete=models.CASCADE)
     content = models.TextField(blank=True, null=True)
-    committee = models.ForeignKey(Committee, null=True, on_delete='CASCADE')
+    committee = models.ForeignKey(
+        Committee, null=True, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=250, blank=True, null=True)
     last_name = models.CharField(max_length=250, blank=True, null=True)
     zipcode = models.PositiveIntegerField(default=90401)

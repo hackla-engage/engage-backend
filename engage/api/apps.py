@@ -8,6 +8,6 @@ def activate_foreign_keys(sender, connection, **kwargs):
         cursor.execute('PRAGMA foreign_keys = ON;')
 
 class ApiConfig(AppConfig):
-    name = 'api'
+    name = 'engage.api'
     def ready(self):
         connection_created(activate_foreign_keys)
