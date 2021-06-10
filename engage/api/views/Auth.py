@@ -83,7 +83,7 @@ class SignupView(APIView):
             query_string = 'https://engage-santa-monica.herokuapp.com/#/emailConfirmation?' + query_parameters
             content = '<html><body><h3>Welcome to the Engage platform for Santa Monica,</h3> Please click <a href="' + \
                 query_string + '">here</a> to authenticate.<br/><br/>Thank you for your interest in your local government!<br/><br/> If you are receiving this in error, please email: <a href="mailto:engage@engage.town">engage@engage.town</a>.</body></html>'
-            print(content)
+
             if not settings.TEST:
                 sent_mail = send_mail(
                     {"user": user, "subject": "Please authenticate your email for the Engage platform",

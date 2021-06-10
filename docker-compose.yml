@@ -2,21 +2,7 @@ version: "3"
 
 services:
   backend:
-    environment:
-      - ENGAGE_TEST=False
-      - ENGAGE_DEBUG=True
-      - DJANGO_SECRET_KEY=examplesecretkeydonotuseinprod
-      - RECAPTCHAKEY=some_string
-      - POSTGRES_USER=engageuser
-      - POSTGRES_PASSWORD=engageuserpassword
-      - POSTGRES_DB=counciltag
-      - POSTGRES_HOSTNAME=postgres
-      - POSTGRES_PORT=5432
-      - REDIS_PORT=6379
-      - REDIS_HOSTNAME=redis
-      - AWS_ACCESS_KEY_ID=AKIAJHGBRQ5ZX6IUSX4A
-      - AWS_SECRET_ACCESS_KEY=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
-      - AWS_REGION=us-east-1
+    env_file: ./.env
     build: .
     image: hack4laengage/engage_backend_service:latest
     volumes:
@@ -25,19 +11,3 @@ services:
     entrypoint: /engage_backend_service/scripts/rundev.sh
     ports:
       - "8000:8000"
-    depends_on:
-      - postgres
-      - redis
-    links: 
-      - postgres
-      - redis
-  postgres:
-    image: postgres:11-alpine
-    environment:
-      - POSTGRES_USER=engageuser
-      - POSTGRES_PASSWORD=engageuserpassword
-      - POSTGRES_DB=counciltag
-    ports:
-      - "${DB_PORT:-5432}:5432"
-  redis:
-    image: redis:5-alpine

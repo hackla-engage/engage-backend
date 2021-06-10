@@ -6,7 +6,7 @@ import logging
 log = logging.Logger(__name__)
 
 @api_view(["GET"])
-def getPDFLocation(request, meeting_id):
+def getPDFLocation(request, meeting_id, format=None):
     try:
         agenda = Agenda.objects.get(meeting_id=meeting_id)
         if agenda is not None and agenda.processed and agenda.pdf_location:

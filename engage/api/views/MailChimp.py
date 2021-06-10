@@ -51,7 +51,7 @@ def mailchimpSubRequest(payload=None, user=None, key=None):
 
 
 @api_view(['POST'])
-def mailChimpSub(request):
+def mailChimpSub(request, format=None):
     user = USER
     key = KEY
 

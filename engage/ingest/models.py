@@ -5,19 +5,19 @@ from datetime import datetime
 from django.utils import timezone
 
 class Tag(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, primary_key=True)
     description = models.TextField(null=True)
     icon = models.CharField(max_length=100, null=True)
 
 
 class EngageUser(AbstractUser):
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, primary_key=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
 
 class Committee(models.Model):
-    name = models.CharField(max_length=250)
+    name = models.CharField(max_length=250, primary_key=True)
     email = models.CharField(max_length=250)
     cutoff_offset_days = models.IntegerField(default=0)
     cutoff_hour = models.PositiveIntegerField(default=11)
@@ -31,6 +31,7 @@ class Committee(models.Model):
 
 
 class Agenda(models.Model):
+    id = models.AutoField(primary_key=True)
     meeting_time = models.PositiveIntegerField()  # Unix timestamp
     committee = models.ForeignKey(Committee, on_delete=models.CASCADE)
     meeting_id = models.CharField(max_length=20, null=True)  # Agenda ID
@@ -40,6 +41,7 @@ class Agenda(models.Model):
     pdf_location = models.CharField(max_length=255, null=True)
 
 class AgendaItem(models.Model):
+    id = models.AutoField(primary_key=True)
     title = models.TextField()
     department = models.CharField(max_length=250)
     body = ArrayField(models.TextField(blank=True), default=list)
@@ -56,6 +58,7 @@ class AgendaItem(models.Model):
         ordering = ('agenda_item_id', )
 
 class AgendaRecommendation(models.Model):
+    id = models.AutoField(primary_key=True)
     agenda_item = models.ForeignKey(
         AgendaItem, related_name="recommendations", on_delete=models.CASCADE)
     recommendation = ArrayField(models.TextField(), default=list)
@@ -64,7 +67,7 @@ class AgendaRecommendation(models.Model):
 class CommitteeMember(models.Model):
     firstname = models.CharField(max_length=250)
     lastname = models.CharField(max_length=250)
-    email = models.EmailField()
+    email = models.EmailField(primary_key=True)
     committee = models.ForeignKey(
         Committee, related_name="members", on_delete=models.CASCADE)
 
@@ -89,6 +92,7 @@ class Message(models.Model):
     messges. Messages will then be grouped by item and separated by pro and con and
     have summaries produced which gauge their sentiment
     """
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(EngageUser, null=True, on_delete=models.CASCADE)
     agenda_item = models.ForeignKey(
         AgendaItem, null=True, on_delete=models.CASCADE)

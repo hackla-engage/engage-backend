@@ -19,7 +19,7 @@ class AgendaView(generics.ListAPIView):
 
 
 @api_view(['GET'])
-def get_agenda(request, meeting_id):
+def get_agenda(request, meeting_id, format=None):
     '''
     Returns specified JSON serialized agenda if it exists
     '''
