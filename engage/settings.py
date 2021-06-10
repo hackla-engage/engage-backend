@@ -28,7 +28,7 @@ DATABASE_OPERATION = os.getenv("ENGAGE_DATABASE", "False") == "True"
 TEST = os.getenv("ENGAGE_TEST", "False") == "True"
 
 ALLOWED_HOSTS = ['localhost', 'engage-santa-monica.herokuapp.com', 'backend.engage.town',
-                 'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1', 'sm.engage.town']
+                 'engage.town', 'engage-backend.herokuapp.com', '127.0.0.1', 'sm.engage.town', 'engage-backend-xso7x3quda-uc.a.run.app']
 
 APPEND_SLASH = True
 # Application definition
