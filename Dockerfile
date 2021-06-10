@@ -5,4 +5,5 @@ COPY requirements.txt /engage_backend_service/requirements.txt
 WORKDIR /engage_backend_service
 RUN pip install -r requirements.txt
 COPY . /engage_backend_service
+RUN ["python", "manage.py", "collectstatic", "--no-input"]
 CMD ["scripts/rundev.sh"]
