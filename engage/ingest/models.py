@@ -17,7 +17,8 @@ class EngageUser(AbstractUser):
 
 
 class Committee(models.Model):
-    name = models.CharField(max_length=250, primary_key=True)
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=250)
     email = models.CharField(max_length=250)
     cutoff_offset_days = models.IntegerField(default=0)
     cutoff_hour = models.PositiveIntegerField(default=11)
@@ -28,7 +29,6 @@ class Committee(models.Model):
         null=False, default="http://santamonicacityca.iqm2.com/Citizens/Detail_Meeting.aspx?ID=")
     agendas_table_location = models.CharField(max_length=255,
         null=False, default="https://www.smgov.net/departments/clerk/agendas.aspx")
-
 
 class Agenda(models.Model):
     id = models.AutoField(primary_key=True)
@@ -73,7 +73,8 @@ class CommitteeMember(models.Model):
 
 
 class EngageUserProfile(models.Model):
-    user = models.OneToOneField(EngageUser, on_delete=models.CASCADE)
+    id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(EngageUser, on_delete=models.CASCADE)
     zipcode = models.PositiveIntegerField(default=90401)
     verified = models.BooleanField(default=False)
     home_owner = models.BooleanField(default=False)

@@ -8,6 +8,6 @@ services:
     volumes:
       - .:/engage_backend_service
     working_dir: /engage_backend_service
-    entrypoint: /engage_backend_service/scripts/rundev.sh
+    entrypoint: /engage_backend_service/scripts/runlocal.sh
     ports:
       - "8000:8000"

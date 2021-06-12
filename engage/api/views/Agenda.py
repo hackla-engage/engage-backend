@@ -27,4 +27,5 @@ def get_agenda(request, meeting_id, format=None):
     if agenda is None:
         return Response(data={"error": "No agenda item with id:" + str(meeting_id)}, status=404)
     data = AgendaSerializer(agenda, many=False).data
+    print(data)
     return Response(data=data, status=200)
