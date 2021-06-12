@@ -24,7 +24,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dsfhsdfgsghd43987s#$dfssdg@#$")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("ENGAGE_DEBUG", "False") == "True"
-DATABASE_OPERATION = os.getenv("ENGAGE_DATABASE", "False") == "True" 
+DATABASE_OPERATION = os.getenv("ENGAGE_DATABASE", "False") == "True"
 TEST = os.getenv("ENGAGE_TEST", "False") == "True"
 
 ALLOWED_HOSTS = ['localhost', 'engage-santa-monica.herokuapp.com', 'backend.engage.town',
@@ -99,7 +99,6 @@ SWAGGER_SETTINGS = {
 }
 
 
-
 # Database
 DATABASES = {
     'default': {
@@ -155,13 +154,10 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, "/staticfiles")
 # CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_REGEX_WHITELIST = (
+CORS_ALLOWED_ORIGIN_REGEXES = [
     r'^(https?://)?(.{2,})?engage\.town$',
-    r'^(https?://)?(34.219.49.254)(:443)?$',
     r'^(http://)?(localhost):?(3000)?$',
-    r'^(http://)?(127.0.0.1):?(3000)?$',
-    r'^(https?://)?engage-santa-monica.herokuapp.com$'
-)
+]
 AUTHENTICATION_BACKENDS = ['engage.api.backends.EmailPasswordBackend']
 AUTH_USER_MODEL = 'ingest.EngageUser'
 
