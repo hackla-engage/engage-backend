@@ -158,8 +158,8 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_REGEX_WHITELIST = (
     r'^(https?://)?(.{2,})?engage\.town$',
     r'^(https?://)?(34.219.49.254)(:443)?$',
-    r'^(http://)?(localhost):?(8080)?$',
-    r'^(http://)?(127.0.0.1):?(8080)?$',
+    r'^(http://)?(localhost):?(3000)?$',
+    r'^(http://)?(127.0.0.1):?(3000)?$',
     r'^(https?://)?engage-santa-monica.herokuapp.com$'
 )
 AUTHENTICATION_BACKENDS = ['engage.api.backends.EmailPasswordBackend']
