@@ -119,7 +119,8 @@ node_modules/
 .DS_Store
 
 # migrations?
-migrations/0*.py
+engage/ingest/migrations/0*.py
+
 nohup.*
 
 staticfiles/
