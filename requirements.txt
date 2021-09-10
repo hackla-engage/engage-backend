@@ -36,7 +36,7 @@ ruamel.yaml==0.17.9
 ruamel.yaml.clib==0.2.2
 s3transfer==0.4.2
 six==1.16.0
-sqlparse==0.4.1
+sqlparse==0.4.2
 swagger-spec-validator==2.7.3
 uritemplate==3.0.1
 urllib3==1.26.5
